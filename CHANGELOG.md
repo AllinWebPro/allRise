@@ -1,0 +1,982 @@
+<h1>Changelog</h1>
+
+<h2>Version 0.7.2.0</h2>
+
+<h3>Fixes:</h3>
+* Send broken pages to 404
+
+<h3>Updates:</h3>
+* Convert modals to pages:
+** F.A.Q.
+** Report a Bug
+** Contact Us
+** Terms of Use
+** Privacy Policy
+* Changes to sitemap
+
+<h3>Notes:</h3>
+* Branches house keeping
+* readme.textile format/data changes
+
+<h2>Version 0.7.1.1</h2>
+
+<h3>Notes:</h3>
+* Renamed branch "beta_current" to "beta"
+* Update branch "beta" (uploaded wrong files)
+* Adding branch "staging"
+
+<h2>Version 0.7.1.0</h2>
+
+<h3>Added:</h3>
+* Search "Subscription" tab
+
+<h3>Updates:</h3>
+* Change notification formating.
+
+<h3>Fixes:</h3>
+* Change history now in chronological order.
+* Large search no longer causes system to timeout. (limit to search terms)
+
+<h2>Version 0.7.0.0</h2>
+
+<h3>Notes:</h3>
+* Updating of SVN to current system / database.
+* Adding branch "beta_current"
+
+<h2>Version 0.6.2.0</h2>
+
+<h3>Added:</h3>
+* Images
+* Email Notifications
+
+<h3>Fixes:</h3>
+* Comments issue
+* URL Redirect issue
+
+<h3>Updates:</h3>
+* User Page Layout
+* Search Query
+
+<h2>Version 0.6.1.0</h2>
+
+<h3>Added:</h3>
+* Admin Panel
+
+<h3>Fixes:</h3>
+* Create Article issue
+* Vote issue
+* Notifications Count issue
+* Resource issue
+* CKEditor issue
+
+<h2>Version 0.6.0.10</h2>
+
+<h3>Updates:</h3>
+* CodeIgniter Security updates
+* Remove Categories
+* Remove Places
+
+<h2>Version 0.6.0.9</h2>
+
+<h3>Added:</h3>
+* Subscriptions
+
+<h3>Fixes:</h3>
+* Vote issue
+* AJAX issues
+
+<h3>Updates:</h3>
+* Notifications now work on Subscriptions
+* SQL Changes
+
+<h2>Version 0.6.0.8</h2>
+
+<h3>Added:</h3>
+* Notifications
+* Components now showing metadata
+* Google Analytics
+
+<h3>Fixes:</h3>
+* Back Button issue
+* AJAX History issue
+* Unlink not Showing on Clusters issue
+* User "Score" issue
+
+<h3>Updates:</h3>
+* Contributors List no longer pulls from children
+* Now Sending Site Emails to all Admin's
+* Additional Notices field
+* Parents now get child resources
+* SEO Changes
+
+<h2>Version 0.6.0.7</h2>
+
+<h3>Added:</h3>
+* Login Redirect
+
+<h3>Fixes:</h3>
+* Errors on Destroy/Unlink issue
+* Manual Cluster issue
+* Submit Comment issue
+* User "See More" issue
+* Modify Item issue
+* Double Submit issue
+
+<h3>Updates:</h3>
+* Tutorial Changes
+* Layout Changes
+* Style Changes
+* SQL Changes
+* Search Update
+
+<h2>Version 0.6.0.6</h2>
+
+<h3>Fixes:</h3>
+* Missing "Pretty" URLs issues
+
+<h3>Updates:</h3>
+* Pages are not public
+* Get Links from Children in Parents
+* Responsive Tutorial Page
+* Force Tutorial on First Login
+
+<h2>Version 0.6.0.5</h2>
+
+<h3>Added:</h3>
+* Temp Tutorial
+
+<h3>Fixes:</h3>
+* User Profile issue
+* Preferences Link issue
+* Advanced Search issue
+* Article Line Break issue
+* User Profile "See More" issue
+* Vote Link AJAX History issue
+* Modal Title issue
+* Sort Nav Text issue
+
+<h3>Updates:</h3>
+* FAQ Text changes
+* User Profile "See More" Sends to User List
+* Reload on Combine Items
+* Layout Changes
+
+<h2>Version 0.6.0.4</h2>
+
+<h3>Fixes:</h3>
+* Item Parent Link issue
+* AJAX Stream issue
+
+<h3>Updates:</h3>
+* Link CSS
+* Removed Stream Bold
+* Finalize "Pretty" URLs
+* Create Article from Cluster
+* Article Creation
+
+<h2>Version 0.6.0.3</h2>
+
+<h3>Fixes:</h3>
+* Broken Links in Comments
+* Verbage Update issue
+* CSS issues
+* Resource Link issue
+* Profile Photo Update issue
+* Advanced Search issue
+* "preferences" Spelling issue
+
+<h3>Updates:</h3>
+* New Font
+* Link to Comments from Search
+* Date Format Changes
+* Added Keywords to Advanced Search
+* Force Close/Refresh on Item Modify
+* Make URLs Links in comments
+* Add "Pretty" URLs
+
+<h2>Version 0.6.0.2</h2>
+
+<h3>Fixes:</h3>
+* Password Update issue
+* Auto-Cluster "Contributors" issue
+* Search Input issue
+* Item Edit issue
+* Item "Slash" issue
+* Comment Edit issue
+* Search Links in Item issue
+
+<h3>Updates:</h3>
+* Link Hover Color Change
+* Move Location Field on Search
+* Search Date/Location format change
+* Additional "See More" links
+* Bold Search Headlines
+* Move Resources below Title
+* Verbiage Update
+* Display Score in Search
+* Removed Tool Tips
+
+<h2>Version 0.6.0.1</h2>
+
+<h3>Fixes:</h3>
+* Slashes Fix
+* Cluster/Search Issue Fix
+
+<h3>Updates:</h3>
+* MySQL Update
+
+<h2>Version 0.6.0.0</h2>
+
+<h3>Notes:</h3>
+Updating of SVN to current system.
+
+<h2>Version 0.5.10.0</h2>
+
+<h3>Updates:</h3>
+* Time Decay Added to Search
+
+<h2>Version 0.5.9.6</h2>
+
+<h3>Fixes:</h3>
+* Metadata Update issue
+* Comment issue
+* Resource Edit issue
+
+<h2>Version 0.5.9.5</h2>
+
+<h3>Fixes:</h3>
+* Manual Join "Clusters" issue
+* Keywords not being created on Joins
+* Ranking Save issue
+
+<h2>Version 0.5.9.4</h2>
+
+<h3>Fixes:</h3>
+* SQL upload
+* Contributors List issue
+* SQL Error on Edit
+* Metadata not being created on Joins
+* Favorite Remove issue
+* Metadata Update issue
+
+<h2>Version 0.5.9.3</h2>
+
+<h3>Fixes:</h3>
+* Page Headline Title issue
+* SQL error
+* Routes issue
+* "Remove" issue
+* Compare Score issue
+
+<h2>Version 0.5.9.2</h2>
+
+<h3>Fixes:</h3>
+* Stream Keyword Search issue
+* Manual Join issue
+* Headline URL issue
+* Preferences Update issue
+
+<h2>Version 0.5.9.1</h2>
+
+<h3>Fixes:</h3>
+* Category Search Score
+
+<h2>Version 0.5.9.0</h2>
+
+<h3>Added:</h3>
+* Favorite ACH Management
+
+<h3>Fixes:</h3>
+* Search GET URLs issue
+* Forgot Password email issue
+
+<h3>Updates:</h3>
+* Comments Moved to GET
+* Added createdBy back to Certain Items
+
+<h2>Version 0.5.8.0</h2>
+
+<h3>Fixes:</h3>
+* QI insert issue
+* Search URI issue
+* Words Search issue
+* Admin URI issues
+* Admin Assets issue
+
+<h3>Updates:</h3>
+* SQL Update
+* Keyword Search Update
+* Handle Merge from "Stable" Database
+
+<h2>Version 0.5.7.0</h2>
+
+<h3>Fixes:</h3>
+* Auto-compare errors
+* Auto-complete Locations error
+* Sidebar error
+
+<h3>Updates:</h3>
+* Vote Moved to GET
+
+<h2>Version 0.5.6.1.0</h2>
+
+<h3>Fixes:</h3>
+* String Escape in Config
+
+<h2>Version 0.5.6.0.0</h2>
+
+<h3>Fixes:</h3>
+* General Errors
+
+<h3>Updates:</h3>
+* Moved RegEx to Global Config (and fixed)
+* Search Queries
+
+<h2>Version 0.5.6.0.0</h2>
+
+<h3>Fixes:</h3>
+* General errors
+
+<h3>Updates:</h3>
+* Search Queries
+
+<h2>Version 0.5.5.0.0</h2>
+
+<h3>Fixes:</h3>
+* General errors
+* Database errors
+
+<h3>Updates:</h3>
+* Password Encryption Enhanced
+
+<h2>Version 0.5.4.0.0</h2>
+
+<h3>Fixes:</h3>
+* New variable names in Views
+* Admin moved to new models
+* More code clean up
+
+<h3>Updates:</h3>
+* Condense Admin Panel Code
+
+<h2>Version 0.5.3.0.0</h2>
+
+<h3>Added:</h3>
+* User Score Updated on Item Vote
+
+<h3>Fixes:</h3>
+* Sub-Data now pulling from Sub-Headlines
+* Compare/Search SQL
+* User Password Hashing
+
+<h3>SQL Changes:</h3>:
+* Created stored data table
+
+<h3>Updates:</h3>
+* Remove UserId from Update unless passed for ach add/edit
+* Change Password Hash
+* Major code cleanup
+
+<h2>Version 0.5.2.0.0</h2>
+
+<h3>Added:</h3>
+* App Version Added to index.php
+* Versions moved to folder
+
+<h3>Updates:</h3>
+* Improved Modularization in Controllers
+* Code Clean Up in Controllers
+* readme.textile Cleaned Up
+
+<h2>Version 0.5.1.0.0</h2>
+
+<h3>Added:</h3>
+* User Score Generator
+* CKEditor for Articles
+
+<h3>SQL Changes:</h3>:
+* Score Turned to Float
+
+<h3>Updates:</h3>
+* Improved Modularization of SQL Statements
+
+<h2>Version 0.5.0.0.0</h2>
+
+<h3>Set Goal:</h3>
+* Flags
+** Add/Remove
+* User Score System
+
+<h2>Version 0.4.15.0.0</h2>
+
+<h3>Added:</h3>
+* User Stream
+
+<h3>Fixes:</h3>
+* Tag Search in Sidebar of Stream Item
+
+<h3>SQL Changes:</h3>:
+* Update to ID's
+
+<h2>Version 0.4.14.0.0</h2>
+
+<h3>SQL Changes:</h3>:
+* Updated SQL Files
+
+<h2>Version 0.4.13.1.0</h2>
+
+<h3>Merges:</h3>
+* Compared and Merged Ange Changes
+
+<h2>Version 0.4.13.0.0</h2>
+
+<h3>Added:</h3>
+* Delete Feature
+
+<h3>Fixes:</h3>
+* Password issue
+* Forgot Password issue
+* Error in Compare sql
+* Edit Location issues
+* Edit Categories issues
+* Edit Resources issues
+
+<h2>Version 0.4.12.0.0</h2>
+
+<h3>Added:</h3>
+* Voting
+
+<h3>Fixes:</h3>
+* Search Ranking
+
+<h3>Updates:</h3>
+* Compare sql
+* Search sql wild-card added
+* Stream scores for testing trimmed down
+
+<h2>Version 0.4.11.0.0</h2>
+
+<h3>Added:</h3>
+* Contributors lists
+
+<h3>Fixes:</h3>
+* Resource error on ach edit
+
+<h3>Updates:</h3>
+* Minor usability issues
+
+<h2>Version 0.4.10.0.0</h2>
+
+<h3>Added:</h3>
+* Stream scores for testing
+
+<h3>Fixes:</h3>
+* Errors on Comments and Sidebar
+* Error in stream compare sql
+* Include results based on children in search sql
+
+<h3>Updates:</h3>
+* Auto compare keyword match requirement raised
+
+<h2>Version 0.4.9.0.0</h2>
+
+<h3>Updates:</h3>
+* Removal of Created for all database items
+
+<h3>Notes:</h3>
+* Need to make changes to edit permissions for the following:
+** comments
+** notes
+** headlines
+
+<h2>Version 0.4.8.0.0</h2>
+
+<h3>Added:</h3>
+* Favicons
+
+<h3>Fixes:</h3>
+* Search Issues
+* Major SQL Issues
+* Auto & Manual Join
+
+<h3>Suggested Changes:</h3>
+* Undo - Remove "H" from headline stream, and move "A" & "C" just after the headline title.
+* Add Created Date to View Meta
+* Added ACH Count to Stream page
+* When writing an article be able to view individual headlines from the cluster
+
+<h2>Version 0.4.7.0.0</h2>
+
+<h3>Fixes:</h3>
+* Stream Search SQL Fix
+
+<h3>Suggested Changes:</h3>
+* Remove "H" from headline stream, and move "A" & "C" just after the headline title.
+* Add a number next to each cluster in the headline stream, with the number equaling the total number of headlines it's absorbed
+
+<h2>Version 0.4.6.0.0</h2>
+
+<h3>Suggested Changes:</h3>
+* Add some kind of marker that shows which headlines are Clusters and which are Cluster-Articles
+* Move “Group Item” check-box to same line as date | location
+* Remove “Read More” link from stream under each headline
+
+<h2>Version 0.4.5.0.0</h2>
+
+<h3>Suggested Changes:</h3>
+* Add "Create Headline" in right sidebar
+* Headlines should link to the Headline’s page just like the “Read More” link.
+
+<h3>Fixes:</h3>
+* Errors Found
+** stream.php
+** streams_model.php
+
+<h2>Version 0.4.4.1.0</h2>
+
+<h3>Fixes:</h3>
+* Removed auto check-marks on stream
+
+<h2>Version 0.4.4.0.0</h2>
+
+<h3>Fixes:</h3>
+* Moderators
+** Un-attach Children
+
+<h2>Version 0.4.3.0.0</h2>
+
+<h3>Added:</h3>
+* Moderators
+** Un-attach Children
+
+<h2>Version 0.4.2.1.0</h2>
+
+<h3>Added:</h3>
+* Moderators
+** Attach Children (needs much testing)
+
+<h3>Updates:</h3>
+* Moderators
+** Find Possible Sub Children
+
+<h2>Version 0.4.2.0.0</h2>
+
+<h3>Added:</h3>
+* Moderators
+** Find Possible Sub Children
+
+<h3>Fixes:</h3>
+* Compare Process issue
+* Category Search issue
+* Admin Pagination issue
+
+<h2>Version 0.4.1.2.0</h2>
+
+<h3>Fixes:</h3>
+* SQL Issue
+
+<h2>Version 0.4.1.1.0</h2>
+
+<h3>Fixes:</h3>
+* Edit Stream
+
+<h2>Version 0.4.1.0.0</h2>
+
+<h3>To Make:</h3>
+* Clusters
+** Make Article
+
+<h3>Fixes:</h3>
+* Syntax Error on Stream Edit
+
+<h3>Updates:</h3>
+* Clusters/Articles Details
+** Output Changes
+
+<h2>Version 0.4.0.1.0</h2>
+
+<h3>Fixes:</h3>
+* Removed die() from stream_model
+* Compare Match Percentages
+* Pagination Hook Variable issue
+
+<h2>Version 0.4.0.0.0</h2>
+
+<h3>Set Goal:</h3>
+* Moderators
+** Find Possible Sub Children
+** Attach Children
+** Un-attach Children
+** Delete Items
+* Clusters
+** Make Article
+
+<h2>Version 0.3.6.0.0</h2>
+
+<h3>Updates:</h3>
+* Query Updates
+** Stream Search
+** Stream Compare
+* Compare Functions
+
+<h2>Version 0.3.5.0.0</h2>
+
+<h3>Added:</h3>
+* Pagination
+* Admin
+** Blwords
+*** Add/Edit/Delete
+
+<h3>Notes:</h3>
+* Pagination for stream will be added after query update
+
+<h3>Fixes:</h3>
+* Admin Forms issue
+* Slugs in Query String
+
+<h2>Version 0.3.4.0.0</h2>
+
+<h3>Added:</h3>
+* Admin
+** Categories/Flags
+*** Add/Edit/Delete
+** Users
+*** Edit/Delete
+
+<h3>Fixes:</h3>
+* set_value default on edit
+* My Account error
+
+<h3>Notes:</h3>
+* Make so category slugs are used and not ID
+
+<h2>Version 0.3.3.0.0</h2>
+
+<h3>Added:</h3>
+* Admin
+** View files
+** Controller functions
+** Template Creation
+** List Views
+
+<h3>Notes:</h3>
+* Need to add pagination to pages
+
+<h2>Version 0.3.2.0.0</h2>
+
+<h3>Added:</h3>
+* Users
+** My Account
+** Forgot Password
+* Admin
+** Routes/Hooks
+
+<h3>Fixes:</h3>
+* Error Var issue
+
+<h2>Version 0.3.1.0.0</h2>
+
+<h3>Added:</h3>
+* Users
+** Sign Up Email (needs text for email)
+** Email Confirmation (needs text for layouts)
+
+<h2>Version 0.3.0.0.0</h2>
+
+<h3>Set Goal:</h3>
+* Users
+** My Account
+** Forgot Password
+** Sign Up Email
+*** Email Confirmation
+* Admin
+** Categories/Flags
+*** Add/Edit/Delete
+** Users
+*** Edit/Delete
+
+<h2>Version 0.2.5.3.1</h2>
+
+<h3>Notes:</h3>
+* Forgot to remove die statement
+
+<h2>Version 0.2.5.3.0</h2>
+
+<h3>Fixes:</h3>
+* Stream Compare
+** Undid change from "Version 0.2.4.2.0"
+
+<h2>Version 0.2.5.2.1</h2>
+
+<h3>Notes:</h3>
+* Set Default Time Zone
+
+<h2>Version 0.2.5.2.0</h2>
+
+<h3>Fixes:</h3>
+* Stream Search
+** Check if CategoryId is array
+
+<h2>Version 0.2.5.1.0</h2>
+
+<h3>Updates:</h3>
+* New SQL Insert
+
+<h3>Fixes:</h3>
+* Headlines/Clusters/Articles Create/Edit
+** Category Selected check issue
+** Resource not included issue
+
+<h2>Version 0.2.5.0.0</h2>
+
+<h3>Added:</h3>
+* Articles
+** Add/Edit View
+* Clusters
+** Add View
+
+<h3>Added/Updates:</h3>
+* Comments/Notes
+** Add/Edit/Update
+
+<h3>Fixes:</h3>
+* Headlines/Clusters/Articles
+** Edit Resources Issue
+** Edit Place issue
+
+<h3>Updates:</h3>
+* Headlines/Clusters/Articles
+** Add/Edit Templates Modularized
+
+<h2>Version 0.2.4.2.1</h2>
+
+<h3>Notes:</h3>
+* Forgot to update file
+
+<h2>Version 0.2.4.2.0</h2>
+
+<h3>Fixes:</h3>
+* Add Comments issue
+* Login User Data issue
+* Compare Query issue
+
+<h2>Version 0.2.4.1.0</h2>
+
+<h3>Fixes:</h3>
+* Headlines/Clusters
+** Add/Edit Resources
+
+<h3>Notes:</h3>
+* Compare Query
+** Need to separate headline and tags match
+
+<h2>Version 0.2.4.0.0</h2>
+
+<h3>Added:</h3>
+* Headlines/Clusters
+** Add/Edit Resources (still needs testing, not stable)
+
+<h3>Updates:</h3>
+* Stream Ranking Query
+** Better Ranking Algorithm
+* Compare
+** Accounts for multiple Categories now
+* Categories/Groups
+** Moved from Assets to Stream Model
+
+<h3>Fixes:</h3>
+* Error on login
+* Turned Hooks back on
+
+<h2>Version 0.2.3.1.0</h2>
+
+<h3>Fixes:</h3>
+* Missing Variable on Register
+
+<h2>Version 0.2.3.0.0</h2>
+
+<h3>SQL Changes:</h3>
+* Old category associations removed
+
+<h3>Updates:</h3>
+* Headlines/Clusters/Articles
+** Ability to Select Multiple Categories
+
+<h2>Version 0.2.2.0.1</h2>
+
+* Forgot to save file
+
+<h2>Version 0.2.2.0.0</h2>
+
+<h3>SQL Changes:</h3>
+* Start setup for multiple Categories
+
+<h3>Fixes:</h3>
+* Stream Compare, now only if no parent
+
+<h2>Version 0.2.1.0.1</h2>
+
+* Forgot to save file
+
+<h2>Version 0.2.1.0.0</h2>
+
+<h3>Added:</h3>
+* Clusters
+** Edit Details
+* Headlines/Clusters/Articles
+** Output Sub-Headlines
+
+<h3>Fixes:</h3>
+* Stream
+** Place Varable Issue from previous fix
+* Headlines/Clusters/Articles
+** Issue with Add History and Get place join
+
+<h2>Version 0.2.0.1.0</h2>
+
+<h3>Fixes:</h3>
+* streams_model.php
+** Issue with single Cluster found in compare
+
+<h3>Updates:</h3>
+* readme.textile
+** Better Formating
+** Version 0.2.0.0.1
+*** Set Goals for next Milestone
+
+<h2>Version 0.2.0.0.1</h2>
+
+<h3>Set Goal:</h3>
+* Clusters
+** Edit Details
+* Headlines/Clusters
+** Add/Edit Resources
+* Headlines/Clusters/Articles
+** Output Sub-Headlines
+** Ability to Select Multiple Categories
+
+<h3>Updates:</h3>
+* readme.textile
+** Write Version Rules
+
+<h2>Version 0.1.2.8.1</h2>
+
+<h3>Notes:</h3>
+* Error Fix
+
+<h2>Version 0.1.2.8</h2>
+
+<h3>Notes:</h3>
+* Updated Features
+** Add/Edit Headline/Clusters/Articles (still work in progress)
+** Error Handling
+** Compare Stream Entries
+* Code Clean Up
+* CodeIgniter Update
+
+<h2>Version 0.1.2.7</h2>
+
+<h3>Notes:</h3>
+* New Features:
+** Auto Group Headlines/Clusters
+
+<h2>Version 0.1.2.6</h2>
+
+<h3>Notes:</h3>
+* Page Functionality Added:
+** Edit Headline
+* Updated Features
+** Search Integrated
+** Search Query Updated
+
+<h2>Version 0.1.2.5</h2>
+
+<h3>Notes:</h3>
+* Page Functionality Added:
+** Stream
+** View Headline
+** Add Comment
+* Fixed:
+** Session - UserId Added
+** Stream - SQL Queries
+
+<h2>Version 0.1.2.4</h2>
+
+<h3>Notes:</h3>
+* Page Functionality Added:
+** Login (fixed)
+** Logout
+** Create Headline
+* Hooks:
+** Redirects from Signup/Login and Login if true
+** Pre-load Categories/Flags Arrays
+* MySQL, Model:
+** Remove Locations System
+** Add Place Fields
+
+<h2>Version 0.1.2.3</h2>
+
+<h3>Notes:</h3>
+* Styling of Pages (cont.):
+** Headlines/Clusters/Articles/Stream
+** Register/Login
+* Page Functionality Added:
+** Register/Login
+** Users Password Encrypt Updated to BCRYPT
+* Hook Added: Check isLoggedIn
+* MySQL User Password Now Stored as BINARY(60)
+
+<h2>Version 0.1.2.2</h2>
+
+<h3>Notes:</h3>
+* Creation of Black List Words Functions
+* Stream Search Query Modified
+* Made new SQL files
+** Includes New Black List Words Table
+** Unique Indexes Added
+** Category, Flag 'activated' Field Added
+* Installation of SASS w/ Grid Framework
+* Styling of pages:
+** Headlines/Clusters/Articles
+* Template Changes
+** File/Folder Arrangement
+** File Seperation
+
+<h2>Version 0.1.2.1</h2>
+
+<h3>Notes:</h3>
+* Change DataBase Engine from MyISAM to InnoDB
+* Template Changes
+** JS Installation of: html5shiv.js, html5shiv.print.js, jquery-2.0.3.min.js, scripts.js
+** CSS Installation of: reset.min.css
+** Dynamic Meta Tags
+** Main Files Moved into Folder
+** Includes Folder Moved Ouside of Templates Folder
+** Started Template Functions File
+
+<h2>Version 0.1.2</h2>
+
+<h3>Notes:</h3>
+* Creation of .htaccess File
+* Creation of Controller/URI Stucture
+* Creation of Basic View Files
+* Creation of Basic Template System
+
+<h2>Version 0.1.1.1</h2>
+
+<h3>Notes:</h3>
+* Restructure of SQL Folder
+
+<h2>Version 0.1.1</h2>
+
+<h3>Notes:</h3>
+* Upload SQL Folder
+* Files Added to Ignore: config.php, database.php
+
+<h2>Version 0.1</h2>
+
+<h3>Notes:</h3>
+* Creation of DataBase SQL
+* Installation of CodeIgniter
+* Forming of Folder Structure
+* Creation of Models with base Functions

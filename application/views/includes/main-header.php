@@ -42,7 +42,7 @@
           <div class="pure-u-1-5">
             <a href="<?php echo site_url('logout'); ?>" title="Logout"><i class="fa fa-sign-out fa-7-4"></i></a>
           </div>
-        <?php else: ?>
+        <?php elseif($page !== 'login-register'): ?>
           <div class="pure-u-1">
             <a href="<?php echo site_url('?r='.$this->uri->uri_string()); ?>" title="Login / Register" class="pure-button pure-button-small pure-input-1-2 right-align">Login / Register <i class="fa fa-sign-in fa-9-10"></i></a>
           </div>

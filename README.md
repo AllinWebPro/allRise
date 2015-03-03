@@ -5,11 +5,11 @@
 PHP Version: 5.3+
 MySQL Version: 5.6+
 
-<h2>Version Information <sup>[1]</sup></h2>
+<h2>Version Information <sup>[1]</sup> <sup>[2]</sup></h2>
 
-Beta Version: 0.7.2.0
-Staging Version: 0.7.2.0
-Development Version: 0.7.2.0
+Beta Version: 0.7.2.1
+Staging Version: 0.7.2.1
+Development Version: 0.7.2.1
 
 <h3>Version Formating <sup>[3]</sup> <sup>[4]</sup> <sup>[5]</sup></h3>
 

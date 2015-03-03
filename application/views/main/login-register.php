@@ -1,4 +1,4 @@
-<aside class="pure-u-7-12 vertical-padding-xlarge">
+<aside class="pure-hidden-phone pure-u-7-12 vertical-padding-xlarge">
   <div class="horizontal-padding-xlarge vertical-padding-xlarge">
     <p class="intro-text vertical-padding-xlarge">Collaborative News for Everyone.<br><br>allRise helps communities large and small connect in new ways to share real-time important information and easily build it into high-quality news articles.  It's democratic news by and for everyone.  Our goal is to become the most valuable source of real-time news in the world.</p>
   </div>
@@ -20,6 +20,7 @@
         </div>
       </form>
     </section>
+    <div class="margin-top pure-visible-phone">&nbsp;</div>
     <section id="register" class="pure-g vertical-padding-xlarge">
       <form class="pure-u-1 pure-form ajax" method="post" action="<?php echo site_url('register'); ?>" autocomplete="off" novalidate>
         <fieldset class="pure-group">
@@ -43,4 +44,4 @@
     </section>
   </div>
 </div>
-<div class="pure-u-3-24"></div>
+<div class="pure-hidden-phone pure-u-3-24"></div>

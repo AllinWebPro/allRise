@@ -1,11 +1,19 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.2.1</h2>
+
+<h4>Fixes:</h4>
+* Remove "Login / Register" button on home page.
+* Responsive "Login / Register" on mobile.
+* Removed text from "Login / Register" on mobile.
+* GET/POST issue with comments if no JS.
+
 <h2>Version 0.7.2.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Send broken pages to 404
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Convert modals to pages:
 ** F.A.Q.
 ** Report a Bug
@@ -14,55 +22,55 @@
 ** Privacy Policy
 * Changes to sitemap
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Branches house keeping
 * readme.textile format/data changes
 
 <h2>Version 0.7.1.1</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Renamed branch "beta_current" to "beta"
 * Update branch "beta" (uploaded wrong files)
 * Adding branch "staging"
 
 <h2>Version 0.7.1.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Search "Subscription" tab
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Change notification formating.
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Change history now in chronological order.
 * Large search no longer causes system to timeout. (limit to search terms)
 
 <h2>Version 0.7.0.0</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Updating of SVN to current system / database.
 * Adding branch "beta_current"
 
 <h2>Version 0.6.2.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Images
 * Email Notifications
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Comments issue
 * URL Redirect issue
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * User Page Layout
 * Search Query
 
 <h2>Version 0.6.1.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Admin Panel
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Create Article issue
 * Vote issue
 * Notifications Count issue
@@ -71,38 +79,38 @@
 
 <h2>Version 0.6.0.10</h2>
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * CodeIgniter Security updates
 * Remove Categories
 * Remove Places
 
 <h2>Version 0.6.0.9</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Subscriptions
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Vote issue
 * AJAX issues
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Notifications now work on Subscriptions
 * SQL Changes
 
 <h2>Version 0.6.0.8</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Notifications
 * Components now showing metadata
 * Google Analytics
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Back Button issue
 * AJAX History issue
 * Unlink not Showing on Clusters issue
 * User "Score" issue
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Contributors List no longer pulls from children
 * Now Sending Site Emails to all Admin's
 * Additional Notices field
@@ -111,10 +119,10 @@
 
 <h2>Version 0.6.0.7</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Login Redirect
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Errors on Destroy/Unlink issue
 * Manual Cluster issue
 * Submit Comment issue
@@ -122,7 +130,7 @@
 * Modify Item issue
 * Double Submit issue
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Tutorial Changes
 * Layout Changes
 * Style Changes
@@ -131,10 +139,10 @@
 
 <h2>Version 0.6.0.6</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Missing "Pretty" URLs issues
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Pages are not public
 * Get Links from Children in Parents
 * Responsive Tutorial Page
@@ -142,10 +150,10 @@
 
 <h2>Version 0.6.0.5</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Temp Tutorial
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * User Profile issue
 * Preferences Link issue
 * Advanced Search issue
@@ -155,7 +163,7 @@
 * Modal Title issue
 * Sort Nav Text issue
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * FAQ Text changes
 * User Profile "See More" Sends to User List
 * Reload on Combine Items
@@ -163,11 +171,11 @@
 
 <h2>Version 0.6.0.4</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Item Parent Link issue
 * AJAX Stream issue
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Link CSS
 * Removed Stream Bold
 * Finalize "Pretty" URLs
@@ -176,7 +184,7 @@
 
 <h2>Version 0.6.0.3</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Broken Links in Comments
 * Verbage Update issue
 * CSS issues
@@ -185,7 +193,7 @@
 * Advanced Search issue
 * "preferences" Spelling issue
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * New Font
 * Link to Comments from Search
 * Date Format Changes
@@ -196,7 +204,7 @@
 
 <h2>Version 0.6.0.2</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Password Update issue
 * Auto-Cluster "Contributors" issue
 * Search Input issue
@@ -205,7 +213,7 @@
 * Comment Edit issue
 * Search Links in Item issue
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Link Hover Color Change
 * Move Location Field on Search
 * Search Date/Location format change
@@ -218,40 +226,40 @@
 
 <h2>Version 0.6.0.1</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Slashes Fix
 * Cluster/Search Issue Fix
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * MySQL Update
 
 <h2>Version 0.6.0.0</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 Updating of SVN to current system.
 
 <h2>Version 0.5.10.0</h2>
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Time Decay Added to Search
 
 <h2>Version 0.5.9.6</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Metadata Update issue
 * Comment issue
 * Resource Edit issue
 
 <h2>Version 0.5.9.5</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Manual Join "Clusters" issue
 * Keywords not being created on Joins
 * Ranking Save issue
 
 <h2>Version 0.5.9.4</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * SQL upload
 * Contributors List issue
 * SQL Error on Edit
@@ -261,7 +269,7 @@ Updating of SVN to current system.
 
 <h2>Version 0.5.9.3</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Page Headline Title issue
 * SQL error
 * Routes issue
@@ -270,7 +278,7 @@ Updating of SVN to current system.
 
 <h2>Version 0.5.9.2</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Stream Keyword Search issue
 * Manual Join issue
 * Headline URL issue
@@ -278,162 +286,162 @@ Updating of SVN to current system.
 
 <h2>Version 0.5.9.1</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Category Search Score
 
 <h2>Version 0.5.9.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Favorite ACH Management
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Search GET URLs issue
 * Forgot Password email issue
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Comments Moved to GET
 * Added createdBy back to Certain Items
 
 <h2>Version 0.5.8.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * QI insert issue
 * Search URI issue
 * Words Search issue
 * Admin URI issues
 * Admin Assets issue
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * SQL Update
 * Keyword Search Update
 * Handle Merge from "Stable" Database
 
 <h2>Version 0.5.7.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Auto-compare errors
 * Auto-complete Locations error
 * Sidebar error
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Vote Moved to GET
 
 <h2>Version 0.5.6.1.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * String Escape in Config
 
 <h2>Version 0.5.6.0.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * General Errors
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Moved RegEx to Global Config (and fixed)
 * Search Queries
 
 <h2>Version 0.5.6.0.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * General errors
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Search Queries
 
 <h2>Version 0.5.5.0.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * General errors
 * Database errors
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Password Encryption Enhanced
 
 <h2>Version 0.5.4.0.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * New variable names in Views
 * Admin moved to new models
 * More code clean up
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Condense Admin Panel Code
 
 <h2>Version 0.5.3.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * User Score Updated on Item Vote
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Sub-Data now pulling from Sub-Headlines
 * Compare/Search SQL
 * User Password Hashing
 
-<h3>SQL Changes:</h3>:
+<h4>SQL Changes:</h4>:
 * Created stored data table
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Remove UserId from Update unless passed for ach add/edit
 * Change Password Hash
 * Major code cleanup
 
 <h2>Version 0.5.2.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * App Version Added to index.php
 * Versions moved to folder
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Improved Modularization in Controllers
 * Code Clean Up in Controllers
 * readme.textile Cleaned Up
 
 <h2>Version 0.5.1.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * User Score Generator
 * CKEditor for Articles
 
-<h3>SQL Changes:</h3>:
+<h4>SQL Changes:</h4>:
 * Score Turned to Float
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Improved Modularization of SQL Statements
 
 <h2>Version 0.5.0.0.0</h2>
 
-<h3>Set Goal:</h3>
+<h4>Set Goal:</h4>
 * Flags
 ** Add/Remove
 * User Score System
 
 <h2>Version 0.4.15.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * User Stream
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Tag Search in Sidebar of Stream Item
 
-<h3>SQL Changes:</h3>:
+<h4>SQL Changes:</h4>:
 * Update to ID's
 
 <h2>Version 0.4.14.0.0</h2>
 
-<h3>SQL Changes:</h3>:
+<h4>SQL Changes:</h4>:
 * Updated SQL Files
 
 <h2>Version 0.4.13.1.0</h2>
 
-<h3>Merges:</h3>
+<h4>Merges:</h4>
 * Compared and Merged Ange Changes
 
 <h2>Version 0.4.13.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Delete Feature
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Password issue
 * Forgot Password issue
 * Error in Compare sql
@@ -443,47 +451,47 @@ Updating of SVN to current system.
 
 <h2>Version 0.4.12.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Voting
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Search Ranking
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Compare sql
 * Search sql wild-card added
 * Stream scores for testing trimmed down
 
 <h2>Version 0.4.11.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Contributors lists
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Resource error on ach edit
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Minor usability issues
 
 <h2>Version 0.4.10.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Stream scores for testing
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Errors on Comments and Sidebar
 * Error in stream compare sql
 * Include results based on children in search sql
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Auto compare keyword match requirement raised
 
 <h2>Version 0.4.9.0.0</h2>
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Removal of Created for all database items
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Need to make changes to edit permissions for the following:
 ** comments
 ** notes
@@ -491,15 +499,15 @@ Updating of SVN to current system.
 
 <h2>Version 0.4.8.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Favicons
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Search Issues
 * Major SQL Issues
 * Auto & Manual Join
 
-<h3>Suggested Changes:</h3>
+<h4>Suggested Changes:</h4>
 * Undo - Remove "H" from headline stream, and move "A" & "C" just after the headline title.
 * Add Created Date to View Meta
 * Added ACH Count to Stream page
@@ -507,102 +515,102 @@ Updating of SVN to current system.
 
 <h2>Version 0.4.7.0.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Stream Search SQL Fix
 
-<h3>Suggested Changes:</h3>
+<h4>Suggested Changes:</h4>
 * Remove "H" from headline stream, and move "A" & "C" just after the headline title.
 * Add a number next to each cluster in the headline stream, with the number equaling the total number of headlines it's absorbed
 
 <h2>Version 0.4.6.0.0</h2>
 
-<h3>Suggested Changes:</h3>
+<h4>Suggested Changes:</h4>
 * Add some kind of marker that shows which headlines are Clusters and which are Cluster-Articles
 * Move “Group Item” check-box to same line as date | location
 * Remove “Read More” link from stream under each headline
 
 <h2>Version 0.4.5.0.0</h2>
 
-<h3>Suggested Changes:</h3>
+<h4>Suggested Changes:</h4>
 * Add "Create Headline" in right sidebar
 * Headlines should link to the Headline’s page just like the “Read More” link.
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Errors Found
 ** stream.php
 ** streams_model.php
 
 <h2>Version 0.4.4.1.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Removed auto check-marks on stream
 
 <h2>Version 0.4.4.0.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Moderators
 ** Un-attach Children
 
 <h2>Version 0.4.3.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Moderators
 ** Un-attach Children
 
 <h2>Version 0.4.2.1.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Moderators
 ** Attach Children (needs much testing)
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Moderators
 ** Find Possible Sub Children
 
 <h2>Version 0.4.2.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Moderators
 ** Find Possible Sub Children
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Compare Process issue
 * Category Search issue
 * Admin Pagination issue
 
 <h2>Version 0.4.1.2.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * SQL Issue
 
 <h2>Version 0.4.1.1.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Edit Stream
 
 <h2>Version 0.4.1.0.0</h2>
 
-<h3>To Make:</h3>
+<h4>To Make:</h4>
 * Clusters
 ** Make Article
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Syntax Error on Stream Edit
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Clusters/Articles Details
 ** Output Changes
 
 <h2>Version 0.4.0.1.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Removed die() from stream_model
 * Compare Match Percentages
 * Pagination Hook Variable issue
 
 <h2>Version 0.4.0.0.0</h2>
 
-<h3>Set Goal:</h3>
+<h4>Set Goal:</h4>
 * Moderators
 ** Find Possible Sub Children
 ** Attach Children
@@ -613,7 +621,7 @@ Updating of SVN to current system.
 
 <h2>Version 0.3.6.0.0</h2>
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Query Updates
 ** Stream Search
 ** Stream Compare
@@ -621,69 +629,69 @@ Updating of SVN to current system.
 
 <h2>Version 0.3.5.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Pagination
 * Admin
 ** Blwords
 *** Add/Edit/Delete
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Pagination for stream will be added after query update
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Admin Forms issue
 * Slugs in Query String
 
 <h2>Version 0.3.4.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Admin
 ** Categories/Flags
 *** Add/Edit/Delete
 ** Users
 *** Edit/Delete
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * set_value default on edit
 * My Account error
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Make so category slugs are used and not ID
 
 <h2>Version 0.3.3.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Admin
 ** View files
 ** Controller functions
 ** Template Creation
 ** List Views
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Need to add pagination to pages
 
 <h2>Version 0.3.2.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Users
 ** My Account
 ** Forgot Password
 * Admin
 ** Routes/Hooks
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Error Var issue
 
 <h2>Version 0.3.1.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Users
 ** Sign Up Email (needs text for email)
 ** Email Confirmation (needs text for layouts)
 
 <h2>Version 0.3.0.0.0</h2>
 
-<h3>Set Goal:</h3>
+<h4>Set Goal:</h4>
 * Users
 ** My Account
 ** Forgot Password
@@ -697,86 +705,86 @@ Updating of SVN to current system.
 
 <h2>Version 0.2.5.3.1</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Forgot to remove die statement
 
 <h2>Version 0.2.5.3.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Stream Compare
 ** Undid change from "Version 0.2.4.2.0"
 
 <h2>Version 0.2.5.2.1</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Set Default Time Zone
 
 <h2>Version 0.2.5.2.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Stream Search
 ** Check if CategoryId is array
 
 <h2>Version 0.2.5.1.0</h2>
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * New SQL Insert
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Headlines/Clusters/Articles Create/Edit
 ** Category Selected check issue
 ** Resource not included issue
 
 <h2>Version 0.2.5.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Articles
 ** Add/Edit View
 * Clusters
 ** Add View
 
-<h3>Added/Updates:</h3>
+<h4>Added/Updates:</h4>
 * Comments/Notes
 ** Add/Edit/Update
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Headlines/Clusters/Articles
 ** Edit Resources Issue
 ** Edit Place issue
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Headlines/Clusters/Articles
 ** Add/Edit Templates Modularized
 
 <h2>Version 0.2.4.2.1</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Forgot to update file
 
 <h2>Version 0.2.4.2.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Add Comments issue
 * Login User Data issue
 * Compare Query issue
 
 <h2>Version 0.2.4.1.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Headlines/Clusters
 ** Add/Edit Resources
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Compare Query
 ** Need to separate headline and tags match
 
 <h2>Version 0.2.4.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Headlines/Clusters
 ** Add/Edit Resources (still needs testing, not stable)
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Stream Ranking Query
 ** Better Ranking Algorithm
 * Compare
@@ -784,21 +792,21 @@ Updating of SVN to current system.
 * Categories/Groups
 ** Moved from Assets to Stream Model
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Error on login
 * Turned Hooks back on
 
 <h2>Version 0.2.3.1.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Missing Variable on Register
 
 <h2>Version 0.2.3.0.0</h2>
 
-<h3>SQL Changes:</h3>
+<h4>SQL Changes:</h4>
 * Old category associations removed
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * Headlines/Clusters/Articles
 ** Ability to Select Multiple Categories
 
@@ -808,10 +816,10 @@ Updating of SVN to current system.
 
 <h2>Version 0.2.2.0.0</h2>
 
-<h3>SQL Changes:</h3>
+<h4>SQL Changes:</h4>
 * Start setup for multiple Categories
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Stream Compare, now only if no parent
 
 <h2>Version 0.2.1.0.1</h2>
@@ -820,13 +828,13 @@ Updating of SVN to current system.
 
 <h2>Version 0.2.1.0.0</h2>
 
-<h3>Added:</h3>
+<h4>Added:</h4>
 * Clusters
 ** Edit Details
 * Headlines/Clusters/Articles
 ** Output Sub-Headlines
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * Stream
 ** Place Varable Issue from previous fix
 * Headlines/Clusters/Articles
@@ -834,11 +842,11 @@ Updating of SVN to current system.
 
 <h2>Version 0.2.0.1.0</h2>
 
-<h3>Fixes:</h3>
+<h4>Fixes:</h4>
 * streams_model.php
 ** Issue with single Cluster found in compare
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * readme.textile
 ** Better Formating
 ** Version 0.2.0.0.1
@@ -846,7 +854,7 @@ Updating of SVN to current system.
 
 <h2>Version 0.2.0.0.1</h2>
 
-<h3>Set Goal:</h3>
+<h4>Set Goal:</h4>
 * Clusters
 ** Edit Details
 * Headlines/Clusters
@@ -855,18 +863,18 @@ Updating of SVN to current system.
 ** Output Sub-Headlines
 ** Ability to Select Multiple Categories
 
-<h3>Updates:</h3>
+<h4>Updates:</h4>
 * readme.textile
 ** Write Version Rules
 
 <h2>Version 0.1.2.8.1</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Error Fix
 
 <h2>Version 0.1.2.8</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Updated Features
 ** Add/Edit Headline/Clusters/Articles (still work in progress)
 ** Error Handling
@@ -876,13 +884,13 @@ Updating of SVN to current system.
 
 <h2>Version 0.1.2.7</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * New Features:
 ** Auto Group Headlines/Clusters
 
 <h2>Version 0.1.2.6</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Page Functionality Added:
 ** Edit Headline
 * Updated Features
@@ -891,7 +899,7 @@ Updating of SVN to current system.
 
 <h2>Version 0.1.2.5</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Page Functionality Added:
 ** Stream
 ** View Headline
@@ -902,7 +910,7 @@ Updating of SVN to current system.
 
 <h2>Version 0.1.2.4</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Page Functionality Added:
 ** Login (fixed)
 ** Logout
@@ -916,7 +924,7 @@ Updating of SVN to current system.
 
 <h2>Version 0.1.2.3</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Styling of Pages (cont.):
 ** Headlines/Clusters/Articles/Stream
 ** Register/Login
@@ -928,7 +936,7 @@ Updating of SVN to current system.
 
 <h2>Version 0.1.2.2</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Creation of Black List Words Functions
 * Stream Search Query Modified
 * Made new SQL files
@@ -944,7 +952,7 @@ Updating of SVN to current system.
 
 <h2>Version 0.1.2.1</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Change DataBase Engine from MyISAM to InnoDB
 * Template Changes
 ** JS Installation of: html5shiv.js, html5shiv.print.js, jquery-2.0.3.min.js, scripts.js
@@ -956,7 +964,7 @@ Updating of SVN to current system.
 
 <h2>Version 0.1.2</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Creation of .htaccess File
 * Creation of Controller/URI Stucture
 * Creation of Basic View Files
@@ -964,18 +972,18 @@ Updating of SVN to current system.
 
 <h2>Version 0.1.1.1</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Restructure of SQL Folder
 
 <h2>Version 0.1.1</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Upload SQL Folder
 * Files Added to Ignore: config.php, database.php
 
 <h2>Version 0.1</h2>
 
-<h3>Notes:</h3>
+<h4>Notes:</h4>
 * Creation of DataBase SQL
 * Installation of CodeIgniter
 * Forming of Folder Structure

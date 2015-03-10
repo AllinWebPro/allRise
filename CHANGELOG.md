@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.2.2</h2>
+
+<h4>Fixes:</h4>
+* Manual Join
+
 <h2>Version 0.7.2.1</h2>
 
 <h4>Fixes:</h4>

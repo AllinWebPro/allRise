@@ -737,7 +737,26 @@ class Stream_model extends CI_Model
       foreach($selected['headline'] as $h)
       {
         $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
-        if(!$this->check_for_cluster($hl, $h, $where_score, $selected['article'][0], $userId)) { $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => $i, 'nvo' => $i); $i++; }
+        $compared = array();
+        foreach($selected['cluster'] as $c)
+        {
+          $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
+          if($score = $this->item_compare($h1, $c->headline, $c->tags)) { $compared[$c] = $score; }
+        }
+        if($compared)
+        {
+          asort($compared);
+          $clusterId = key($compared);
+          //
+          $nInsert = array('headlineId' => $c, 'parentId' => $clusterId, 'createdOn' => time());
+          $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+          $this->ci->database->edit('headlines', array('headlineId' => $h), array('clusterId' => $clusterId, 'editedBy' => $userId));
+        }
+        else
+        {
+          $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => 0, 'nvo' => 0);
+        }
       }
       if($newCluster)
       {
@@ -771,7 +790,8 @@ class Stream_model extends CI_Model
       foreach($selected['cluster'] as $c)
       {
         $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
-        if(!$this->check_for_cluster($cl, $c, $where_score, $articleId, $userId)) { $newArticle[] = array('id' => $c, 'item' => $cl, 'ovn' => $i, 'nvo' => $i); $i++; }
+        $newArticle[] = array('id' => $c, 'item' => $cl, 'ovn' => $i, 'nvo' => $i);
+        $i++;
       }
       if($newArticle)
       {
@@ -790,7 +810,26 @@ class Stream_model extends CI_Model
       foreach($selected['headline'] as $h)
       {
         $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
-        if(!$this->check_for_cluster($hl, $h, $where_score, $articleId, $userId)) { $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => $i, 'nvo' => $i); $i++; }
+        $compared = array();
+        foreach($selected['cluster'] as $c)
+        {
+          $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
+          if($score = $this->item_compare($h1, $c->headline, $c->tags)) { $compared[$c] = $score; }
+        }
+        if($compared)
+        {
+          asort($compared);
+          $clusterId = key($compared);
+          //
+          $nInsert = array('headlineId' => $c, 'parentId' => $clusterId, 'createdOn' => time());
+          $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+          $this->ci->database->edit('headlines', array('headlineId' => $h), array('clusterId' => $clusterId, 'editedBy' => $userId));
+        }
+        else
+        {
+          $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => 0, 'nvo' => 0);
+        }
       }
       if($newCluster)
       {
@@ -812,7 +851,26 @@ class Stream_model extends CI_Model
       foreach($selected['headline'] as $h)
       {
         $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
-        $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => $i, 'nvo' => $i); $i++;
+        $compared = array();
+        foreach($selected['cluster'] as $c)
+        {
+          $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
+          if($score = $this->item_compare($h1, $c->headline, $c->tags)) { $compared[$c] = $score; }
+        }
+        if($compared)
+        {
+          asort($compared);
+          $clusterId = key($compared);
+          //
+          $nInsert = array('headlineId' => $c, 'parentId' => $clusterId, 'createdOn' => time());
+          $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+          $this->ci->database->edit('headlines', array('headlineId' => $h), array('clusterId' => $clusterId, 'editedBy' => $userId));
+        }
+        else
+        {
+          $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => 0, 'nvo' => 0);
+        }
       }
       if($newCluster)
       {
@@ -2408,7 +2466,7 @@ class Stream_model extends CI_Model
     return false;
   }
 
-  private function new_article($clusters = array())
+  private function new_article($clusters = array(), $userId = 0)
   {
     $t_score = 0;
     $t_item = null;
@@ -2423,7 +2481,7 @@ class Stream_model extends CI_Model
       {
         if(!in_array($tr, $resources)) { $resources[] = $tr; }
       }
-      $thisImages = $this->ci->database->get_array('images', array('headlineId' => $o['item']->headlineId, 'deleted' => 0), 'image');
+      $thisImages = $this->ci->database->get_array('images', array('clusterId' => $o['item']->clusterId, 'deleted' => 0), 'image');
       foreach($thisImages as $ti)
       {
         if(!in_array($ti, $images)) { $images[] = $ti; }
@@ -2438,6 +2496,7 @@ class Stream_model extends CI_Model
     }
 
     $insert = array('headline' => $t_item['item']->headline, 'tags' => $tags, 'createdOn' => time());
+    if($userId) { $insert['editedBy'] = $userId; }
     $articleId = $this->ci->database->add('articles', $insert, 'articleId');
     $this->database_model->add('subscriptions', array('userId' => 3, 'articleId' => $articleId, 'createdOn' => time()), 'subscriptionId');
 
@@ -2460,7 +2519,7 @@ class Stream_model extends CI_Model
     return $articleId;
   }
 
-  private function new_cluster($headlines = array())
+  private function new_cluster($headlines = array(), $articleId = 0, $userId = 0)
   {
     $t_score = 0;
     $t_item = null;
@@ -2490,6 +2549,8 @@ class Stream_model extends CI_Model
     }
 
     $insert = array('headline' => $t_item['item']->headline, 'tags' => $tags, 'createdOn' => time());
+    if($articleId) { $insert['articleId'] = $articleId; }
+    if($userId) { $insert['editedBy'] = $userId; }
     $clusterId = $this->ci->database->add('clusters', $insert, 'clusterId');
     $this->database_model->add('subscriptions', array('userId' => 3, 'clusterId' => $clusterId, 'createdOn' => time()), 'subscriptionId');
 

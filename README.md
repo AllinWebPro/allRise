@@ -2,20 +2,20 @@
 
 <h2>System Requirements</h2>
 
-PHP Version: 5.3+
+PHP Version: 5.3+<br>
 MySQL Version: 5.6+
 
 <h2>Version Information <sup>[1]</sup> <sup>[2]</sup></h2>
 
-Beta Version: 0.7.2.1
-Staging Version: 0.7.2.1
-Development Version: 0.7.2.1
+Beta Version: 0.7.2.2<br>
+Staging Version: 0.7.2.2<br>
+Development Version: 0.7.2.2
 
 <h3>Version Formating <sup>[3]</sup> <sup>[4]</sup> <sup>[5]</sup></h3>
 
-X.0.0.0 - Has all required mechanics, but may require testing and refinement.
-0.X.0.0 - Next milestone has been reached. (e.g. Styling, Chat System, User Login, etc.)
-0.0.X.0 - Steps toward achieving next milestone, but may include changes to previous milestones.
+X.0.0.0 - Has all required mechanics, but may require testing and refinement.<br>
+0.X.0.0 - Next milestone has been reached. (e.g. Styling, Chat System, User Login, etc.)<br>
+0.0.X.0 - Steps toward achieving next milestone, but may include changes to previous milestones.<br>
 0.0.0.X - General bug fixes.
 
 <h4>Citations</h4>

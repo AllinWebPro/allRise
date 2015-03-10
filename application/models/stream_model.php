@@ -2469,6 +2469,8 @@ class Stream_model extends CI_Model
   private function new_article($clusters = array(), $userId = 0)
   {
     $t_score = 0;
+    $temp_key = key($clusters);
+    $t_item = $clusters[$temp_key];
     $t_item = null;
     $tags = "";
     $resources = array();
@@ -2522,7 +2524,8 @@ class Stream_model extends CI_Model
   private function new_cluster($headlines = array(), $articleId = 0, $userId = 0)
   {
     $t_score = 0;
-    $t_item = null;
+    $temp_key = key($headlines);
+    $t_item = $headlines[$temp_key];
     $tags = "";
     $resources = array();
     $images = array();

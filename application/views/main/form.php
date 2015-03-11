@@ -1,6 +1,6 @@
 <form id="item_form" class="pure-u-1 pure-form ajax" method="post" action="<?php echo isset($id)?site_url($type.'/modify/'.$id):site_url($type.'/create'); ?>" novalidate>
   <div id="item" class="pure-u-1 vertical-padding-small">
-    <section class="large">
+    <section class="large ontop">
       <div class="horizontal-margin-small vertical-margin-small">
         <div class="horizontal-margin-small vertical-margin-small">
           <div class="pure-u-1"><strong><a name="resources"><i class="fa fa-dot-circle-o"></i></a> Headline</strong></div>
@@ -171,13 +171,13 @@
         </div>
       </section>
     <?php endif; ?>
-    <section class="small">
+    <section class="small ontop">
       <div class="horizontal-margin-small vertical-margin-small">
         <div class="horizontal-padding-small vertical-padding-small">
           <div class="pure-u-1"><strong><a name="resources"><i class="fa fa-tags"></i></a> Tags</strong></div>
           <div class="clear"></div>
           <fieldset class="item pure-group pure-u-1">
-            <textarea name="tags" id="item-tags" class="pure-input-1" placeholder="Tags (comma seperated)"><?php echo isset($item)?str_replace(',', ', ', $item->tags):''; ?></textarea>
+            <textarea name="tags" id="item-tags" class="pure-input-1" placeholder="Tags (comma seperated)"><?php echo isset($item)?str_replace(',', ', ', stripslashes($item->tags)):''; ?></textarea>
           </fieldset>
         </div>
       </div>

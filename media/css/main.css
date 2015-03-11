@@ -102,6 +102,8 @@ a[data-type=vote]:hover i { color:#666 !important; }
 
 .border { border:1px solid #ff8041;box-sizing:border-box; }
 
+.ontop { position:relative;z-index:10; }
+
 @media (max-width: 480px), (max-width: 767px) {
   #main-bar { z-index:100 !important; }
   #main-bar form .pure-u-5-6 { width:75%; }

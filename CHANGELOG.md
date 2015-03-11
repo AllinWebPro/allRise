@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.2.4</h2>
+
+<h4>Fixes:</h4>
+* stripslashes() on tags in edit.
+* Update page layout on textarea/ckeditors resize
+
 <h2>Version 0.7.2.3</h2>
 
 <h4>Fixes:</h4>

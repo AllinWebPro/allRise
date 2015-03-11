@@ -61,6 +61,30 @@ var $stream,
     browsers = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
 
 $(document).ready(function() {
+  
+  var $textareas = jQuery('textarea');  
+  if($textareas)
+  {
+    $textareas.data('x', $textareas.outerWidth());
+    $textareas.data('y', $textareas.outerHeight());
+    
+    $textareas.mouseup(function () {
+      var $this = $(this);
+      if($this.outerWidth() != $this.data('x') || $this.outerHeight() != $this.data('y')) {
+        if($item = $('#item')) { itemMasonry(); }
+      }
+      // set new height/width
+      $this.data('x', $this.outerWidth());
+      $this.data('y', $this.outerHeight());
+    });
+  }
+  
+  CKEDITOR.on('instanceCreated', function(ev) {
+    ev.editor.on('resize',function(reEvent){
+       if($item = $('#item')) { itemMasonry(); }
+     });
+  });
+  
   $(this).on('click, focus', "#copy", function() {
     $(this).select();
   });

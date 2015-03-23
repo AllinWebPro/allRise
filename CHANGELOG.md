@@ -1,5 +1,15 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.3.0</h2>
+
+<h4>Added:</h4>
+* Related Items
+
+<h4>Fixes:</h4>
+* Edit Article Link
+* Safari AJAX Loading on Form
+* Regular Users Buttons on Headlines
+
 <h2>Version 0.7.2.4</h2>
 
 <h4>Fixes:</h4>

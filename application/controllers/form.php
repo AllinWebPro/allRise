@@ -31,8 +31,16 @@ class Form extends CI_Controller
       // Load View
       // redirect(substr($type, 0, 1).'/'.$id);
       $this->data['title'] = ($action=='add'?'Create':'Modify')." ".ucfirst($this->data['type']);
-      $this->data['page'] = "form";
-      $this->load->view($this->template, $this->data);
+      if(isset($_GET['ajax']) && $_GET['ajax'])
+      {
+        $this->load->view('includes/functions');
+        $this->load->view('main/form', $this->data);
+      }
+      else
+      {
+        $this->data['page'] = "form";
+        $this->load->view($this->template, $this->data);
+      }
     }
     else { redirect('p/404'); }
   }
@@ -47,8 +55,16 @@ class Form extends CI_Controller
       // Load View
       // redirect(substr($type, 0, 1).'/'.$id);
       $this->data['title'] = ($action=='add'?'Create':'Modify')." ".ucfirst($this->data['type']);
-      $this->data['page'] = "form";
-      $this->load->view($this->template, $this->data);
+      if(isset($_GET['ajax']) && $_GET['ajax'])
+      {
+        $this->load->view('includes/functions');
+        $this->load->view('main/form', $this->data);
+      }
+      else
+      {
+        $this->data['page'] = "form";
+        $this->load->view($this->template, $this->data);
+      }
     }
     else { redirect('p/404'); }
   }

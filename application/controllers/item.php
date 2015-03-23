@@ -23,7 +23,7 @@ class Item extends CI_Controller
    * @param int
    * @return void
    */
-  public function index($type = '', $id = 0)
+  public function index($type = '', $id = 0, $sort = "score", $results = "all", $comments = true, $limit = 20, $current = 1, $userId = 0, $subscription = 0)
   {
     // Grab Data by Type
     $this->data['type'] = $type;
@@ -32,6 +32,7 @@ class Item extends CI_Controller
     // Get Data
     if(isset($this->data['item']) && $this->data['item'])
     {
+      $this->data['related'] = $this->stream_model->search($this->data['item']->tags, '(id != '.$id.' AND type != "'.$type.'")', 'score', 'all', true, 3);
       // Views
       if($this->session->userdata('isLoggedIn'))
       {
@@ -159,7 +160,7 @@ class Item extends CI_Controller
    * @param string
    * @return void
    */
-  public function hashed($type = '', $hashId = '')
+  public function hashed($type = '', $hashId = '', $sort = "score", $results = "all", $comments = true, $limit = 20)
   {
     // Grab Data by Type
     $this->data['type'] = $type;
@@ -177,6 +178,7 @@ class Item extends CI_Controller
     {
       $idType = $type.'Id';
       $this->data['id'] = $id = $this->data['item']->$idType;
+      $this->data['related'] = $this->stream_model->search($this->data['item']->tags, '(id != '.$id.' AND type != "'.$type.'")', 'score', 'all', true, 3);
       // Views
       if($this->session->userdata('isLoggedIn') && !isset($_GET['hId']))
       {

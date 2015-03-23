@@ -62,7 +62,7 @@
             <article class="content">
               <?php echo stripslashes(str_replace('\r', '', str_replace('\n', '', $item->article))); ?>
             </article>
-            <a href="<?php echo site_url('article/modify/'.$id); ?>" class="right-align">Edit this Article</a>
+            <a href="<?php echo site_url(substr($type, 0, 1).'/modify/'.$item->hashId); ?>" class="right-align">Edit this Article</a>
             <div class="clear"></div>
           <?php elseif($this->session->userdata('isLoggedIn')): ?>
             <a class="pure-button pure-button-small" href="<?php echo site_url('article/modify/'.$id); ?>" >
@@ -250,7 +250,7 @@
       </div>
     </section>
   <?php endif; ?>
-  <?php if($this->session->userdata('isLoggedIn') && ($type !== 'headline' || ($item->createdBy == $this->session->userdata('userId') || in_array($this->session->userdata('level'), array('m', 'a')))) && !isset($history)): ?>
+  <?php if($this->session->userdata('isLoggedIn') && !isset($history)): ?>
     <section class="small">
       <div class="horizontal-margin-small vertical-margin-small">
         <div class="horizontal-padding-small vertical-padding-small pure-g">
@@ -296,10 +296,12 @@
               <?php endif; ?>
             </div>
           </div>
-          <div class="pure-u-1 center-text vertical-margin-small">
-            <a class="pure-button pure-u-1 no-lr-padding" href="<?php echo site_url(substr($type, 0, 1).'/modify/'.$item->hashId); ?>">
-              <i class="fa fa-pencil-square-o fa-9-10"></i> Modify <?php echo ucfirst($type); ?></a>
-          </div>
+          <?php if($type !== 'headline' || ($item->createdBy == $this->session->userdata('userId') || in_array($this->session->userdata('level'), array('m', 'a')))): ?>
+            <div class="pure-u-1 center-text vertical-margin-small">
+              <a class="pure-button pure-u-1 no-lr-padding" href="<?php echo site_url(substr($type, 0, 1).'/modify/'.$item->hashId); ?>">
+                <i class="fa fa-pencil-square-o fa-9-10"></i> Modify <?php echo ucfirst($type); ?></a>
+            </div>
+          <?php endif; ?>
           <?php if((($type == 'cluster' && $item->articleId) || ($type == 'headline' && $item->clusterId)) && in_array($this->session->userdata('level'), array('m', 'a'))): ?>
             <div class="pure-u-1-2 center-text">
               <a href="<?php echo site_url(substr($type, 0, 1).'/unlink/'.$item->hashId); ?>"><i class="fa fa-chain-broken fa-9-10"></i> Unlink <?php echo ucfirst($type); ?></a>
@@ -460,6 +462,69 @@
             </article>
           <?php endif; ?>
         </div>
+      </div>
+    </div>
+  </section>
+  <section class="small">
+    <div class="horizontal-margin-small vertical-margin-small">
+      <div class="horizontal-padding-small vertical-padding-small">
+        <strong><a name="related"><i class="fa fa-search"></i></a> Related</strong>
+        <?php if($related): ?>
+          <?php foreach($related as $i): ?>
+            <div class="vertical-padding-small horizontal-padding-xsmall">
+              <?php if($i->image && 1 == 0): ?>
+                <img src="<?php echo $i->image; ?>" height="42" width="42" class="left-align right-padding-xsmall">
+              <?php endif; ?>
+              <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
+                <span class="item">
+                  <i class="fa fa-<?php echo ($i->type == 'headline')?'dot-circle-o':(($i->type == 'cluster')?'code-fork':'caret-square-o-up'); ?>"></i>
+                  <span><?php echo stripslashes($i->headline); ?></span>
+                </span>
+              </a><br>
+              <span class="grey">
+                <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
+                  <time>
+                    <?php if($i->editedOn > strtotime(date("m/d/Y"))): ?>
+                      Today at <?php echo date("h:ia", $i->editedOn); ?>
+                    <?php elseif($i->editedOn > strtotime(date("m/d/Y", strtotime("-1 day")))): ?>
+                      Yesterday at <?php echo date("h:ia", $i->editedOn); ?>
+                    <?php elseif(date("Y", $i->editedOn) == date("Y")): ?>
+                      <?php echo date("M d", $i->editedOn); ?> @ <?php echo date("h:ia", $i->editedOn); ?>
+                    <?php else: ?>
+                      <?php echo date("M d Y", $i->editedOn); ?>
+                    <?php endif; ?>
+                  </time>
+                </span>
+                <?php if($i->c_count): ?>
+                  <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-code-fork"></i>
+                    <?php echo $i->c_count; ?></span>
+                <?php endif; ?>
+                <?php if($i->h_count): ?>
+                  <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-dot-circle-o"></i>
+                    <?php echo $i->h_count; ?></span>
+                <?php endif; ?>
+                <?php if($i->comments): ?>
+                  <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
+                    <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>#comments" class="ajax" data-type="item">
+                      <?php echo $i->comments; ?></a></span>
+                <?php endif; ?>
+                <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('a'))): ?>
+                  <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-eye"></i> <?php echo round($i->x_score * 10, 2); ?></span>
+                  <span class="horizontal-padding-tiny">
+                    K: <?php echo round($i->search_score * 10, 2); ?>
+                    C: <?php echo round($i->cred_score * 10, 2); ?>
+                    S: <?php echo round($i->sub_score * 10, 2); ?>
+                    Q: <?php echo round($i->decay_score * 10, 2); ?>
+                  </span>
+                <?php endif; ?>
+              </span>
+            </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="vertical-padding-xsmall horizontal-padding-xsmall">
+            <span class="item">No results found.</span>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
   </section>

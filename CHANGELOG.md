@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.4.1</h2>
+
+<h4>Fixes:</h4>
+* Make Edit Consistent with Item Layout Changes
+
 <h2>Version 0.7.4.0</h2>
 
 <h4>Added:</h4>

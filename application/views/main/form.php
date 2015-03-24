@@ -3,7 +3,6 @@
     <section class="large ontop">
       <div class="horizontal-margin-small vertical-margin-small">
         <div class="horizontal-margin-small vertical-margin-small">
-          <div class="pure-u-1"><strong><a name="resources"><i class="fa fa-dot-circle-o"></i></a> Headline</strong></div>
           <div class="clear"></div>
           <fieldset class="item pure-group pure-u-1">
             <input type="text" name="headline" id="item-headline" class="pure-input-1" placeholder="Headline*" value="<?php echo isset($item)?stripslashes($item->headline):''; ?>" required title="Max length 255 characters.">
@@ -68,7 +67,9 @@
         <div class="horizontal-margin-small vertical-margin-small">
           <div class="horizontal-padding-small vertical-padding-xsmall pure-g">
             <?php if(isset($clusters)): ?>
-              <div class="pure-u-1 strong">Article Components</div>
+              <div class="pure-u-1 bottom-padding-small">
+                <strong><a name="social"><i class="fa fa-caret-square-o-up"></i></a> Components</strong>
+              </div>
               <?php foreach($clusters as $c): ?>
                 <div class="pure-u-1 vertical-padding-tiny">
                   <a title="<?php echo stripslashes($c->headline); ?>" href="<?php echo site_url('c/'.$c->hashId.'/'.get_url_string($c->headline)); ?>" class="item ajax" data-type="item">
@@ -133,7 +134,9 @@
                 <?php endforeach; ?>
               <?php endforeach; ?>
             <?php elseif(isset($headlines)): ?>
-              <div class="pure-u-1 strong">Cluster Components</div>
+              <div class="pure-u-1 bottom-padding-small">
+                <strong><a name="social"><i class="fa fa-code-fork"></i></a> Components</strong>
+              </div>
               <?php foreach($headlines as $h): ?>
                 <div class="pure-u-1 vertical-padding-tiny">
                   <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>" class="item ajax" data-type="item">

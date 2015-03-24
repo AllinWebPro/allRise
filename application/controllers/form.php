@@ -153,7 +153,7 @@ class Form extends CI_Controller
       $this->database_model->add('metadata', $metadata, 'metadataId');
       $this->stream_model->autocompare($this->data['type'], $id);
       // Load View
-      redirect($this->data['type'].'/'.$id);
+      redirect($this->data['type'].'/'.$id."?n=1");
     }
     else
     {

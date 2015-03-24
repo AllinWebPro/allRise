@@ -37,12 +37,13 @@ label span { font-size:95%; }
 #logo a { text-decoration:none !important; }
 
 #main-bar, #stream .items > div, #list section > div, #item section > div, #notices section > div, #admin section > div, #bottom-bar { background-color:#fff; }
-#sort, #stream .items > div, #list section > div, #item section > div, #notices section > div, #admin section > div { overflow:hidden; }
-#stream .items > div, #list section > div, #item section > div, #notices section > div, #admin section > div {
+#alert > div { background-color:#fcd3bd; }
+#sort, #stream .items > div, #list section > div, #item section > div, #alert > div, #notices section > div, #admin section > div { overflow:hidden; }
+#stream .items > div, #list section > div, #item section > div, #alert > div, #notices section > div, #admin section > div {
   border:1px solid rgba(0, 0, 0, 0.4);
   box-shadow:1px 1px 1px rgba(0, 0, 0, 0.2);
 }
-#stream .items > div, #list section > div, #item section > div, #notices section > div, #admin section > div { border:1px solid #999; }
+#stream .items > div, #list section > div, #item section > div, #alert > div, #notices section > div, #admin section > div { border:1px solid #999; }
 #main-bar, #bottom-bar { position:fixed;width:100%;z-index:100; }
 #main-bar { border-bottom:1px solid #fea879;top:0; }
 #bottom-bar { border-top:1px solid #fea879;bottom:0; }
@@ -184,6 +185,7 @@ a[data-type=vote]:hover i { color:#666 !important; }
 .right-padding-xsmall { padding-right:0.3em; }
 
 .top-padding-xsmall { padding-top:0.3em; }
+.top-padding-small { padding-top:0.6em; }
 .top-padding { padding-top:0.9em; }
 
 .no-margin { margin:0; }

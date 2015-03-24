@@ -12,6 +12,18 @@
     <?php endif; ?>
   </ul>
 </nav>
+<?php if(isset($_REQUEST['n']) && $_REQUEST['n'] && isset($parent) && $parent): ?>
+  <div id="alert" class="pure-u-1 top-padding">
+    <div class="horizontal-margin-small">
+      <div class="horizontal-padding-small vertical-padding-small">
+        <a href="<?php echo site_url(substr($parent->type, 0, 1).'/'.$parent->hashId.'/'.get_url_string($parent->headline)); ?>">
+          This Headline was Auto-Joined with a Cluster based on the title and tags submitted.
+          Click here, to join the conversation and see what other people are saying about the topic.
+        </a>
+      </div>
+    </div>
+  </div>
+<?php endif; ?>
 <div id="item" class="pure-u-1 vertical-padding-small">
   <section class="large">
     <div class="horizontal-margin-small vertical-margin-small">
@@ -82,8 +94,10 @@
         </div>
       <?php endif; ?>
       <hr>
-      <div class="horizontal-padding-small vertical-padding-small pure-g-r">
-        <div class="pure-u-1"><strong><a name="resources"><i class="fa fa-camera"></i></a> Images</strong></div>
+      <div class="horizontal-padding-small vertical-padding-xsmall pure-g-r">
+        <div class="pure-u-1 bottom-padding-small">
+          <strong><a name="resources"><i class="fa fa-camera"></i></a> Images</strong>
+        </div>
         <?php if($images): ?>
           <div class="clear"></div>
           <?php foreach($images as $i): ?>
@@ -101,8 +115,10 @@
         <?php endif; ?>
       </div>
       <hr>
-      <div class="horizontal-padding-small vertical-padding-small">
-        <strong><a name="resources"><i class="fa fa-link"></i></a> Resources</strong>
+      <div class="horizontal-padding-small vertical-padding-small top-padding-xsmall">
+        <div class="pure-u-1 bottom-padding-small">
+          <strong><a name="resources"><i class="fa fa-link"></i></a> Resources</strong>
+        </div>
         <?php if($resources): ?>
           <?php foreach($resources as $r): ?>
             <div class="pure-u-1 truncate">
@@ -139,9 +155,11 @@
   <?php if($type !== 'headline'): ?>
     <section id="components" class="large">
       <div class="horizontal-margin-small vertical-margin-small">
-        <div class="horizontal-padding-small vertical-padding-xsmall pure-g">
+        <div class="horizontal-padding-small vertical-padding-small pure-g">
           <?php if(isset($clusters)): ?>
-            <div class="pure-u-1 strong">Article Components</div>
+            <div class="pure-u-1 bottom-padding-small">
+              <strong><a name="social"><i class="fa fa-caret-square-o-up"></i></a> Components</strong>
+            </div>
             <?php foreach($clusters as $c): ?>
               <div class="pure-u-1 vertical-padding-tiny">
                 <a title="<?php echo stripslashes($c->headline); ?>" href="<?php echo site_url('c/'.$c->hashId.'/'.get_url_string($c->headline)); ?>" class="item ajax" data-type="item">
@@ -210,7 +228,9 @@
               <?php endforeach; ?>
             <?php endforeach; ?>
           <?php elseif(isset($headlines)): ?>
-            <div class="pure-u-1 strong">Cluster Components</div>
+            <div class="pure-u-1 bottom-padding-small">
+              <strong><a name="social"><i class="fa fa-code-fork"></i></a> Components</strong>
+            </div>
             <?php foreach($headlines as $h): ?>
               <div class="pure-u-1 vertical-padding-tiny">
                 <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>" class="item ajax" data-type="item">
@@ -376,7 +396,9 @@
   <section class="small">
     <div class="horizontal-margin-small vertical-margin-small">
       <div class="horizontal-padding-small vertical-padding-small">
-        <strong><a name="social"><i class="fa fa-share"></i></a> Social</strong>
+        <div class="pure-u-1  bottom-padding-small">
+          <strong><a name="social"><i class="fa fa-share"></i></a> Social</strong>
+        </div>
         <form class="pure-u-1 pure-form">
           <fieldset class="pure-group pure-u-1">
             <input type="text" id="copy" value="http:<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline)); ?>" class="pure-input-1" readonly>
@@ -387,7 +409,9 @@
   </section>
   <section class="large">
     <div class="horizontal-margin-small vertical-margin-small">
-      <h3 class="horizontal-padding-xsmall"><i class="fa fa-3-4 fa-comment"></i> Comments (<?php echo sizeof($comments); ?>)</h3>
+      <div class="horizontal-padding-small top-padding-small">
+        <strong><a name="comments"><i class="fa fa-comment"></i></a> Comments (<?php echo sizeof($comments); ?>)</strong>
+      </div>
       <?php if($this->session->userdata('isLoggedIn') && !isset($history)): ?>
         <div class="horizontal-padding-small vertical-padding-small">
           <form method="post" action="?comments=create" class="pure-form pure-u-1 vertical-padding-xsmall ajax" novalidate>
@@ -458,7 +482,12 @@
             <?php endforeach; ?>
           <?php else: ?>
             <article id="blank-comment">
-              <span class="text"><em>Be the first to add a comment.</em></span>
+              <span class="text"><em>
+                Be the first to add a comment.
+                <?php if(!$this->session->userdata('isLoggedIn')): ?>
+                  <a href="<?php echo site_url('?r='.$this->uri->uri_string()); ?>" title="Login / Register"><i>Login / Register</i></a>
+                <?php endif; ?>
+              </em></span>
             </article>
           <?php endif; ?>
         </div>

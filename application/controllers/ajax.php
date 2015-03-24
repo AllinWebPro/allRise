@@ -334,7 +334,7 @@ class Ajax extends CI_Controller
       //
       $response['success'] = 1;
       $h = $this->database_model->get_single('headlines', array('headlineId' => $id, 'deleted' => 0), '*, OLD_PASSWORD(headlineId) AS hashId');
-      $response['redirect'] = site_url('h/'.$h->hashId);
+      $response['redirect'] = site_url('h/'.$h->hashId."?n=1");
     }
     else { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     $this->_output_json($response);

@@ -20,9 +20,10 @@ class Utility_model extends CI_Model
     $this->email_config['mailtype'] = 'html';
     $this->email_config['protocol'] = 'smtp';
     $this->email_config['smtp_host'] = 'ssl://email-smtp.us-west-2.amazonaws.com';
-    $this->email_config['smtp_user'] = 'AKIAIDUIMVKIZANXAWXQ';
-    $this->email_config['smtp_pass'] = 'AmlAtgYTb7W8f8No/BgICQwJ762HmCvWmjdXPVRBXv2E';
+    $this->email_config['smtp_user'] = 'AKIAJ6OGILILO2VFRC3A';
+    $this->email_config['smtp_pass'] = 'AofqD7zDJlCzrryrGdn8MgLI6u1v7M64wgN/ENQuANZr';
     $this->email_config['smtp_port'] = '465';
+    $this->email_config['smtp_timeout'] = '10';
     $this->email_config['newline'] = "\r\n";
 
     $this->email_header = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
@@ -184,6 +185,20 @@ class Utility_model extends CI_Model
     }
     if($contributors) { return ($u_score + $c_score) / sizeof($contributors); }
     return 0;
+  }
+  
+  public function email_owen($subject, $message)
+  {
+    $this->load->library('email');
+    $this->email->initialize($this->email_config);
+
+    $this->email->from('no-reply@allrise.co', 'allRise');
+    $this->email->to("owen@allinwebpro.com");
+
+    $this->email->subject($subject);
+    $this->email->message($message);
+
+    return $this->email->send();
   }
 
   public function emails_notification($user, $notice)

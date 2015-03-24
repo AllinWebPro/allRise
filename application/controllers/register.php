@@ -33,7 +33,7 @@ class Register extends CI_Controller
       $userId = $this->database_model->add('users', $insert, 'userId');
       if($user = $this->database_model->get_single('users', array('userId' => $userId)))
       {
-        @mail("owen@allinwebpro.com", "New User", "Username: ".$user->user);
+        $this->utility_model->email_owen("New User", "Username: ".$user->user);
         //
         $this->database_model->edit('users', array('userId' => $user->userId), array('lastLogin' => time()));
         $this->utility_model->emails_signup($user);

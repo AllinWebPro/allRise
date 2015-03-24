@@ -303,7 +303,7 @@ class Ajax extends CI_Controller
       $insert['active'] = 1;
       $id = $this->database_model->add("headlines", $insert, "headlineId");
       $item = $this->database_model->get_select('headlines', array('headlineId' => $id), 'OLD_PASSWORD(headlineId) AS hashId');
-      @mail("owen@allinwebpro.com", "New Headline", "Link: ".site_url('h/'.$item->hashId));
+      $this->utility_model->email_owen("New Headline", "Link: ".site_url('h/'.$item->hashId));
       $sInsert = array('headlineId' => $id, 'userId' => $userId);
       $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
       $this->database_model->add('subscriptions', array('userId' => 3, 'headlineId' => $id, 'createdOn' => time()), 'subscriptionId');
@@ -798,7 +798,7 @@ class Ajax extends CI_Controller
       $userId = $this->database_model->add('users', $insert, 'userId');
       if($user = $this->database_model->get_single('users', array('userId' => $userId)))
       {
-        @mail("owen@allinwebpro.com", "New User", "Username: ".$user->user);
+        $this->utility_model->email_owen("New User", "Username: ".$user->user);
         //
         $this->database_model->edit('users', array('userId' => $user->userId), array('lastLogin' => time()));
         $this->utility_model->emails_signup($user);

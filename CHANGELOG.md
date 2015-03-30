@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.5.1</h2>
+
+<h4>Fixes:</h4>
+* Line Breaks on Headline Notes
+
 <h2>Version 0.7.5.0</h2>
 
 <h4>Added:</h4>

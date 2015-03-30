@@ -89,7 +89,7 @@
       <?php elseif($type == 'headline' && $item->notes): ?>
         <div class="horizontal-padding-small vertical-padding-xsmall">
           <article class="content">
-            <p class="em"><?php echo stripslashes(str_replace('\r', '<br>', str_replace('\n', '', $item->notes))); ?></p>
+            <p class="em"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $item->notes))); ?></p>
           </article>
         </div>
       <?php endif; ?>
@@ -223,7 +223,7 @@
                       <a href="<?php echo site_url('user/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
                     <?php if($h->notes): ?><span class="horizontal-padding-tiny note"><i class="fa fa-3-4 fa-file-text-o"></i> View Note</span><?php endif; ?>
                   </span>
-                  <?php if($h->notes): ?><div class="note-text hidden"><?php echo $h->notes; ?></div><?php endif; ?>
+                  <?php if($h->notes): ?><div class="note-text hidden"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $h->notes))); ?></div><?php endif; ?>
                 </div>
               <?php endforeach; ?>
             <?php endforeach; ?>
@@ -262,7 +262,7 @@
                     <a href="<?php echo site_url('user/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
                   <?php if($h->notes): ?><span class="horizontal-padding-tiny note-toggle pointer"><i class="fa fa-3-4 fa-file-text-o"></i> View Note</span><?php endif; ?>
                 </span>
-                <?php if($h->notes): ?><div class="note-text show-none em"><?php echo $h->notes; ?></div><?php endif; ?>
+                <?php if($h->notes): ?><div class="note-text show-none em"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $h->notes))); ?></div><?php endif; ?>
               </div>
             <?php endforeach; ?>
           <?php endif; ?>

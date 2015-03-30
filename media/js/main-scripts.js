@@ -138,7 +138,7 @@ $(document).ready(function() {
   if($notice = $("#notice-alert"))
   {
     updateNoticeAlert();
-    setInterval(function() { updateNoticeAlert() }, 15 * 1000);
+    setInterval(function() { updateNoticeAlert() }, 60 * 1000);
   }
 
   /*

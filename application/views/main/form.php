@@ -188,6 +188,34 @@
     <section class="small">
       <div class="horizontal-margin-small vertical-margin-small">
         <div class="horizontal-padding-small vertical-padding-small">
+          <?php if($this->session->userdata('level') == 'a'): ?>
+            <div class="pure-u-1-3">
+              <label for="adminOnly">Admin Only:</label>
+            </div>
+            <div class="pure-u-1-4">
+              <label for="adminOnly-yes">
+                <input type="radio" name="adminOnly" id="adminOnly-yes" value="1" <?php echo set_radio('adminOnly', '1', $item->adminOnly?true:false); ?>> Yes
+              </label>
+            </div>
+            <div class="pure-u-1-4">
+              <label for="adminOnly-no">
+                <input type="radio" name="adminOnly" id="adminOnly-no" value="0" <?php echo set_radio('adminOnly', '0', $item->adminOnly?false:true); ?>> No
+              </label>
+            </div>
+            <div class="pure-u-1-3">
+              <label for="hidden">Hidden:</label>
+            </div>
+            <div class="pure-u-1-4">
+              <label for="hidden-yes">
+                <input type="radio" name="hidden" id="hidden-yes" value="1" <?php echo set_radio('hidden', '1', $item->hidden?true:false); ?>> Yes
+              </label>
+            </div>
+            <div class="pure-u-1-4">
+              <label for="hidden-no">
+                <input type="radio" name="hidden" id="hidden-no" value="0" <?php echo set_radio('hidden', '0', $item->hidden?false:true); ?>> No
+              </label>
+            </div>
+          <?php endif; ?>
           <input type="hidden" name="place" id="headline-place" class="pure-input-1 place-ac" placeholder="Location">
           <input type="hidden" name="placeId" id="headline-placeId">
           <input type="hidden" name="categoryId[]" id="headline-categoryId-1" value="1">

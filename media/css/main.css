@@ -34,6 +34,7 @@ label span { font-size:95%; }
 /*input[type=radio].left-align { margin-right:3px !important;top:2px !important; }*/
 
 #logo .branding { font-size:34px;letter-spacing:2px;line-height:38px; }
+#logo .branding sup { font-size:25%;vertical-align:super;top:-1em; }
 #logo a { text-decoration:none !important; }
 
 #main-bar, #stream .items > div, #list section > div, #item section > div, #notices section > div, #admin section > div, #bottom-bar { background-color:#fff; }

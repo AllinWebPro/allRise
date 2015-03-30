@@ -270,7 +270,7 @@
       </div>
     </section>
   <?php endif; ?>
-  <?php if($this->session->userdata('isLoggedIn') && !isset($history)): ?>
+  <?php if($this->session->userdata('isLoggedIn') && !isset($history) && (!$item->adminOnly || ($item->adminOnly && $this->session->userdata('level') == 'a'))): ?>
     <section class="small">
       <div class="horizontal-margin-small vertical-margin-small">
         <div class="horizontal-padding-small vertical-padding-small pure-g">

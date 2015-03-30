@@ -46,6 +46,13 @@ class Ajax extends CI_Controller
   {
     $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url|max_length[255]');
     $this->form_validation->set_rules('article', 'Article', 'trim|xss_clean');
+    
+    if($this->session->userdata('level') == 'a')
+    {
+      $this->form_validation->set_rules('adminOnly', 'Admin Only', 'trim|xss_clean');
+      $this->form_validation->set_rules('hidden', 'Hidden', 'trim|xss_clean');
+    }
+    
     $this->form_validation->set_rules('place', 'Location', 'trim|xss_clean');
     $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
     $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
@@ -64,6 +71,13 @@ class Ajax extends CI_Controller
         'createdOn' => time(),
         'editedBy' => $userId
       );
+        
+      if($this->session->userdata('level') == 'a')
+      {
+        $insert['adminOnly'] = $post['adminOnly'];
+        $insert['hidden'] = $post['hidden'];
+      }
+      
       if($post['placeId']) { $insert['placeId'] = $post['placeId']; }
       elseif($post['place'])
       {
@@ -276,6 +290,13 @@ class Ajax extends CI_Controller
   {
     $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url|max_length[255]');
     $this->form_validation->set_rules('notes', 'Author Notes', 'trim|xss_clean|strip_tags');
+    
+    if($this->session->userdata('level') == 'a')
+    {
+      $this->form_validation->set_rules('adminOnly', 'Admin Only', 'trim|xss_clean');
+      $this->form_validation->set_rules('hidden', 'Hidden', 'trim|xss_clean');
+    }
+    
     $this->form_validation->set_rules('place', 'Location', 'trim|xss_clean');
     $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
     $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
@@ -294,6 +315,13 @@ class Ajax extends CI_Controller
         'createdOn' => time(),
         'editedBy' => $userId
       );
+        
+      if($this->session->userdata('level') == 'a')
+      {
+        $update['adminOnly'] = $post['adminOnly'];
+        $update['hidden'] = $post['hidden'];
+      }
+        
       if($post['placeId']) { $insert['placeId'] = $post['placeId']; }
       elseif($post['place'])
       {
@@ -849,6 +877,11 @@ class Ajax extends CI_Controller
     {
       $this->form_validation->set_rules('article', 'Article', 'trim|xss_clean');
     }
+    if($this->session->userdata('level') == 'a')
+    {
+      $this->form_validation->set_rules('adminOnly', 'Admin Only', 'trim|xss_clean');
+      $this->form_validation->set_rules('hidden', 'Hidden', 'trim|xss_clean');
+    }
     $this->form_validation->set_rules('place', 'Location', 'trim|xss_clean');
     $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
     $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
@@ -863,6 +896,11 @@ class Ajax extends CI_Controller
       $item['tags'] = $this->db->escape_str($this->utility_model->clean_tag_list($post['tags']));
       $item['editedBy'] = $userId;
       $item['active'] = 1;
+      if($this->session->userdata('level') == 'a')
+      {
+        $item['adminOnly'] = $post['adminOnly'];
+        $item['hidden'] = $post['hidden'];
+      }
       if($type == 'headline') { $item['notes'] = $this->db->escape_str($post['notes']); }
       if($type == 'article') { $item['article'] = $this->db->escape_str(str_replace("\r", '', str_replace("\n", '', $post['article']))); }
       if($place && $post['placeId'] == $place['placeId'])

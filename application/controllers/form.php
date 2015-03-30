@@ -118,6 +118,13 @@ class Form extends CI_Controller
       if($this->data['type'] == 'headline') { $insert['notes'] = $this->db->escape_str($post['notes']); }
       if($this->data['type'] == 'article') { $insert['article'] = $this->db->escape_str(str_replace('\r', '', str_replace('\n', '', $post['article']))); }
       $insert['active'] = 1;
+      
+      if($this->session->userdata('level') == 'a')
+      {
+        $insert['adminOnly'] = $post['adminOnly'];
+        $insert['hidden'] = $post['hidden'];
+      }
+        
       $id = $this->database_model->add($this->data['type']."s", $insert, $this->data['type']."Id");
       $sInsert = array($$this->data['type'].'Id' => $id, 'userId' => $userId);
       $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
@@ -216,7 +223,7 @@ class Form extends CI_Controller
     $this->data['images_output'] = $this->database_model->get('images', $assets_where+array('active' => 1, 'deleted' => 0));
     $this->data['resources_output'] = $this->database_model->get('resources', $assets_where+array('active' => 1, 'deleted' => 0));
     // Verify Data Exists
-    if(isset($this->data['item']) && $this->data['item'])
+    if(isset($this->data['item']) && $this->data['item'] && (!$this->data['adminOnly'] || ($this->data['adminOnly'] && $this->session->userdata('level') == 'a')))
     {
       // Set Variables for Display
       $this->data['place'] = $this->database_model->get_single('places', array('placeId' => $this->data['item']->placeId, 'deleted' => 0));
@@ -269,6 +276,12 @@ class Form extends CI_Controller
           {
             $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId');
           }
+        }
+        
+        if($this->session->userdata('level') == 'a')
+        {
+          $update['adminOnly'] = $post['adminOnly'];
+          $update['hidden'] = $post['hidden'];
         }
 
         $this->database_model->edit($this->data['type'].'s', array($this->data['type'].'Id' => $this->data['id']), $update);
@@ -462,6 +475,11 @@ class Form extends CI_Controller
     if($this->data['type'] == 'article')
     {
       $this->form_validation->set_rules('article', 'Article', 'trim|xss_clean');
+    }
+    if($this->session->userdata('level') == 'a')
+    {
+      $this->form_validation->set_rules('adminOnly', 'Admin Only', 'trim|xss_clean');
+      $this->form_validation->set_rules('hidden', 'Hidden', 'trim|xss_clean');
     }
     $this->form_validation->set_rules('place', 'Location', 'trim|xss_clean');
     $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');

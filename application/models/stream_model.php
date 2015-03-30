@@ -722,63 +722,87 @@ class Stream_model extends CI_Model
       // Process
     if(sizeof($selected['article']) == 1)
     {
-      // Update Cluster Matches
-      $clusters_update = array('articleId' => $selected['article'][0], 'editedBy' => $userId);
-      foreach($selected['cluster'] as $c)
+      $article = $this->database_model->get_single('articles', array('articleId' => $selected['article'][0]), 'adminOnly');
+      if(!$article->adminOnly || $this->session->userdata('level') == 'a')
       {
-        $nInsert = array('clusterId' => $c, 'parentId' => $selected['article'][0], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $c, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $c), $clusters_update);
-      }
-      // Update Headline Matches
-      $newCluster = array();
-      $i = 0;
-      foreach($selected['headline'] as $h)
-      {
-        $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
-        $compared = array();
+        // Update Cluster Matches
+        $clusters_update = array('articleId' => $selected['article'][0], 'editedBy' => $userId);
         foreach($selected['cluster'] as $c)
         {
-          $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
-          if($score = $this->item_compare($h1, $c->headline, $c->tags)) { $compared[$c] = $score; }
+          $cluster = $this->database_model->get_single('clusters', array('clusterId' => $c), 'adminOnly');
+          if(!$cluster->adminOnly || $this->session->userdata('level') == 'a')
+          {
+            $nInsert = array('clusterId' => $c, 'parentId' => $selected['article'][0], 'createdOn' => time());
+            $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $c, 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('clusters', array('clusterId' => $c), $clusters_update);
+          }
         }
-        if($compared)
+        // Update Headline Matches
+        $newCluster = array();
+        $i = 0;
+        foreach($selected['headline'] as $h)
         {
-          asort($compared);
-          $clusterId = key($compared);
-          //
-          $nInsert = array('headlineId' => $c, 'parentId' => $clusterId, 'createdOn' => time());
-          $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
-          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-          $this->ci->database->edit('headlines', array('headlineId' => $h), array('clusterId' => $clusterId, 'editedBy' => $userId));
+          $headline = $this->database_model->get_single('headlines', array('headlineId' => $h), 'adminOnly');
+          if(!$headline->adminOnly || $this->session->userdata('level') == 'a')
+          {
+            $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
+            $compared = array();
+            foreach($selected['cluster'] as $c)
+            {
+              $cluster = $this->database_model->get_single('clusters', array('clusterId' => $c), 'adminOnly');
+              if(!$cluster->adminOnly || $this->session->userdata('level') == 'a')
+              {
+                $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
+                if($score = $this->item_compare($h1, $c->headline, $c->tags)) { $compared[$c] = $score; }
+              }
+            }
+            if($compared)
+            {
+              asort($compared);
+              $clusterId = key($compared);
+              //
+              $nInsert = array('headlineId' => $c, 'parentId' => $clusterId, 'createdOn' => time());
+              $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+              foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+              $this->ci->database->edit('headlines', array('headlineId' => $h), array('clusterId' => $clusterId, 'editedBy' => $userId));
+            }
+            else
+            {
+              $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => 0, 'nvo' => 0);
+            }
+          }
         }
-        else
+        if($newCluster)
         {
-          $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => 0, 'nvo' => 0);
-        }
-      }
-      if($newCluster)
-      {
-        $clusterId = $this->new_cluster($newCluster, $selected['article'][0], $userId);
-        foreach($newCluster as $o)
-        {
-          $nInsert = array('headlineId' => $o['id'], 'parentId' => $clusterId, 'createdOn' => time());
-          $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o['id'], 'deleted' => 0));
-          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-          $this->ci->database->edit('headlines', array('headlineId' => $o['id']), array('clusterId' => $clusterId));
+          $clusterId = $this->new_cluster($newCluster, $selected['article'][0], $userId);
+          foreach($newCluster as $o)
+          {
+            $nInsert = array('headlineId' => $o['id'], 'parentId' => $clusterId, 'createdOn' => time());
+            $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o['id'], 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('headlines', array('headlineId' => $o['id']), array('clusterId' => $clusterId));
+          }
         }
       }
     }
     elseif(sizeof($selected['cluster']) == 1)
     {
-      $headlines_update = array('clusterId' => $selected['cluster'][0], 'editedBy' => $userId);
-      foreach($selected['headline'] as $h)
+      $cluster = $this->database_model->get_single('clusters', array('clusterId' => $selected['cluster'][0]), 'adminOnly');
+      if(!$cluster->adminOnly || $this->session->userdata('level') == 'a')
       {
-        $nInsert = array('headlineId' => $h, 'parentId' => $selected['cluster'][0], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $h), $headlines_update);
+        $headlines_update = array('clusterId' => $selected['cluster'][0], 'editedBy' => $userId);
+        foreach($selected['headline'] as $h)
+        {
+          $headline = $this->database_model->get_single('headlines', array('headlineId' => $h), 'adminOnly');
+          if(!$headline->adminOnly || $this->session->userdata('level') == 'a')
+          {
+            $nInsert = array('headlineId' => $h, 'parentId' => $selected['cluster'][0], 'createdOn' => time());
+            $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('headlines', array('headlineId' => $h), $headlines_update);
+          }
+        }
       }
     }
     elseif($selected['cluster'])
@@ -789,9 +813,13 @@ class Stream_model extends CI_Model
       $i = 0;
       foreach($selected['cluster'] as $c)
       {
-        $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
-        $newArticle[] = array('id' => $c, 'item' => $cl, 'ovn' => $i, 'nvo' => $i);
-        $i++;
+        $cluster = $this->database_model->get_single('clusters', array('clusterId' => $c), 'adminOnly');
+        if(!$cluster->adminOnly || $this->session->userdata('level') == 'a')
+        {
+          $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
+          $newArticle[] = array('id' => $c, 'item' => $cl, 'ovn' => $i, 'nvo' => $i);
+          $i++;
+        }
       }
       if($newArticle)
       {
@@ -809,26 +837,30 @@ class Stream_model extends CI_Model
       $i = 0;
       foreach($selected['headline'] as $h)
       {
-        $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
-        $compared = array();
-        foreach($selected['cluster'] as $c)
+        $headline = $this->database_model->get_single('headlines', array('headlineId' => $h), 'adminOnly');
+        if(!$headline->adminOnly || $this->session->userdata('level') == 'a')
         {
-          $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
-          if($score = $this->item_compare($h1, $c->headline, $c->tags)) { $compared[$c] = $score; }
-        }
-        if($compared)
-        {
-          asort($compared);
-          $clusterId = key($compared);
-          //
-          $nInsert = array('headlineId' => $c, 'parentId' => $clusterId, 'createdOn' => time());
-          $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
-          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-          $this->ci->database->edit('headlines', array('headlineId' => $h), array('clusterId' => $clusterId, 'editedBy' => $userId));
-        }
-        else
-        {
-          $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => 0, 'nvo' => 0);
+          $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
+          $compared = array();
+          foreach($selected['cluster'] as $c)
+          {
+            $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
+            if($score = $this->item_compare($h1, $c->headline, $c->tags)) { $compared[$c] = $score; }
+          }
+          if($compared)
+          {
+            asort($compared);
+            $clusterId = key($compared);
+            //
+            $nInsert = array('headlineId' => $c, 'parentId' => $clusterId, 'createdOn' => time());
+            $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('headlines', array('headlineId' => $h), array('clusterId' => $clusterId, 'editedBy' => $userId));
+          }
+          else
+          {
+            $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => 0, 'nvo' => 0);
+          }
         }
       }
       if($newCluster)
@@ -850,26 +882,30 @@ class Stream_model extends CI_Model
       $i = 0;
       foreach($selected['headline'] as $h)
       {
-        $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
-        $compared = array();
-        foreach($selected['cluster'] as $c)
+        $headline = $this->database_model->get_single('headlines', array('headlineId' => $h), 'adminOnly');
+        if(!$headline->adminOnly || $this->session->userdata('level') == 'a')
         {
-          $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
-          if($score = $this->item_compare($h1, $c->headline, $c->tags)) { $compared[$c] = $score; }
-        }
-        if($compared)
-        {
-          asort($compared);
-          $clusterId = key($compared);
-          //
-          $nInsert = array('headlineId' => $c, 'parentId' => $clusterId, 'createdOn' => time());
-          $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
-          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-          $this->ci->database->edit('headlines', array('headlineId' => $h), array('clusterId' => $clusterId, 'editedBy' => $userId));
-        }
-        else
-        {
-          $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => 0, 'nvo' => 0);
+          $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
+          $compared = array();
+          foreach($selected['cluster'] as $c)
+          {
+            $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
+            if($score = $this->item_compare($h1, $c->headline, $c->tags)) { $compared[$c] = $score; }
+          }
+          if($compared)
+          {
+            asort($compared);
+            $clusterId = key($compared);
+            //
+            $nInsert = array('headlineId' => $c, 'parentId' => $clusterId, 'createdOn' => time());
+            $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('headlines', array('headlineId' => $h), array('clusterId' => $clusterId, 'editedBy' => $userId));
+          }
+          else
+          {
+            $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => 0, 'nvo' => 0);
+          }
         }
       }
       if($newCluster)
@@ -1023,7 +1059,7 @@ class Stream_model extends CI_Model
             $sql .= "GROUP BY headlineId ";
           $sql .= ") d ON d.headlineId = s.headlineId ";
         }
-        $sql .= "WHERE s.deleted = 0 ";
+        $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
           $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
           if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
           if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR h.editedBy = ".$userId.") "; }
@@ -1072,7 +1108,7 @@ class Stream_model extends CI_Model
             $sql .= $viewed_include;
           $sql .= ") d ON d.clusterId = s.clusterId ";
         }
-        $sql .= "WHERE s.deleted = 0 ";
+        $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
           $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
           if($exclusive && !$subscriptions) { $sql .= "AND s.articleId IS null "; }
           if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR c.editedBy = ".$userId.") "; }
@@ -1131,7 +1167,7 @@ class Stream_model extends CI_Model
             $sql .= $viewed_include;
           $sql .= ") d ON d.articleId = s.articleId ";
         }
-        $sql .= "WHERE s.deleted = 0 ";
+        $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
           $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
           if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR a.editedBy = ".$userId.") "; }
           if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
@@ -1260,7 +1296,7 @@ class Stream_model extends CI_Model
             $sql .= "GROUP BY headlineId ";
           $sql .= ") d ON d.headlineId = s.headlineId ";
         }
-        $sql .= "WHERE s.deleted = 0 ";
+        $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
           if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
           if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
           if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
@@ -1291,7 +1327,7 @@ class Stream_model extends CI_Model
             $sql .= $viewed_include;
           $sql .= ") d ON d.clusterId = s.clusterId ";
         }
-        $sql .= "WHERE s.deleted = 0 ";
+        $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
           if(!$subscriptions) { $sql .= "AND s.articleId IS null "; }
           if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
           if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
@@ -1332,7 +1368,7 @@ class Stream_model extends CI_Model
             $sql .= $viewed_include;
           $sql .= ") d ON d.articleId = s.articleId ";
         }
-        $sql .= "WHERE s.deleted = 0 ";
+        $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
           if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
           if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
       }
@@ -1927,7 +1963,7 @@ class Stream_model extends CI_Model
 
     $keywords = trim($o_headline.' '.$o_tags);
     $if = "IF(headline REGEXP '".str_replace(' ', '|', $keywords)."', 1, IF(tags REGEXP '".str_replace(' ', '|', $keywords)."', 1, 0)) =";
-    $where = array($if => 1, 'deleted' => 0);
+    $where = array($if => 1, 'deleted' => 0, 'hidden' => 0, 'adminOnly' => 0);
     $o_success = array(
       'headline' => array(),
       'cluster' => array(),

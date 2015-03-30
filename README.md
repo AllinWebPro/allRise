@@ -7,7 +7,7 @@ MySQL Version: 5.6+
 
 <h2>Version Information <sup>[1]</sup> <sup>[2]</sup></h2>
 
-Beta Version: 0.7.5.0<br>
+Beta Version: 0.7.4.2<br>
 Staging Version: 0.7.5.0<br>
 Development Version: 0.7.5.0
 

@@ -931,6 +931,7 @@ class Stream_model extends CI_Model
     $w = 0;
     $match = "";
     $article_match = "";
+    $terms = str_replace(",", " ", $terms);
     $terms = preg_replace('/[^A-Za-z0-9 ]/', '', $terms);
     $terms = $this->ci->utility->blwords_strip($terms, 'regEx_spaces', ' ');
     if($terms)

@@ -32,7 +32,7 @@ class Item extends CI_Controller
     // Get Data
     if(isset($this->data['item']) && $this->data['item'])
     {
-      $this->data['related'] = $this->stream_model->search($this->data['item']->tags, '(id != '.$id.' AND type != "'.$type.'")', 'score', 'all', true, 3);
+      $this->data['related'] = $this->stream_model->search($this->data['item']->tags, '(id != '.$id.' AND type != "'.$type.'")', 'score', $type, true, 3);
       // Views
       if($this->session->userdata('isLoggedIn'))
       {
@@ -178,7 +178,7 @@ class Item extends CI_Controller
     {
       $idType = $type.'Id';
       $this->data['id'] = $id = $this->data['item']->$idType;
-      $this->data['related'] = $this->stream_model->search($this->data['item']->tags, '(id != '.$id.' AND type != "'.$type.'")', 'score', 'all', true, 3);
+      $this->data['related'] = $this->stream_model->search($this->data['item']->tags, '(id != '.$id.' AND type != "'.$type.'")', 'score', $type, true, 3);
       // Views
       if($this->session->userdata('isLoggedIn') && !isset($_GET['hId']))
       {
@@ -284,6 +284,7 @@ class Item extends CI_Controller
       if($type == 'headline')
       {
         $this->data['parent'] = $this->database_model->get_single('clusters', array('clusterId' => $this->data['item']->clusterId, 'deleted' => 0), "*, OLD_PASSWORD(clusterId) AS hashId, 'cluster' AS type");
+        $this->data['parent_parent'] = $this->database_model->get_single('articles', array('articleId' => $this->data['parent']->articleId, 'deleted' => 0), "*, OLD_PASSWORD(articleId) AS hashId, 'article' AS type");
       }
       elseif($type == 'cluster')
       {

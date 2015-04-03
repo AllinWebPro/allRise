@@ -1,5 +1,13 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.6.0</h2>
+
+<h4>Added:</h4>
+* Show Parent Article of Parent Cluster if in Headline
+
+<h4>Fixes:</h4>
+* Item Page Load Times
+
 <h2>Version 0.7.5.1</h2>
 
 <h4>Fixes:</h4>

@@ -64,7 +64,11 @@
           <?php endif; ?>
           <?php if(isset($parent) && $parent): ?>
             <span><i class="fa fa-<?php echo ($parent->type == 'cluster')?'code-fork':'caret-square-o-up'; ?> horizontal-padding-tiny"></i>
-              <a href="<?php echo site_url(substr($parent->type, 0, 1).'/'.$parent->hashId.'/'.get_url_string($parent->headline)); ?>">View <?php echo ucfirst($parent->type); ?></a></span>
+              <a href="<?php echo site_url(substr($parent->type, 0, 1).'/'.$parent->hashId.'/'.get_url_string($parent->headline)); ?>">View Parent <?php echo ucfirst($parent->type); ?></a></span>
+            <?php if($parent->type == 'cluster' && isset($parent_parent) && $parent_parent): ?>
+              <span><i class="fa fa-caret-square-o-up horizontal-padding-tiny"></i>
+                <a href="<?php echo site_url('a/'.$parent_parent->hashId.'/'.get_url_string($parent_parent->headline)); ?>">View Parent Article</a></span>
+            <?php endif; ?>
           <?php endif; ?>
         </div>
       </div>

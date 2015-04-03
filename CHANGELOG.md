@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.6.1</h2>
+
+<h4>Fixes:</h4>
+* Item Page Load Times (cont.)
+
 <h2>Version 0.7.6.0</h2>
 
 <h4>Added:</h4>

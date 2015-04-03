@@ -1002,7 +1002,7 @@ class Stream_model extends CI_Model
     if($terms) { $sub_score .= "SUM((".$match.") / ".$w.") AS search_score "; }
     else { $sub_score .= "0 AS search_score "; }
 
-    if($results !== 'headline')
+    if($results !== 'headlines')
     {
       $headline_include = "LEFT JOIN ( ";
         $headline_include .= "SELECT s.clusterId, COUNT(s.headlineId) AS h_count, ";

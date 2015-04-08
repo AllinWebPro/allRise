@@ -284,7 +284,7 @@ class Item extends CI_Controller
       if($type == 'headline')
       {
         $this->data['parent'] = $this->database_model->get_single('clusters', array('clusterId' => $this->data['item']->clusterId, 'deleted' => 0), "*, OLD_PASSWORD(clusterId) AS hashId, 'cluster' AS type");
-        $this->data['parent_parent'] = $this->database_model->get_single('articles', array('articleId' => $this->data['parent']->articleId, 'deleted' => 0), "*, OLD_PASSWORD(articleId) AS hashId, 'article' AS type");
+        if($this->data['parent']) { $this->data['parent_parent'] = $this->database_model->get_single('articles', array('articleId' => $this->data['parent']->articleId, 'deleted' => 0), "*, OLD_PASSWORD(articleId) AS hashId, 'article' AS type"); }
       }
       elseif($type == 'cluster')
       {

@@ -1,5 +1,15 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.6.3</h2>
+
+<h4>Added:</h4>
+* Controller/Route for URL Shortener
+
+<h4>Fixes:</h4>
+* Error on Item Parent of Parent
+* Item Page Format
+* Logo Format
+
 <h2>Version 0.7.6.2</h2>
 
 <h4>Fixes:</h4>

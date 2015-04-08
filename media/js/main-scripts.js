@@ -304,6 +304,14 @@ $(document).ready(function() {
                 {
                   $page.html(data);
                   setTimeout(function() { $(".ui-dialog").position({ my: "center", at: "center", of: window, collision: "fit" }); }, 500);
+        
+                  $("img").load(function() {
+                    $comments = $("#comments");
+                    if($stream = $('#stream')) { streamMasonry(); }
+                    if($item = $('#item')) { itemMasonry(); }
+                    if($notices = $('#notices')) { noticeMasonry(); }
+                    if($list = $('#list')) { listMasonry(); }
+                  });
                 },
                 error: function(jqXHR, textStatus, errorThrown) { return true; }
               });
@@ -488,6 +496,14 @@ $(document).ready(function() {
               {
                 $(".message").text('This item is currently locked down. Please check back shortly.');
               }
+        
+              $("img").load(function() {
+                $comments = $("#comments");
+                if($stream = $('#stream')) { streamMasonry(); }
+                if($item = $('#item')) { itemMasonry(); }
+                if($notices = $('#notices')) { noticeMasonry(); }
+                if($list = $('#list')) { listMasonry(); }
+              });
             },
             error: function(jqXHR, textStatus, errorThrown) { return true; }
           });
@@ -597,6 +613,14 @@ $(document).ready(function() {
               {
                 $(".message").text('This item is currently locked down. Please check back shortly.');
               }
+        
+              $("img").load(function() {
+                $comments = $("#comments");
+                if($stream = $('#stream')) { streamMasonry(); }
+                if($item = $('#item')) { itemMasonry(); }
+                if($notices = $('#notices')) { noticeMasonry(); }
+                if($list = $('#list')) { listMasonry(); }
+              });
             },
             error: function(jqXHR, textStatus, errorThrown) { return true; }
           });
@@ -730,6 +754,14 @@ $(document).ready(function() {
             itemMasonry();
           }
           if($(".ui-dialog-titlebar-close") && output) { $(".ui-dialog-titlebar-close").trigger('click'); resources = 0; }
+        
+          $("img").load(function() {
+            $comments = $("#comments");
+            if($stream = $('#stream')) { streamMasonry(); }
+            if($item = $('#item')) { itemMasonry(); }
+            if($notices = $('#notices')) { noticeMasonry(); }
+            if($list = $('#list')) { listMasonry(); }
+          });
         },
         error: function(jqXHR, textStatus, errorThrown) {
           console.log(jqXHR);
@@ -779,6 +811,14 @@ $(document).ready(function() {
         var title = "Search ["+($("#filter-k").val())+"]" + site_title;
         var state = { "pageURL": url, "pageTitle": title, "isList": true };
         saveURL(state, title, url);
+        
+        $("img").load(function() {
+          $comments = $("#comments");
+          if($stream = $('#stream')) { streamMasonry(); }
+          if($item = $('#item')) { itemMasonry(); }
+          if($notices = $('#notices')) { noticeMasonry(); }
+          if($list = $('#list')) { listMasonry(); }
+        });
       },
       error: function(jqXHR, textStatus, errorThrown) {
         //console.log(jqXHR);
@@ -831,6 +871,14 @@ $(document).ready(function() {
         var title = "Search" + site_title;
         var state = { "pageURL": url, "pageTitle": title, "isList": true };
         saveURL(state, title, url);
+        
+        $("img").load(function() {
+          $comments = $("#comments");
+          if($stream = $('#stream')) { streamMasonry(); }
+          if($item = $('#item')) { itemMasonry(); }
+          if($notices = $('#notices')) { noticeMasonry(); }
+          if($list = $('#list')) { listMasonry(); }
+        });
       },
       error: function(jqXHR, textStatus, errorThrown) {
         //console.log(jqXHR);
@@ -945,6 +993,13 @@ $(document).ready(function() {
               clearInterval(timer);
             }
           }, 200);
+          $("img").load(function() {
+            $comments = $("#comments");
+            if($stream = $('#stream')) { streamMasonry(); }
+            if($item = $('#item')) { itemMasonry(); }
+            if($notices = $('#notices')) { noticeMasonry(); }
+            if($list = $('#list')) { listMasonry(); }
+          });
           var state = { "pageURL": current_page, "pageTitle": title };
           if(ajaxLink.attr('data-type') == 'stream') { state.isStream = true; }
           if(ajaxLink.attr('data-type') == 'list') { state.isList = true; }
@@ -1002,6 +1057,13 @@ $(window).load(function() {
   var state = { "pageURL": url, "pageTitle": title, "isList": isList, "isItem": isItem };
   saveURL(state, title, url);
 
+  $("img").load(function() {
+    $comments = $("#comments");
+    if($stream = $('#stream')) { streamMasonry(); }
+    if($item = $('#item')) { itemMasonry(); }
+    if($notices = $('#notices')) { noticeMasonry(); }
+    if($list = $('#list')) { listMasonry(); }
+  });
 
   /*
    * Handle AJAX History

@@ -32,7 +32,7 @@ class Item extends CI_Controller
     // Get Data
     if(isset($this->data['item']) && $this->data['item'])
     {
-      $this->data['related'] = $this->stream_model->search($this->data['item']->tags, '(id != '.$id.' AND type != "'.$type.'")', 'score', $type.'s', true, 3);
+      // $this->data['related'] = $this->stream_model->search($this->data['item']->tags, '(id != '.$id.' AND type != "'.$type.'")', 'score', $type.'s', true, 3);
       // Views
       if($this->session->userdata('isLoggedIn'))
       {
@@ -178,7 +178,7 @@ class Item extends CI_Controller
     {
       $idType = $type.'Id';
       $this->data['id'] = $id = $this->data['item']->$idType;
-      $this->data['related'] = $this->stream_model->search($this->data['item']->tags, '(id != '.$id.' AND type != "'.$type.'")', 'score', $type.'s', true, 3);
+      // $this->data['related'] = $this->stream_model->search($this->data['item']->tags, '(id != '.$id.' AND type != "'.$type.'")', 'score', $type.'s', true, 3);
       // Views
       if($this->session->userdata('isLoggedIn') && !isset($_GET['hId']))
       {

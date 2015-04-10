@@ -498,69 +498,71 @@
       </div>
     </div>
   </section>
-  <section class="small">
-    <div class="horizontal-margin-small vertical-margin-small">
-      <div class="horizontal-padding-small vertical-padding-small">
-        <strong><a name="related"><i class="fa fa-search"></i></a> Related</strong>
-        <?php if($related): ?>
-          <?php foreach($related as $i): ?>
-            <div class="vertical-padding-small horizontal-padding-xsmall">
-              <?php if($i->image && 1 == 0): ?>
-                <img src="<?php echo $i->image; ?>" height="42" width="42" class="left-align right-padding-xsmall">
-              <?php endif; ?>
-              <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
-                <span class="item">
-                  <i class="fa fa-<?php echo ($i->type == 'headline')?'dot-circle-o':(($i->type == 'cluster')?'code-fork':'caret-square-o-up'); ?>"></i>
-                  <span><?php echo stripslashes($i->headline); ?></span>
-                </span>
-              </a><br>
-              <span class="grey">
-                <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
-                  <time>
-                    <?php if($i->editedOn > strtotime(date("m/d/Y"))): ?>
-                      Today at <?php echo date("h:ia", $i->editedOn); ?>
-                    <?php elseif($i->editedOn > strtotime(date("m/d/Y", strtotime("-1 day")))): ?>
-                      Yesterday at <?php echo date("h:ia", $i->editedOn); ?>
-                    <?php elseif(date("Y", $i->editedOn) == date("Y")): ?>
-                      <?php echo date("M d", $i->editedOn); ?> @ <?php echo date("h:ia", $i->editedOn); ?>
-                    <?php else: ?>
-                      <?php echo date("M d Y", $i->editedOn); ?>
-                    <?php endif; ?>
-                  </time>
-                </span>
-                <?php if($i->c_count): ?>
-                  <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-code-fork"></i>
-                    <?php echo $i->c_count; ?></span>
+  <?php if(isset($related)): ?>
+    <section class="small">
+      <div class="horizontal-margin-small vertical-margin-small">
+        <div class="horizontal-padding-small vertical-padding-small">
+          <strong><a name="related"><i class="fa fa-search"></i></a> Related</strong>
+          <?php if($related): ?>
+            <?php foreach($related as $i): ?>
+              <div class="vertical-padding-small horizontal-padding-xsmall">
+                <?php if($i->image && 1 == 0): ?>
+                  <img src="<?php echo $i->image; ?>" height="42" width="42" class="left-align right-padding-xsmall">
                 <?php endif; ?>
-                <?php if($i->h_count): ?>
-                  <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-dot-circle-o"></i>
-                    <?php echo $i->h_count; ?></span>
-                <?php endif; ?>
-                <?php if($i->comments): ?>
-                  <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
-                    <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>#comments" class="ajax" data-type="item">
-                      <?php echo $i->comments; ?></a></span>
-                <?php endif; ?>
-                <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('a'))): ?>
-                  <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-eye"></i> <?php echo round($i->x_score * 10, 2); ?></span>
-                  <span class="horizontal-padding-tiny">
-                    K: <?php echo round($i->search_score * 10, 2); ?>
-                    C: <?php echo round($i->cred_score * 10, 2); ?>
-                    S: <?php echo round($i->sub_score * 10, 2); ?>
-                    Q: <?php echo round($i->decay_score * 10, 2); ?>
+                <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
+                  <span class="item">
+                    <i class="fa fa-<?php echo ($i->type == 'headline')?'dot-circle-o':(($i->type == 'cluster')?'code-fork':'caret-square-o-up'); ?>"></i>
+                    <span><?php echo stripslashes($i->headline); ?></span>
                   </span>
-                <?php endif; ?>
-              </span>
+                </a><br>
+                <span class="grey">
+                  <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
+                    <time>
+                      <?php if($i->editedOn > strtotime(date("m/d/Y"))): ?>
+                        Today at <?php echo date("h:ia", $i->editedOn); ?>
+                      <?php elseif($i->editedOn > strtotime(date("m/d/Y", strtotime("-1 day")))): ?>
+                        Yesterday at <?php echo date("h:ia", $i->editedOn); ?>
+                      <?php elseif(date("Y", $i->editedOn) == date("Y")): ?>
+                        <?php echo date("M d", $i->editedOn); ?> @ <?php echo date("h:ia", $i->editedOn); ?>
+                      <?php else: ?>
+                        <?php echo date("M d Y", $i->editedOn); ?>
+                      <?php endif; ?>
+                    </time>
+                  </span>
+                  <?php if($i->c_count): ?>
+                    <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-code-fork"></i>
+                      <?php echo $i->c_count; ?></span>
+                  <?php endif; ?>
+                  <?php if($i->h_count): ?>
+                    <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-dot-circle-o"></i>
+                      <?php echo $i->h_count; ?></span>
+                  <?php endif; ?>
+                  <?php if($i->comments): ?>
+                    <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
+                      <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>#comments" class="ajax" data-type="item">
+                        <?php echo $i->comments; ?></a></span>
+                  <?php endif; ?>
+                  <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('a'))): ?>
+                    <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-eye"></i> <?php echo round($i->x_score * 10, 2); ?></span>
+                    <span class="horizontal-padding-tiny">
+                      K: <?php echo round($i->search_score * 10, 2); ?>
+                      C: <?php echo round($i->cred_score * 10, 2); ?>
+                      S: <?php echo round($i->sub_score * 10, 2); ?>
+                      Q: <?php echo round($i->decay_score * 10, 2); ?>
+                    </span>
+                  <?php endif; ?>
+                </span>
+              </div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="vertical-padding-xsmall horizontal-padding-xsmall">
+              <span class="item">No results found.</span>
             </div>
-          <?php endforeach; ?>
-        <?php else: ?>
-          <div class="vertical-padding-xsmall horizontal-padding-xsmall">
-            <span class="item">No results found.</span>
-          </div>
-        <?php endif; ?>
+          <?php endif; ?>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  <?php endif; ?>
 </div>
 <?php if($this->session->userdata('isLoggedIn')): ?>
   <div class="modal-content" id="comment-edit" title="Modify Comment">

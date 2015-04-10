@@ -223,7 +223,7 @@ class Form extends CI_Controller
     $this->data['images_output'] = $this->database_model->get('images', $assets_where+array('active' => 1, 'deleted' => 0));
     $this->data['resources_output'] = $this->database_model->get('resources', $assets_where+array('active' => 1, 'deleted' => 0));
     // Verify Data Exists
-    if(isset($this->data['item']) && $this->data['item'] && (!$this->data['adminOnly'] || ($this->data['adminOnly'] && $this->session->userdata('level') == 'a')))
+    if(isset($this->data['item']) && $this->data['item'] && (!$this->data['item']->adminOnly || ($this->data['item']->adminOnly && $this->session->userdata('level') == 'a')))
     {
       // Set Variables for Display
       $this->data['place'] = $this->database_model->get_single('places', array('placeId' => $this->data['item']->placeId, 'deleted' => 0));

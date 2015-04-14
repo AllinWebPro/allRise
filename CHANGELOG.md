@@ -1,5 +1,14 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.7.0</h2>
+
+<h4>Added:</h4>
+* URL Shortener via TinyURL
+* Share Buttons for Twitter and Facebook
+
+<h4>Removed</h4>
+* Controller/Route for URL Shortener
+
 <h2>Version 0.7.6.4</h2>
 
 <h4>Fixes:</h4>

@@ -403,10 +403,18 @@
         <div class="pure-u-1  bottom-padding-small">
           <strong><a name="social"><i class="fa fa-share"></i></a> Social</strong>
         </div>
-        <form class="pure-u-1 pure-form">
+        <form class="pure-u-1 pure-form pure-g-r">
+          <?php $tinyurl = file_get_contents('http://tinyurl.com/api-create.php?url=http:'.site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline))); ?>
           <fieldset class="pure-group pure-u-1">
-            <input type="text" id="copy" value="http:<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline)); ?>" class="pure-input-1" readonly>
+            <input type="text" id="copy" value="<?php echo $tinyurl; ?>" class="pure-input-1" readonly>
           </fieldset>
+          <div class="pure-u-1-2 center-text">
+            <a href="https://twitter.com/share" class="twitter-share-button" data-url="<?php echo $tinyurl; ?>" data-text="<?php echo get_100_char($item->headline); ?>">Tweet</a>
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+          </div>
+          <div class="pure-u-1-2 center-text">
+            <div class="fb-share-button" data-href="<?php echo $tinyurl; ?>" data-layout="button_count"></div>
+          </div>
         </form>
       </div>
     </div>

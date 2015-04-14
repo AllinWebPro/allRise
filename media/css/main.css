@@ -133,6 +133,8 @@ a[data-type=vote]:hover i { color:#666 !important; }
   #content nav a { font-size:.75em; }
 }
 
+.fb_iframe_widget { text-align:left;width:107px; }
+
 /*
  * allRise Global Styles
  */

@@ -92,8 +92,6 @@ $route['page/(:any)']                = "page/index/$1";
 
 $route['p/(:any)']                   = "page/index/$1";
 
-$route['i/(:any)']                   = "shortener/index/$1";
-
 $route['admin']                      = "admin/users";
 
 $route['default_controller']         = "login";

@@ -43,4 +43,15 @@ function get_url_string($string = '', $max_length = 122)
   }
   return str_replace(' ', '-', str_replace('  ', '-', $string));
 }
+
+function get_100_char($string = '')
+{
+  if(strlen($string) > 100)
+  {
+    $string = wordwrap($string, 100);
+    $string = substr($string, 0, strpos($string, "\n"));
+    $string .= "...";
+  }
+  return $string;
+}
 ?>

@@ -331,7 +331,7 @@ class Ajax extends CI_Controller
       $insert['active'] = 1;
       $id = $this->database_model->add("headlines", $insert, "headlineId");
       $item = $this->database_model->get_select('headlines', array('headlineId' => $id), 'OLD_PASSWORD(headlineId) AS hashId');
-      $this->utility_model->email_owen("New Headline", "Link: ".site_url('h/'.$item->hashId));
+      $this->utility_model->email_owen("New Headline", "Link: http:".site_url('h/'.$item[0]->hashId));
       $sInsert = array('headlineId' => $id, 'userId' => $userId);
       $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
       $this->database_model->add('subscriptions', array('userId' => 3, 'headlineId' => $id, 'createdOn' => time()), 'subscriptionId');

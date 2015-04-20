@@ -67,7 +67,7 @@
         <div class="horizontal-margin-small vertical-margin-small">
           <div class="horizontal-padding-small vertical-padding-xsmall pure-g">
             <?php if(isset($clusters)): ?>
-              <div class="pure-u-1 bottom-padding-small">
+              <div class="pure-u-1 bottom-padding-xsmall">
                 <strong><a name="social"><i class="fa fa-caret-square-o-up"></i></a> Components</strong>
               </div>
               <?php foreach($clusters as $c): ?>
@@ -134,7 +134,7 @@
                 <?php endforeach; ?>
               <?php endforeach; ?>
             <?php elseif(isset($headlines)): ?>
-              <div class="pure-u-1 bottom-padding-small">
+              <div class="pure-u-1 bottom-padding-xsmall">
                 <strong><a name="social"><i class="fa fa-code-fork"></i></a> Components</strong>
               </div>
               <?php foreach($headlines as $h): ?>
@@ -189,31 +189,33 @@
       <div class="horizontal-margin-small vertical-margin-small">
         <div class="horizontal-padding-small vertical-padding-small">
           <?php if($this->session->userdata('level') == 'a'): ?>
-            <div class="pure-u-1-3">
-              <label for="adminOnly">Admin Only:</label>
-            </div>
-            <div class="pure-u-1-4">
-              <label for="adminOnly-yes">
-                <input type="radio" name="adminOnly" id="adminOnly-yes" value="1" <?php echo set_radio('adminOnly', '1', (isset($item) && $item->adminOnly)?true:false); ?>> Yes
-              </label>
-            </div>
-            <div class="pure-u-1-4">
-              <label for="adminOnly-no">
-                <input type="radio" name="adminOnly" id="adminOnly-no" value="0" <?php echo set_radio('adminOnly', '0', (isset($item) && $item->adminOnly)?false:true); ?>> No
-              </label>
-            </div>
-            <div class="pure-u-1-3">
-              <label for="hidden">Hidden:</label>
-            </div>
-            <div class="pure-u-1-4">
-              <label for="hidden-yes">
-                <input type="radio" name="hidden" id="hidden-yes" value="1" <?php echo set_radio('hidden', '1', (isset($item) && $item->hidden)?true:false); ?>> Yes
-              </label>
-            </div>
-            <div class="pure-u-1-4">
-              <label for="hidden-no">
-                <input type="radio" name="hidden" id="hidden-no" value="0" <?php echo set_radio('hidden', '0', (isset($item) && $item->hidden)?false:true); ?>> No
-              </label>
+            <div class="pure-u-1 bottom-padding-xsmall">
+              <div class="pure-u-1-3">
+                <label for="adminOnly">Admin Only:</label>
+              </div>
+              <div class="pure-u-1-4">
+                <label for="adminOnly-yes">
+                  <input type="radio" name="adminOnly" id="adminOnly-yes" value="1" <?php echo set_radio('adminOnly', '1', (isset($item) && $item->adminOnly)?true:false); ?>> Yes
+                </label>
+              </div>
+              <div class="pure-u-1-4">
+                <label for="adminOnly-no">
+                  <input type="radio" name="adminOnly" id="adminOnly-no" value="0" <?php echo set_radio('adminOnly', '0', (isset($item) && $item->adminOnly)?false:true); ?>> No
+                </label>
+              </div>
+              <div class="pure-u-1-3">
+                <label for="hidden">Hidden:</label>
+              </div>
+              <div class="pure-u-1-4">
+                <label for="hidden-yes">
+                  <input type="radio" name="hidden" id="hidden-yes" value="1" <?php echo set_radio('hidden', '1', (isset($item) && $item->hidden)?true:false); ?>> Yes
+                </label>
+              </div>
+              <div class="pure-u-1-4">
+                <label for="hidden-no">
+                  <input type="radio" name="hidden" id="hidden-no" value="0" <?php echo set_radio('hidden', '0', (isset($item) && $item->hidden)?false:true); ?>> No
+                </label>
+              </div>
             </div>
           <?php endif; ?>
           <input type="hidden" name="place" id="headline-place" class="pure-input-1 place-ac" placeholder="Location">
@@ -244,7 +246,7 @@
       <section class="small">
         <div class="horizontal-margin-small vertical-margin-small">
           <div class="horizontal-padding-small vertical-padding-small">
-            <div class="pure-u-1 bottom-margin-small"><strong><a name="resources"><i class="fa fa-clock-o"></i></a> Change History</strong></div>
+            <div class="pure-u-1 bottom-margin-xsmall"><strong><a name="resources"><i class="fa fa-clock-o"></i></a> Change History</strong></div>
             <div class="clear"></div>
             <ul class="no-margin">
               <?php foreach($history as $h): ?>

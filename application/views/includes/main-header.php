@@ -10,7 +10,7 @@
       <?php if($page !== 'login-register'): ?>
         <form action="<?php echo site_url('search'); ?>" class="pure-form pure-g-r vertical-padding-xsmall" novalidate>
           <div class="pure-u-5-6">
-            <?php echo form_input('k', '', 'placeholder="Keywords, Tags (e.g. Dragons)" class="pure-input-1" id="k"'); ?>
+            <?php echo form_input('k', '', 'placeholder="Keywords, Tags (e.g. Dragons)" class="pure-input-1 no-round" id="k"'); ?>
           </div>
           <div class="pure-u-1-6">
             <?php if(isset($sort)): ?><input type="hidden" name="s" id="s" value="<?php echo $sort; ?>"><?php endif; ?>
@@ -26,21 +26,21 @@
       <div class="pure-g center-text vertical-padding-xsmall">
         <?php if($this->session->userdata('isLoggedIn')): ?>
           <div class="pure-u-1-5">
-            <a href="<?php echo site_url('h/create'); ?>" title="Create Headline"><i class="fa fa-dot-circle-o fa-7-4"></i></a>
+            <a href="<?php echo site_url('h/create'); ?>" title="Create Headline"><i class="fa fa-dot-circle-o fa-7-4 grey"></i></a>
           </div>
           <div class="pure-u-1-5">
             <a href="<?php echo site_url('notifications'); ?>" title="Notifications" class="pos-rel" data-ajax="<?php echo site_url('ajax/page/notices'); ?>" data-modal='notice-page'>
-              <i class="fa fa-book fa-7-4"></i> <strong id="notice-alert" class="notice grey-light-bg orange horizontal-padding-xsmall"></strong>
+              <i class="fa fa-book fa-7-4 grey"></i> <strong id="notice-alert" class="notice grey-light-bg orange horizontal-padding-xsmall"></strong>
             </a>
           </div>
           <div class="pure-u-1-5">
-            <a href="<?php echo site_url('user/'.$this->session->userdata('user')); ?>" title="Profile"><i class="fa fa-user fa-7-4"></i></a>
+            <a href="<?php echo site_url('user/'.$this->session->userdata('user')); ?>" title="Profile"><i class="fa fa-user fa-7-4 grey"></i></a>
           </div>
           <div class="pure-u-1-5">
-            <a href="<?php echo site_url('preferences'); ?>" title="Preferences" data-modal="account-preferences"><i class="fa fa-cog fa-7-4"></i></a>
+            <a href="<?php echo site_url('preferences'); ?>" title="Preferences" data-modal="account-preferences"><i class="fa fa-cog fa-7-4 grey"></i></a>
           </div>
           <div class="pure-u-1-5">
-            <a href="<?php echo site_url('logout'); ?>" title="Logout"><i class="fa fa-sign-out fa-7-4"></i></a>
+            <a href="<?php echo site_url('logout'); ?>" title="Logout"><i class="fa fa-sign-out fa-7-4 grey"></i></a>
           </div>
         <?php elseif($page !== 'login-register'): ?>
           <div class="pure-u-1">

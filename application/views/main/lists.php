@@ -15,23 +15,23 @@
 <div id="list" class="pure-u-1 vertical-padding-small">
   <section id="search-filters" class="small">
     <div class="horizontal-margin-small vertical-margin-small">
-      <h3 class="horizontal-padding-xsmall">Advanced Search</h3>
-      <div class="vertical-padding-small horizontal-padding-xsmall">
+      <div class="vertical-padding-xsmall horizontal-padding-small">
+        <strong><a name="search"><i class="fa fa-search"></i></a> Advanced Search</strong>
         <form class="pure-u-1 pure-form ajax-list" method="get" action="<?php echo site_url('search'); ?>">
-          <fieldset>
-            <input type="text" name="k" id="filter-k" class="pure-input-1" placeholder="Keywords, Tags (e.g. Dragons)" value="<?php echo $search; ?>">
-          </fieldset>
-          <fieldset>
-            <select name="r" id="filter-r" class="pure-input-1">
-              <option value="all" <?php echo ($results == 'all')?'selected':''; ?>>All Results</option>
-              <option value="visited" <?php echo ($results == 'visited')?'selected':''; ?>>Already Visited</option>
-              <option value="unvisited" <?php echo ($results == 'unvisited')?'selected':''; ?>>Not Yet Visited</option>
-              <option value="headlines" <?php echo ($results == 'headlines')?'selected':''; ?>>Only Headlines</option>
-              <option value="clusters" <?php echo ($results == 'clusters')?'selected':''; ?>>Only Clusters</option>
-              <option value="articles" <?php echo ($results == 'articles')?'selected':''; ?>>Only Articles</option>
-            </select>
-          </fieldset>
-          <fieldset>
+          <fieldset class="item pure-group pure-u-1 vertical-padding-tiny">
+            <div class="pure-g">
+              <input type="text" name="k" id="filter-k" class="pure-input-1" placeholder="Keywords, Tags (e.g. Dragons)" value="<?php echo $search; ?>">
+            </div>
+            <div class="pure-g">
+              <select name="r" id="filter-r" class="pure-input-1">
+                <option value="all" <?php echo ($results == 'all')?'selected':''; ?>>All Results</option>
+                <option value="visited" <?php echo ($results == 'visited')?'selected':''; ?>>Already Visited</option>
+                <option value="unvisited" <?php echo ($results == 'unvisited')?'selected':''; ?>>Not Yet Visited</option>
+                <option value="headlines" <?php echo ($results == 'headlines')?'selected':''; ?>>Only Headlines</option>
+                <option value="clusters" <?php echo ($results == 'clusters')?'selected':''; ?>>Only Clusters</option>
+                <option value="articles" <?php echo ($results == 'articles')?'selected':''; ?>>Only Articles</option>
+              </select>
+            </div>
             <input type="hidden" name="s" id="filter-s" value="<?php echo $sort; ?>">
             <input type="hidden" name="subscription" id="filter-subscription" value="<?php echo $subscription; ?>">
             <input type="hidden" name="u" id="filter-u" value="<?php echo $userId; ?>">
@@ -45,17 +45,18 @@
   <section id="items-list" class="large">
     <div class="horizontal-margin-small vertical-margin-small">
       <form method="post" action="<?php echo site_url('search/join'); ?>" class="ajax-join">
-        <h3 class="horizontal-padding-xsmall">Results
-          <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('m', 'a'))): ?>
-            <input type="hidden" name="ajax" value="<?php echo site_url('ajax/join'); ?>">
-            <input type="hidden" name="uri" value="<?php echo ltrim($uri."&pg=".$current, '&'); ?>">
-            <input type="submit" value="Combine Items" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg">
-          <?php endif; ?>
-        </h3>
         <div class="vertical-padding-xsmall">
+          <div class="horizontal-padding-small">
+            <strong><a name="results"><i class="fa fa-align-justify"></i></a> Search Results</strong>
+            <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('m', 'a'))): ?>
+              <input type="hidden" name="ajax" value="<?php echo site_url('ajax/join'); ?>">
+              <input type="hidden" name="uri" value="<?php echo ltrim($uri."&pg=".$current, '&'); ?>">
+              <input type="submit" value="Combine Items" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg">
+            <?php endif; ?>
+          </div>
           <?php if($items): ?>
             <?php foreach($items as $i): ?>
-              <div class="vertical-padding-small horizontal-padding-xsmall">
+              <div class="vertical-padding-xsmall horizontal-padding-small">
                 <?php if($i->image): ?>
                   <img src="<?php echo $i->image; ?>" height="42" width="42" class="left-align right-padding-xsmall">
                 <?php endif; ?>
@@ -135,11 +136,11 @@
       <?php endif; ?>
     </div>
   </section>
-  <section id="search-filters" class="small">
+  <!--<section id="search-filters" class="small">
     <div class="horizontal-margin-small vertical-margin-small">
       <h3 class="horizontal-padding-xsmall">Other</h3>
       <div class="vertical-padding-xsmall">
       </div>
     </div>
-  </section>
+  </section>-->
 </div>

@@ -1161,6 +1161,12 @@ function itemMasonry()
 function listMasonry()
 {
   columns = Math.floor($("body").width() / 300);
+  columnWidth = Math.floor(Math.floor($list.width() / columns));
+  $list.children('.large').width(columnWidth * ((columns > 2) ? ((columns - 1)) : columns));
+  $list.children('.small').width(columnWidth* ((columns > 2) ? 1 : columns));
+  $list.masonry({ columnWidth: columnWidth, itemSelector: 'section' });
+  
+  /*columns = Math.floor($("body").width() / 300);
   columnWidth = Math.floor($list.width() / columns);
   columnWidth--;
   if(columns <= 4)
@@ -1172,7 +1178,7 @@ function listMasonry()
     $list.children('.large').width(columnWidth * (columns - 2));
   }
   $list.children('.small').width(columnWidth * ((columns == 2) ? 2 : 1));
-  $list.masonry({ columnWidth: columnWidth, itemSelector: 'section' });
+  $list.masonry({ columnWidth: columnWidth, itemSelector: 'section' });*/
 }
 
 function streamMasonry(largeItemSelector)

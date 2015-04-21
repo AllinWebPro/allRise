@@ -78,7 +78,9 @@
             <article class="content">
               <?php echo stripslashes(str_replace('\r', '', str_replace('\n', '', $item->article))); ?>
             </article>
-            <a href="<?php echo site_url(substr($type, 0, 1).'/modify/'.$item->hashId); ?>" class="right-align">Edit this Article</a>
+            <?php if(($this->session->userdata('isLoggedIn') && !isset($history) && (!$item->adminOnly || ($item->adminOnly && $this->session->userdata('level') == 'a'))) && ($type !== 'headline' || ($item->createdBy == $this->session->userdata('userId') || in_array($this->session->userdata('level'), array('m', 'a')))): ?>
+              <a href="<?php echo site_url(substr($type, 0, 1).'/modify/'.$item->hashId); ?>" class="right-align">Edit this Article</a>
+            <?php endif; ?>
             <div class="clear"></div>
           <?php elseif($this->session->userdata('isLoggedIn')): ?>
             <a class="pure-button pure-button-small" href="<?php echo site_url('article/modify/'.$id); ?>" >

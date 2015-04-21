@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.7.3</h2>
+
+<h4>Fixes:</h4>
+* Design Consistancy (cont.)
+* Hide Link if Not Logged In
+
 <h2>Version 0.7.7.2</h2>
 
 <h4>Fixes:</h4>

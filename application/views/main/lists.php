@@ -16,7 +16,9 @@
   <section id="search-filters" class="small">
     <div class="horizontal-margin-small vertical-margin-small">
       <div class="vertical-padding-xsmall horizontal-padding-small">
-        <strong><a name="search"><i class="fa fa-search"></i></a> Advanced Search</strong>
+        <div class="bottom-padding-xsmall">
+          <strong><a name="search"><i class="fa fa-search"></i></a> Advanced Search</strong>
+        </div>
         <form class="pure-u-1 pure-form ajax-list" method="get" action="<?php echo site_url('search'); ?>">
           <fieldset class="item pure-group pure-u-1 vertical-padding-tiny">
             <div class="pure-g">
@@ -46,7 +48,7 @@
     <div class="horizontal-margin-small vertical-margin-small">
       <form method="post" action="<?php echo site_url('search/join'); ?>" class="ajax-join">
         <div class="vertical-padding-xsmall">
-          <div class="horizontal-padding-small">
+          <div class="horizontal-padding-small bottom-padding-xsmall">
             <strong><a name="results"><i class="fa fa-align-justify"></i></a> Search Results</strong>
             <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('m', 'a'))): ?>
               <input type="hidden" name="ajax" value="<?php echo site_url('ajax/join'); ?>">
@@ -107,6 +109,7 @@
                     </span>
                   <?php endif; ?>
                 </span>
+                <div class="clear"></div>
               </div>
             <?php endforeach; ?>
           <?php else: ?>

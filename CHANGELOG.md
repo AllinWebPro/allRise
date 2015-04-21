@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.7.4</h2>
+
+<h4>Fixes:</h4> 
+* Hide Link if Not Logged In (cont.)
+
 <h2>Version 0.7.7.3</h2>
 
 <h4>Fixes:</h4>

@@ -63,10 +63,12 @@
               <a href="<?php echo site_url('user/'.$contributors[0]->user); ?>"><?php echo $contributors[0]->user; ?></a></span>
           <?php endif; ?>
           <?php if(isset($parent) && $parent): ?>
-            <span><i class="fa fa-<?php echo ($parent->type == 'cluster')?'code-fork':'caret-square-o-up'; ?> horizontal-padding-tiny"></i>
+            <span>
+              <div class="icon-box horizontal-padding-tiny"><?php echo file_get_contents('media/svg/'.$parent->type.'.svg'); ?></div>
               <a href="<?php echo site_url(substr($parent->type, 0, 1).'/'.$parent->hashId.'/'.get_url_string($parent->headline)); ?>">View Parent <?php echo ucfirst($parent->type); ?></a></span>
             <?php if($parent->type == 'cluster' && isset($parent_parent) && $parent_parent): ?>
-              <span><i class="fa fa-caret-square-o-up horizontal-padding-tiny"></i>
+              <span>
+                <div class="icon-box horizontal-padding-tiny"><?php echo file_get_contents('media/svg/article.svg'); ?></div>
                 <a href="<?php echo site_url('a/'.$parent_parent->hashId.'/'.get_url_string($parent_parent->headline)); ?>">View Parent Article</a></span>
             <?php endif; ?>
           <?php endif; ?>
@@ -164,12 +166,13 @@
         <div class="horizontal-padding-small vertical-padding-small pure-g">
           <?php if(isset($clusters)): ?>
             <div class="pure-u-1 bottom-padding-small">
-              <strong><a name="social"><i class="fa fa-caret-square-o-up"></i></a> Components</strong>
+              <strong><a name="components"><div class="icon-box"><?php echo file_get_contents('media/svg/article.svg'); ?></div></a> Components</strong>
             </div>
             <?php foreach($clusters as $c): ?>
               <div class="pure-u-1 vertical-padding-tiny">
                 <a title="<?php echo stripslashes($c->headline); ?>" href="<?php echo site_url('c/'.$c->hashId.'/'.get_url_string($c->headline)); ?>" class="item ajax" data-type="item">
-                  <i class="fa fa-code-fork"></i> <?php echo stripslashes($c->headline); ?></a>
+                  <div class="icon-box"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div>
+                  <?php echo stripslashes($c->headline); ?></a>
                 <span class="grey">
                   <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
                     <time>
@@ -201,7 +204,8 @@
               <?php foreach($headlines[$c->clusterId] as $h): ?>
                 <div class="pure-u-1 vertical-padding-tiny">
                   <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>" class="left-padding display-ib item ajax" data-type="item">
-                    <i class="fa fa-dot-circle-o"></i> <?php echo stripslashes($h->headline); ?></a>
+                    <div class="icon-box"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
+                    <?php echo stripslashes($h->headline); ?></a>
                   <span class="grey left-padding display-ib">
                     <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
                       <time>
@@ -235,12 +239,13 @@
             <?php endforeach; ?>
           <?php elseif(isset($headlines)): ?>
             <div class="pure-u-1 bottom-padding-small">
-              <strong><a name="social"><i class="fa fa-code-fork"></i></a> Components</strong>
+              <strong><a name="components"><div class="icon-box"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div> Components</strong>
             </div>
             <?php foreach($headlines as $h): ?>
               <div class="pure-u-1 vertical-padding-tiny">
                 <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>" class="item ajax" data-type="item">
-                  <i class="fa fa-dot-circle-o"></i> <?php echo stripslashes($h->headline); ?></a>
+                  <div class="icon-box"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
+                  <?php echo stripslashes($h->headline); ?></a>
                 <span class="grey">
                   <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
                     <time>
@@ -521,7 +526,7 @@
                 <?php endif; ?>
                 <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
                   <span class="item">
-                    <i class="fa fa-<?php echo ($i->type == 'headline')?'dot-circle-o':(($i->type == 'cluster')?'code-fork':'caret-square-o-up'); ?>"></i>
+                    <div class="icon-box"><?php echo file_get_contents('media/svg/'.$i->type.'.svg'); ?></div>
                     <span><?php echo stripslashes($i->headline); ?></span>
                   </span>
                 </a><br>
@@ -540,11 +545,13 @@
                     </time>
                   </span>
                   <?php if($i->c_count): ?>
-                    <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-code-fork"></i>
+                    <span class="horizontal-padding-tiny">
+                      <div class="icon-box small"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div>
                       <?php echo $i->c_count; ?></span>
                   <?php endif; ?>
                   <?php if($i->h_count): ?>
-                    <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-dot-circle-o"></i>
+                    <span class="horizontal-padding-tiny">
+                      <div class="icon-box small"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
                       <?php echo $i->h_count; ?></span>
                   <?php endif; ?>
                   <?php if($i->comments): ?>

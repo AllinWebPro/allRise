@@ -61,10 +61,13 @@
               <div class="vertical-padding-xsmall horizontal-padding-small">
                 <?php if($i->image): ?>
                   <img src="<?php echo $i->image; ?>" height="42" width="42" class="left-align right-padding-xsmall">
+                <?php else: ?>
+                  <img src="<?php echo site_url('media/img/no-image.gif'); ?>" height="42" width="42" class="left-align right-padding-xsmall">
                 <?php endif; ?>
                 <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
                   <span class="item">
-                    <i class="fa fa-<?php echo ($i->type == 'headline')?'dot-circle-o':(($i->type == 'cluster')?'code-fork':'caret-square-o-up'); ?>"></i>
+                    <!--<i class="fa fa-<?php echo ($i->type == 'headline')?'dot-circle-o':(($i->type == 'cluster')?'code-fork':'caret-square-o-up'); ?>"></i>-->
+                    <div class="icon-box"><?php echo file_get_contents('media/svg/'.$i->type.'.svg'); ?></div>
                     <span><?php echo stripslashes($i->headline); ?></span>
                   </span>
                 </a>
@@ -83,11 +86,13 @@
                     </time>
                   </span>
                   <?php if($i->c_count): ?>
-                    <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-code-fork"></i>
+                    <span class="horizontal-padding-tiny">
+                      <div class="icon-box small"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div>
                       <?php echo $i->c_count; ?></span>
                   <?php endif; ?>
                   <?php if($i->h_count): ?>
-                    <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-dot-circle-o"></i>
+                    <span class="horizontal-padding-tiny">
+                      <div class="icon-box"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
                       <?php echo $i->h_count; ?></span>
                   <?php endif; ?>
                   <?php if($i->comments): ?>

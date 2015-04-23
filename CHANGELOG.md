@@ -1,5 +1,13 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.8.0</h2>
+
+<h4>Added:</h4>
+* New Custom Icons for Items
+
+<h4>Fixes:</h4>
+* Design Consistancy (cont.)
+
 <h2>Version 0.7.7.4</h2>
 
 <h4>Fixes:</h4> 

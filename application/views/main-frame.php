@@ -6,7 +6,6 @@
 <!--[if gt IE 8]><!--><html class="no-js" lang="en"><!--<![endif]-->
   <?php $this->load->view('includes/head'); ?>
   <body>
-    <!--[if lt IE 7]><script>for (x in open);</script><![endif]-->
     <div id="fb-root"></div>
     <script>(function(d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0];
@@ -14,7 +13,8 @@
       js = d.createElement(s); js.id = id;
       js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.3";
       fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));</script>
+    }(document, 'script', 'facebook-jssdk'));
+    </script>
     <!--load page-->
     <?php $this->load->view('includes/main-header'); ?>
     <div id="content" class="pure-g-r" data-page="<?php echo $page; ?>">

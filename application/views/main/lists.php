@@ -87,12 +87,12 @@
                   </span>
                   <?php if($i->c_count): ?>
                     <span class="horizontal-padding-tiny">
-                      <div class="icon-box small"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div>
+                      <div class="icon-box small grey"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div>
                       <?php echo $i->c_count; ?></span>
                   <?php endif; ?>
                   <?php if($i->h_count): ?>
                     <span class="horizontal-padding-tiny">
-                      <div class="icon-box"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
+                      <div class="icon-box small grey"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
                       <?php echo $i->h_count; ?></span>
                   <?php endif; ?>
                   <?php if($i->comments): ?>

@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.8.1</h2>
+
+<h4>Fixes:</h4>
+* Design Consistancy (cont.)
+* Potential Facebook Share Fix
+
 <h2>Version 0.7.8.0</h2>
 
 <h4>Added:</h4>

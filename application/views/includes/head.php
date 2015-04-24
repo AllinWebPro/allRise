@@ -15,4 +15,5 @@
   <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/ui-lightness/jquery-ui.css">
   <link rel="stylesheet" href="<?php echo site_url('media/css/main.css'); ?>">
   <!--<script src="<?php echo site_url('media/js/vendor/modernizr.min.js'); ?>"></script>-->
+  <!--[if lt IE 7]><script>for (x in open);</script><![endif]-->
 </head>

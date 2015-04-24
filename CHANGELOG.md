@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.8.2</h2>
+
+<h4>Fixes:</h4>
+* Potential Facebook Share Fix
+
 <h2>Version 0.7.8.1</h2>
 
 <h4>Fixes:</h4>

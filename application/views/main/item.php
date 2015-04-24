@@ -420,7 +420,8 @@
             <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
           </div>
           <div class="pure-u-1-2 center-text">
-            <div class="fb-share-button" data-href="<?php echo $tinyurl; ?>" data-layout="button_count"></div>
+            <!--<div class="fb-share-button" data-href="<?php echo $tinyurl; ?>" data-layout="button_count"></div>-->
+            <fb:share-button type="button_count"></fb:share-button>
           </div>
         </form>
       </div>

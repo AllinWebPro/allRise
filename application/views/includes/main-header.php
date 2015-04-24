@@ -32,7 +32,7 @@
           </div>
           <div class="pure-u-1-5">
             <a href="<?php echo site_url('notifications'); ?>" title="Notifications" class="pos-rel" data-ajax="<?php echo site_url('ajax/page/notices'); ?>" data-modal='notice-page'>
-              <i class="fa fa-book fa-7-4 ltgrey"></i> <strong id="notice-alert" class="notice grey-light-bg orange horizontal-padding-xsmall"></strong>
+              <i class="fa fa-book fa-7-4 ltgrey"></i> <strong id="notice-alert" class="notice white orange-bg horizontal-padding-xsmall"></strong>
             </a>
           </div>
           <div class="pure-u-1-5">

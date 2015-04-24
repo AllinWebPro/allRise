@@ -233,6 +233,7 @@ a[data-type=vote]:hover i { color:#666 !important; }
 .ltgrey, .ltgrey a { color:#aaa; }
 
 .white-bg { background-color:#fff; }
+.orange-bg { background-color:#ff8041; }
 .grey-light-bg { background-color:#d1d1d1 !important; }
 
 .grey-border-top { border-top:.9em solid #eee; }

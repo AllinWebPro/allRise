@@ -1,5 +1,15 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.8.5</h2>
+
+<h4>Fixes:</h4>
+* No JavaScript Enabled / Mobile jQuery issues
+* Misc. issues
+* Design Consistancy (cont.)
+
+<h4>Notes:</h4>
+* This is a huge update. Too many changes to track.
+
 <h2>Version 0.7.8.4</h2>
 
 <h4>Fixes:</h4>

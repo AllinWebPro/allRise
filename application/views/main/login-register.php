@@ -9,9 +9,22 @@
       <form class="pure-u-1 pure-form ajax" method="post" action="<?php echo site_url('login'); ?>" novalidate>
         <fieldset class="pure-group">
           <legend>Login</legend>
-          <div class="errors"></div>
-          <input type="text" name="login" id="login-login" class="pure-input-1" placeholder="Username / Email" required>
-          <input type="password" name="password" id="login-password" class="pure-input-1" placeholder="Password" required>
+          <div class="errors">
+            <?php if(isset($login_error)): ?>
+              <p><?php echo $login_error; ?></p>
+            <?php endif; ?>
+            <?php if(isset($login_errors)): ?>
+              <?php if(is_string($login_errors)): ?>
+                <p><?php echo $login_errors; ?></p>
+              <?php else: ?>
+                <?php foreach($login_errors as $key => $val): ?>
+                  <p><?php echo $val; ?></p>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            <?php endif; ?>
+          </div>
+          <input type="text" name="login" value="<?php echo set_value('login', $this->input->post('login')); ?>" id="login-login" class="pure-input-1" placeholder="Username / Email" required>
+          <input type="password" name="password" value="<?php echo set_value('password', $this->input->post('password')); ?>" id="login-password" class="pure-input-1" placeholder="Password" required>
         </fieldset>
         <div class="pure-controls">
           <input type="hidden" name="redirect" value="<?php echo isset($_GET['r'])?$_GET['r']:'search'; ?>">
@@ -25,10 +38,23 @@
       <form class="pure-u-1 pure-form ajax" method="post" action="<?php echo site_url('register'); ?>" autocomplete="off" novalidate>
         <fieldset class="pure-group">
           <legend>Register</legend>
-          <div class="errors"></div>
-          <input type="text" name="user" id="register-user" class="pure-input-1" placeholder="Username" required autocomplete="off">
-          <input type="text" name="email" id="register-email" class="pure-input-1" placeholder="Email" required autocomplete="off">
-          <input type="password" name="password" id="register-password" class="pure-input-1" placeholder="Password" required autocomplete="off">
+          <div class="errors">
+            <?php if(isset($register_error)): ?>
+              <p><?php echo $register_error; ?></p>
+            <?php endif; ?>
+            <?php if(isset($register_errors)): ?>
+              <?php if(is_string($register_errors)): ?>
+                <p><?php echo $register_errors; ?></p>
+              <?php else: ?>
+                <?php foreach($register_errors as $key => $val): ?>
+                  <p><?php echo $val; ?></p>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            <?php endif; ?>
+          </div>
+          <input type="text" name="user" value="<?php echo set_value('user', $this->input->post('user')); ?>" id="register-user" class="pure-input-1" placeholder="Username" required autocomplete="off">
+          <input type="text" name="email" value="<?php echo set_value('email', $this->input->post('email')); ?>" id="register-email" class="pure-input-1" placeholder="Email" required autocomplete="off">
+          <input type="password" name="rgpassword" value="<?php echo set_value('rgpassword', $this->input->post('rgpassword')); ?>" id="register-password" class="pure-input-1" placeholder="Password" required autocomplete="off">
         </fieldset>
         <div class="pure-controls">
           <label for="register-confirm" class="pure-checkbox">

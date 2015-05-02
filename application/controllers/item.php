@@ -138,7 +138,7 @@ class Item extends CI_Controller
       $this->data['keywords'] = $this->data['item']->tags;
       // Load View
       $this->data['title'] = stripslashes($this->data['item']->headline);
-      if(isset($_GET['ajax']) && $_GET['ajax'])
+      if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
       {
         $this->load->view('includes/functions');
         $this->load->view('main/item', $this->data);
@@ -299,7 +299,7 @@ class Item extends CI_Controller
       // Load View
       $this->data['title'] = stripslashes($this->data['item']->headline);
       $this->data['page'] = "item";
-      if(isset($_GET['ajax']) && $_GET['ajax'])
+      if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
       {
         $this->load->view('includes/functions');
         $this->load->view('main/item', $this->data);

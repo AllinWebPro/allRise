@@ -24,7 +24,7 @@ class Page extends CI_Controller
     elseif($page == 'terms') { $this->data['title'] = "Terms of Use"; }
     elseif($page == 'policy') { $this->data['title'] = "Privacy Policy"; }
     else { $this->data['title'] = "Page Not Found"; $page = '404'; }
-    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'])
+    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
     {
       $this->load->view('includes/functions');
       $this->load->view('main/'.$page, $this->data);

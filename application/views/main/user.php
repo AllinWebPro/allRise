@@ -7,13 +7,13 @@
 <div id="stream" class="pure-u-1 vertical-padding-small">
   <section id="user" class="items">
     <div class="horizontal-margin-small vertical-margin-small">
-      <div class="horizontal-padding-xsmall vertical-padding-small">
+      <div class="horizontal-padding-small vertical-padding-small">
         <h2><span class="left-align"><?php echo $user->user; ?></span>
-          <?php echo ($user->level == 'm')?'<i class="fa fa-leaf green right-align horizontal-margin-xsmall" title="Organizer"></i>':''; ?>
-          <?php echo ($user->level == 'a')?'<i class="fa fa-pagelines fa-9-10 green right-align horizontal-margin-xsmall" title="Director"></i>':''; ?>
-          <?php echo ($user->score > 0)?'<i class="fa fa-plus fa-9-10 blue right-align horizontal-margin-xsmall" title="Positive Contributor"></i>':''; ?>
-          <?php echo ($user->score < 0)?'<i class="fa fa-minus red right-align horizontal-margin-xsmall" title="Negative Contributor"></i>':''; ?>
-          <?php echo $user->confirmed?'<i class="fa fa-check orange right-align horizontal-margin-xsmall" title="Confirmed Account"></i>':''; ?>
+          <?php echo ($user->level == 'm')?'<i class="fa fa-leaf green right-align horizontal-margin-xsmall vertical-margin-tiny" title="Organizer"></i>':''; ?>
+          <?php echo ($user->level == 'a')?'<i class="fa fa-pagelines fa-9-10 green right-align horizontal-margin-xsmall vertical-margin-tiny" title="Director"></i>':''; ?>
+          <?php echo ($user->score > 0)?'<i class="fa fa-plus fa-9-10 blue right-align horizontal-margin-xsmall vertical-margin-tiny" title="Positive Contributor"></i>':''; ?>
+          <?php echo ($user->score < 0)?'<i class="fa fa-minus red right-align horizontal-margin-xsmall vertical-margin-tiny" title="Negative Contributor"></i>':''; ?>
+          <?php echo $user->confirmed?'<i class="fa fa-check orange right-align horizontal-margin-xsmall vertical-margin-tiny" title="Confirmed Account"></i>':''; ?>
         </h2>
         <div class="clear"></div>
         <div class="photo-frame horizontal-padding-xsmall vertical-padding-small left-align">
@@ -73,24 +73,26 @@
   ?>
   <section id="headlines" class="items">
     <div class="horizontal-margin-small vertical-margin-small">
-      <h3 class="horizontal-padding-xsmall">
-        <a title="Search User Headlines"  href="<?php echo site_url('search/'.$headline_url); ?>" class="white ajax" data-type="list">Headlines</a>
-        <a title="Search User Headlines" href="<?php echo site_url('search/'.$headline_url); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg ajax" data-type="list">
-          See More <i class="fa fa-chevron-right fa-3-4"></i></a>
-      </h3>
       <div class="vertical-padding-xsmall">
+        <div class="horizontal-padding-small bottom-padding-xsmall">
+          <strong><a name="headlines"><div class="icon-box"><?php echo file_get_contents('media/svg/headline.svg'); ?></div></a> Headlines</strong>
+          <a title="Search User Headlines" href="<?php echo site_url('search/'.$headline_url); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg ajax" data-type="list">
+          See More <i class="fa fa-chevron-right fa-3-4"></i></a>
+        </div>
         <?php foreach($headlines as $i): ?>
-          <div class="vertical-padding-small horizontal-padding-xsmall">
+          <div class="height-42 h-overflow pos-rel vertical-padding-xsmall horizontal-padding-small">
             <?php if($i->image): ?>
-              <img src="<?php echo $i->image; ?>" height="42" width="42" class="left-align right-padding-xsmall">
+              <img src="<?php echo $i->image; ?>" height="42" width="42" class="height-inherit left-align right-padding-xsmall">
+            <?php else: ?>
+              <img src="<?php echo site_url('media/img/no-image.gif'); ?>" height="42" width="42" class="left-align right-padding-xsmall">
             <?php endif; ?>
             <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
-              <span class="item">
+              <span class="item truncate">
                 <div class="icon-box"><?php echo file_get_contents('media/svg/'.$i->type.'.svg'); ?></div>
                 <span><?php echo stripslashes($i->headline); ?></span>
               </span>
             </a>
-            <span class="grey">
+            <span class="grey space-left">
               <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
                 <time>
                   <?php if($i->editedOn > strtotime(date("m/d/Y"))): ?>
@@ -122,16 +124,10 @@
               <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('m', 'a'))): ?>
                 <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-eye"></i> <?php echo round($i->x_score * 10, 2); ?></span>
               <?php endif; ?>
-            </span><!--<br>
-            <span>
-              K: <?php echo $i->search_score; ?>
-              C: <?php echo $i->cred_score; ?>
-              S: <?php echo $i->sub_score; ?>
-              Q: <?php echo $i->decay_score; ?>
-            </span>-->
+            </span>
           </div>
         <?php endforeach; ?>
-        <div class="vertical-padding-xsmall horizontal-padding-xsmall">
+        <div class="h-overflow vertical-padding-tiny horizontal-padding-small">
           <a title="Search User Headlines"  href="<?php echo site_url('search/'.$headline_url); ?>" class="right-align">See More &gt;</a>
         </div>
       </div>
@@ -139,24 +135,26 @@
   </section>
   <section id="contributions" class="items">
     <div class="horizontal-margin-small vertical-margin-small">
-      <h3 class="horizontal-padding-xsmall">
-        <a title="Search User Contributions"  href="<?php echo site_url('search/'.$url); ?>" class="white ajax" data-type="list">Contributions</a>
-        <a title="Search User Contributions" href="<?php echo site_url('search/'.$url); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg ajax" data-type="list">
-          See More <i class="fa fa-chevron-right fa-3-4"></i></a>
-      </h3>
       <div class="vertical-padding-xsmall">
+        <div class="horizontal-padding-small bottom-padding-xsmall">
+          <strong><a name="contributions"><i class="fa fa-edit"></i></a> Contributions</strong>
+          <a title="Search User Contributions" href="<?php echo site_url('search/'.$url); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg ajax" data-type="list">
+          See More <i class="fa fa-chevron-right fa-3-4"></i></a>
+        </div>
         <?php foreach($contributions as $i): ?>
-          <div class="vertical-padding-small horizontal-padding-xsmall">
+          <div class="height-42 h-overflow pos-rel vertical-padding-xsmall horizontal-padding-small">
             <?php if($i->image): ?>
-              <img src="<?php echo $i->image; ?>" height="42" width="42" class="left-align right-padding-xsmall">
+              <img src="<?php echo $i->image; ?>" height="42" width="42" class="height-inherit left-align right-padding-xsmall">
+            <?php else: ?>
+              <img src="<?php echo site_url('media/img/no-image.gif'); ?>" height="42" width="42" class="left-align right-padding-xsmall">
             <?php endif; ?>
             <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
-              <span class="item">
+              <span class="item truncate">
                 <div class="icon-box"><?php echo file_get_contents('media/svg/'.$i->type.'.svg'); ?></div>
                 <span><?php echo stripslashes($i->headline); ?></span>
               </span>
             </a>
-            <span class="grey">
+            <span class="grey space-left">
               <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
                 <time>
                   <?php if($i->editedOn > strtotime(date("m/d/Y"))): ?>
@@ -188,16 +186,10 @@
               <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('m', 'a'))): ?>
                 <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-eye"></i> <?php echo round($i->x_score * 10, 2); ?></span>
               <?php endif; ?>
-            </span><!--<br>
-            <span>
-              K: <?php echo $i->search_score; ?>
-              C: <?php echo $i->cred_score; ?>
-              S: <?php echo $i->sub_score; ?>
-              Q: <?php echo $i->decay_score; ?>
-            </span>-->
+            </span>
           </div>
         <?php endforeach; ?>
-        <div class="vertical-padding-xsmall horizontal-padding-xsmall">
+        <div class="h-overflow vertical-padding-tiny horizontal-padding-small">
           <a title="Search User Contributions"  href="<?php echo site_url('search/'.$url); ?>" class="right-align">See More &gt;</a>
         </div>
       </div>
@@ -205,24 +197,26 @@
   </section>
   <section id="latest" class="items">
     <div class="horizontal-margin-small vertical-margin-small">
-      <h3 class="horizontal-padding-xsmall">
-        <a title="Search User Latest"  href="<?php echo site_url('search/'.$latest_url); ?>" class="white ajax" data-type="list">Latest</a>
-        <a title="Search User Latest" href="<?php echo site_url('search/'.$latest_url); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg ajax" data-type="list">
-          See More <i class="fa fa-chevron-right fa-3-4"></i></a>
-      </h3>
       <div class="vertical-padding-xsmall">
+        <div class="horizontal-padding-small bottom-padding-xsmall">
+          <strong><a name="latest"><i class="fa fa-clock-o"></i></a> Latest</strong>
+          <a title="Search User Latest" href="<?php echo site_url('search/'.$latest_url); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg ajax" data-type="list">
+          See More <i class="fa fa-chevron-right fa-3-4"></i></a>
+        </div>
         <?php foreach($recent as $i): ?>
-          <div class="vertical-padding-small horizontal-padding-xsmall">
+          <div class="height-42 h-overflow pos-rel vertical-padding-xsmall horizontal-padding-small">
             <?php if($i->image): ?>
-              <img src="<?php echo $i->image; ?>" height="42" width="42" class="left-align right-padding-xsmall">
+              <img src="<?php echo $i->image; ?>" height="42" width="42" class="height-inherit left-align right-padding-xsmall">
+            <?php else: ?>
+              <img src="<?php echo site_url('media/img/no-image.gif'); ?>" height="42" width="42" class="left-align right-padding-xsmall">
             <?php endif; ?>
             <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
-              <span class="item">
+              <span class="item truncate">
                 <div class="icon-box"><?php echo file_get_contents('media/svg/'.$i->type.'.svg'); ?></div>
                 <span><?php echo stripslashes($i->headline); ?></span>
               </span>
             </a>
-            <span class="grey">
+            <span class="grey space-left">
               <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
                 <time>
                   <?php if($i->editedOn > strtotime(date("m/d/Y"))): ?>
@@ -254,16 +248,10 @@
               <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('m', 'a'))): ?>
                 <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-eye"></i> <?php echo round($i->x_score * 10, 2); ?></span>
               <?php endif; ?>
-            </span><!--<br>
-            <span>
-              K: <?php echo $i->search_score; ?>
-              C: <?php echo $i->cred_score; ?>
-              S: <?php echo $i->sub_score; ?>
-              Q: <?php echo $i->decay_score; ?>
-            </span>-->
+            </span>
           </div>
         <?php endforeach; ?>
-        <div class="vertical-padding-xsmall horizontal-padding-xsmall">
+        <div class="h-overflow vertical-padding-tiny horizontal-padding-small">
           <a title="Search User Latest"  href="<?php echo site_url('search/'.$latest_url); ?>" class="right-align">See More &gt;</a>
         </div>
       </div>

@@ -58,20 +58,19 @@
           </div>
           <?php if($items): ?>
             <?php foreach($items as $i): ?>
-              <div class="vertical-padding-xsmall horizontal-padding-small">
+              <div class="height-42 h-overflow pos-rel vertical-padding-xsmall horizontal-padding-small">
                 <?php if($i->image): ?>
-                  <img src="<?php echo $i->image; ?>" height="42" width="42" class="left-align right-padding-xsmall">
+                  <img src="<?php echo $i->image; ?>" height="42" width="42" class="height-inherit left-align right-padding-xsmall">
                 <?php else: ?>
                   <img src="<?php echo site_url('media/img/no-image.gif'); ?>" height="42" width="42" class="left-align right-padding-xsmall">
                 <?php endif; ?>
                 <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
-                  <span class="item">
-                    <!--<i class="fa fa-<?php echo ($i->type == 'headline')?'dot-circle-o':(($i->type == 'cluster')?'code-fork':'caret-square-o-up'); ?>"></i>-->
+                  <span class="item truncate">
                     <div class="icon-box"><?php echo file_get_contents('media/svg/'.$i->type.'.svg'); ?></div>
                     <span><?php echo stripslashes($i->headline); ?></span>
                   </span>
                 </a>
-                <span class="grey">
+                <span class="grey space-left">
                   <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
                     <time>
                       <?php if($i->editedOn > strtotime(date("m/d/Y"))): ?>
@@ -126,7 +125,7 @@
       </div>
       <?php if($pages > 1): ?>
         <?php $url = "search?s=".$sort."&".ltrim($uri."&pg=", '&'); ?>
-        <div class="vertical-padding-small horizontal-padding-xsmall">
+        <div class="vertical-padding-small horizontal-padding-small">
           <ul class="pure-paginator">
             <?php if($current > 1): ?>
               <li><a class="pure-button ajax prev" href="<?php echo site_url($url.($current-1)); ?>" data-type="list"><i class="fa fa-11-10 fa-arrow-circle-left"></i></a></li>

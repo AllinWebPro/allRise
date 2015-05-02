@@ -3,7 +3,7 @@
 class Preferences extends CI_Controller
 {
   var $data = array();
-  var $template = "main-frame";
+  var $template = "page-frame";
 
   function __construct()
   {
@@ -77,9 +77,13 @@ class Preferences extends CI_Controller
         $this->data['error'] = "Account has been updated!";
       }
     }
+    elseif($_POST)
+    {
+      $this->data['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.';
+    }
     // Load View
     $this->data['title'] = "Preferences";
-    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'])
+    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
     {
       $this->load->view('includes/functions');
       $this->load->view('main/preferences', $this->data);
@@ -124,6 +128,18 @@ class Preferences extends CI_Controller
     }
     $this->data['user'] = $this->database_model->get_single('users', array('userId' => $userId));
     $this->load->view('main/preferences-photo', $this->data);
+  }
+
+  public function destroy($encrypt = '')
+  {
+    if($encrypt && $encrypt == md5($this->session->userdata('userId')))
+    {
+      $where = array('userId' => $this->session->userdata('userId'));
+      $update = array('deleted' => 1);
+      $this->database_model->edit('users', $where, $update);
+      redirect('logout');
+    }
+    else { redirect('/'); }
   }
 }
 

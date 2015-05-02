@@ -60,7 +60,7 @@ var $stream,
     id,
     browsers = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
 
-$(document).ready(function() {
+$(function() {
   
   var $textareas = jQuery('textarea');  
   if($textareas)
@@ -85,7 +85,7 @@ $(document).ready(function() {
      });
   });
   
-  $(this).on('click, focus', "#copy", function() {
+  $(this).on('mouseup', "#copy", function() {
     $(this).select();
   });
 
@@ -633,42 +633,6 @@ $(document).ready(function() {
     return false;
   });
 
-  $(this).on('click', "[data-modal='account-preferences']", function(e) {
-    e.preventDefault();
-    $form = $("#account-preferences form");
-    $("#account-preferences").dialog({
-      buttons: {
-        "Update Account": function() {
-          $form.submit();
-          $(".ui-dialog").position({ my: "center", at: "center", of: window, collision: "fit" });
-        },
-        "Delete Account": function() {
-          $("#delete-confirm").dialog({
-            resizable: false,
-            width:300,
-            modal: true,
-            minHeight: 'auto',
-            maxHeight: ($(window).width() > 767)?($(window).height() - ($("#main-bar").height() * 2) - 80):(($(window).height() * 1) - 25),
-            buttons: {
-              "Confirm": function() {
-                //console.log('confirm');
-              },
-              "Close": function() { $(this).dialog( "close" ); }
-            }
-          });
-          return false;
-        },
-        "Close": function() { $(this).dialog("close"); }
-      },
-      fluid: true,
-      maxHeight: ($(window).width() > 767)?($(window).height() - ($("#main-bar").height() * 2) - 80):(($(window).height() * 1) - 25),
-      modal: true,
-      position: { collision: "fit" },
-      resizable: false,
-      width: '95%'
-    });
-    return false;
-  });
   $(this).on('click', "[data-modal='comment-edit']", function(e) {
     e.preventDefault();
     $link = $(this);
@@ -708,6 +672,7 @@ $(document).ready(function() {
     $("[required]", ajaxForm).each(function() {
       if(!$(this).val()) { errors[errors.length] = $(this).attr('placeholder')+" is required."; }
     });
+    if($notices = $('#notices')) { noticeMasonry(); }
     var post = ajaxForm.serialize();
     if($.isEmptyObject(errors))
     {
@@ -1133,11 +1098,16 @@ function ajaxErrors(ajaxForm, errors)
   $.each(errors, function(index1, value1) {
     if($.type(value1) == 'array' || $.type(value1) == 'object')
     {
-      $.each(value1, function(index2, value2) { $(".errors", ajaxForm).append("<p"+(output?' class="output"':'')+">"+value2+"</p>"); });
+      $.each(value1, function(index2, value2) { $(".errors", ajaxForm).append("<p"+(output?' class="output"':'')+">"+value2.replace('*', '')+"</p>"); });
     }
-    else { $(".errors", ajaxForm).append("<p"+(output?' class="output"':'')+">"+value1+"</p>"); }
+    else { $(".errors", ajaxForm).append("<p"+(output?' class="output"':'')+">"+value1.replace('*', '')+"</p>"); }
   });
   output = false;
+  
+  if($stream = $('#stream')) { streamMasonry(); }
+  if($item = $('#item')) { itemMasonry(); }
+  if($notices = $('#notices')) { noticeMasonry(); }
+  if($list = $('#list')) { listMasonry(); }
 }
 
 function noticeMasonry()

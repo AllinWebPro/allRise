@@ -27,7 +27,7 @@ h2 { margin:0; }
 h2 span { font-size:1em; }
 table, thead, tbody, tr { width:100%; }
 th, td { text-align:center; }
-textarea { resize:vertical; }
+textarea { position:relative;resize:vertical;top:0px; }
 iframe { border:none; }
 input[type=radio] { display:inline-block !important;top:2px !important; }
 label span { font-size:95%; }
@@ -131,7 +131,7 @@ a[data-type=vote]:hover i { color:#666 !important; }
   #main-bar, #bottom-bar { position:relative; }
   #login, #register { padding:0; } 
   #content { margin-bottom:0;margin-top:0;padding-bottom:0;padding-top:0; }
-  input:focus { font-size:16px !important; }
+  input { font-size:16px !important; }
   #logo .branding { font-size:80px;line-height:100px; }
   .phone-u-1-2 { width:50% !important; }
 
@@ -187,6 +187,7 @@ a[data-type=vote]:hover i { color:#666 !important; }
 .bottom-margin-xsmall { margin-bottom:0.3em; }
 .bottom-margin-small { margin-bottom:0.6em; }
 .bottom-margin { margin-bottom:0.9em; }
+.bottom-margin-large { margin-bottom:1.2em; }
 
 .bottom-padding-xsmall { padding-bottom:0.3em; }
 .bottom-padding-small { padding-bottom:0.6em; }
@@ -195,6 +196,9 @@ a[data-type=vote]:hover i { color:#666 !important; }
 .left-padding-xsmall { padding-left:0.3em; }
 .left-padding { padding-left:0.9em; }
 
+.left-margin-xsmall { margin-left:0.3em; }
+.left-margin { margin-left:0.9em; }
+
 .right-padding-tiny { padding-right:0.15em; }
 .right-padding-xsmall { padding-right:0.3em; }
 
@@ -202,9 +206,19 @@ a[data-type=vote]:hover i { color:#666 !important; }
 .top-padding-small { padding-top:0.6em; }
 .top-padding { padding-top:0.9em; }
 
+.top-margin-xsmall { margin-top:0.3em; }
+.top-margin-small { margin-top:0.6em; }
+.top-margin { margin-top:0.9em; }
+
+.space-left { position:absolute;left:56px; }
+
+.height-42 { height:42px; }
+
 .no-margin { margin:0; }
 
 .no-lr-padding { padding-left:0;padding-right:0; }
+
+.note-text { background-color:#e0e0e0; }
 
 .full-width { width:100%; }
 
@@ -213,6 +227,7 @@ a[data-type=vote]:hover i { color:#666 !important; }
 .notice { font-size:.75em;position:absolute;right:-.25em;top:-.75em;box-shadow:1px 1px 1px rgba(0, 0, 0, 0.2); }
 
 .left-align { float:left; }
+.center-align { margin:0 auto; }
 .right-align { float:right; }
 
 .left-text { text-align:left; }
@@ -247,6 +262,8 @@ a[data-type=vote]:hover i { color:#666 !important; }
 .truncate { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 
 .h-overflow { overflow:hidden; }
+
+.height-inherit { height:inherit !important; }
 
 .ajax-loader-overlay, .ajax-loader {
   display:none;

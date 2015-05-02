@@ -57,15 +57,16 @@ class Login extends CI_Controller
           );
           $this->session->set_userdata($s);
           $this->session->set_flashdata('tutorial', $user->tutorial);
-        redirect($post['redirect']);
+          redirect($post['redirect']);
         }
-        else { $this->data['error'] = '<p>Password did not match account.</p>'; }
+        else { $this->data['login_error'] = 'Password did not match account.'; }
       }
-      else { $this->data['error'] = '<p>Username/Email could not be found.</p>'; }
+      else { $this->data['login_error'] = 'Username/Email could not be found.'; }
     }
+    elseif($_POST) { $this->data['login_errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     // Load View
     $this->data['title'] = "Login / Register";
-    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'])
+    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
     {
       $this->load->view('includes/functions');
       $this->load->view('main/login-register', $this->data);

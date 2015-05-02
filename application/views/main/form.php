@@ -3,7 +3,20 @@
     <section class="large ontop">
       <div class="horizontal-margin-small vertical-margin-small">
         <div class="horizontal-margin-small vertical-margin-small">
-          <div class="clear"></div>
+          <div class="errors">
+            <?php if(isset($error)): ?>
+              <p><?php echo $error; ?></p>
+            <?php endif; ?>
+            <?php if(isset($errors)): ?>
+              <?php if(is_string($errors)): ?>
+                <p><?php echo $errors; ?></p>
+              <?php else: ?>
+                <?php foreach($errors as $key => $val): ?>
+                  <p><?php echo $val; ?></p>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            <?php endif; ?>
+          </div>
           <fieldset class="item pure-group pure-u-1">
             <input type="text" name="headline" id="item-headline" class="pure-input-1" placeholder="Headline*" value="<?php echo isset($item)?stripslashes($item->headline):''; ?>" required title="Max length 255 characters.">
             <?php if($type == 'headline'): ?>
@@ -130,7 +143,7 @@
                         </span>
                       <?php endif; ?>
                       <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-user"></i>
-                        <a href="<?php echo site_url('user/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
+                        <a href="<?php echo site_url('u/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
                     </span>
                   </div>
                 <?php endforeach; ?>
@@ -168,7 +181,7 @@
                       </span>
                     <?php endif; ?>
                     <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-user"></i>
-                      <a href="<?php echo site_url('user/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
+                      <a href="<?php echo site_url('u/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
                   </span>
                 </div>
               <?php endforeach; ?>
@@ -193,7 +206,7 @@
         <div class="horizontal-padding-small vertical-padding-small">
           <?php if($this->session->userdata('level') == 'a'): ?>
             <div class="pure-u-1 bottom-padding-xsmall">
-              <div class="pure-u-1-3">
+              <div class="pure-u-1-3 em">
                 <label for="adminOnly">Admin Only:</label>
               </div>
               <div class="pure-u-1-4">
@@ -206,7 +219,7 @@
                   <input type="radio" name="adminOnly" id="adminOnly-no" value="0" <?php echo set_radio('adminOnly', '0', (isset($item) && $item->adminOnly)?false:true); ?>> No
                 </label>
               </div>
-              <div class="pure-u-1-3">
+              <div class="pure-u-1-3 em">
                 <label for="hidden">Hidden:</label>
               </div>
               <div class="pure-u-1-4">

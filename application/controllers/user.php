@@ -38,7 +38,7 @@ class User extends CI_Controller
       $this->data['recent'] = $this->stream_model->search($search, 'IF((type = "headline"), IF((createdBy = '.$this->data['user']->userId.'), 1, 0), 1) = 1', 'createdOn', $results, $comments, $limit, $current, $this->data['user']->userId, false, false);
       // Load View
       $this->data['title'] = $this->data['user']->user;
-      if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'])
+      if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
       {
         $this->load->view('includes/functions');
         $this->load->view('main/user', $this->data);

@@ -4,6 +4,7 @@ class Ajax extends CI_Controller
 {
   function __construct()
   {
+    $_POST = $_POST + $_GET;
     parent::__construct();
     $this->load->model('utility_model');
     if(!$this->session->userdata('isLoggedIn'))
@@ -118,7 +119,7 @@ class Ajax extends CI_Controller
       $item_temp = $this->database_model->get_single('articles', array('articleId' => $id, 'deleted' => 0), '*, OLD_PASSWORD(articleId) AS hashId');
       $response['redirect'] = site_url('a/'.$item_temp->hashId);
     }
-    else { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
+    elseif($_POST) { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     $this->_output_json($response);
   }
 
@@ -364,7 +365,7 @@ class Ajax extends CI_Controller
       $h = $this->database_model->get_single('headlines', array('headlineId' => $id, 'deleted' => 0), '*, OLD_PASSWORD(headlineId) AS hashId');
       $response['redirect'] = site_url('h/'.$h->hashId."?n=1");
     }
-    else { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
+    elseif($_POST) { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     $this->_output_json($response);
   }
 
@@ -799,7 +800,7 @@ class Ajax extends CI_Controller
         $response['errors'] = "Account has been updated!";
       }
     }
-    else { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
+    elseif($_POST) { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     $this->_output_json($response);
   }
 
@@ -814,7 +815,7 @@ class Ajax extends CI_Controller
     $response = array('success' => 0);
     $this->form_validation->set_rules('user', 'Username', 'trim|required|min_length[3]|max_length[24]|alpha_dash|xss_clean|is_unique[users.user]');
     $this->form_validation->set_rules('email', 'Email', 'trim|required|min_length[6]|max_length[255]|valid_email|xss_clean|is_unique[users.email]');
-    $this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[8]|max_length[50]|xss_clean'); //password_check
+    $this->form_validation->set_rules('rgpassword', 'Password', 'trim|required|min_length[8]|max_length[50]|xss_clean'); //password_check
     $this->form_validation->set_rules('redirect', 'Redirect', 'trim|xss_clean');
     if($this->form_validation->run())
     {
@@ -822,7 +823,7 @@ class Ajax extends CI_Controller
       $post = $this->input->post();
       $insert = array('user' => $this->db->escape_str($post['user']), 'email' => $this->db->escape_str($post['email']));
       $insert['createdOn'] = time();
-      $insert['password'] = $this->utility_model->password_encrypt($post['user'], $post['password']);
+      $insert['password'] = $this->utility_model->password_encrypt($post['user'], $post['rgpassword']);
       $userId = $this->database_model->add('users', $insert, 'userId');
       if($user = $this->database_model->get_single('users', array('userId' => $userId)))
       {
@@ -1012,6 +1013,10 @@ class Ajax extends CI_Controller
           }
         }
       }
+    }
+    elseif($_POST)
+    {
+      $this->data['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.';
     }
     $item_temp = $this->database_model->get_select($type.'s', array($type.'Id' => $id), 'OLD_PASSWORD('.$type.'Id) AS hashId');
     $response['redirect'] = site_url(substr($type, 0, 1).'/'.$item_temp[0]->hashId);

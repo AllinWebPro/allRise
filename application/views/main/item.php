@@ -27,7 +27,7 @@
 <div id="item" class="pure-u-1 vertical-padding-small">
   <section class="large">
     <div class="horizontal-margin-small vertical-margin-small">
-      <div class="horizontal-padding-small vertical-padding-small">
+      <div class="horizontal-padding-small vertical-padding-xsmall">
         <h2><?php echo stripslashes($item->headline); ?></h2>
         <div class="horizontal-padding-tiny vertical-padding-tiny top-padding-xsmall grey">
           <span class="right-padding-tiny"><i class="fa fa-3-4 fa-edit horizontal-padding-tiny"></i>
@@ -60,7 +60,7 @@
           <?php endif; ?>
           <?php if($type == 'headline'): ?>
             <span><i class="fa fa-3-4 fa-user horizontal-padding-tiny"></i>
-              <a href="<?php echo site_url('user/'.$contributors[0]->user); ?>"><?php echo $contributors[0]->user; ?></a></span>
+              <a href="<?php echo site_url('u/'.$contributors[0]->user); ?>"><?php echo $contributors[0]->user; ?></a></span>
           <?php endif; ?>
           <?php if(isset($parent) && $parent): ?>
             <span>
@@ -75,7 +75,7 @@
         </div>
       </div>
       <?php if($type == 'article'): ?>
-        <div class="horizontal-padding-small vertical-padding-small">
+        <div class="horizontal-padding-small bottom-padding-xsmall">
           <?php if($type == 'article' && $item->article): ?>
             <article class="content">
               <?php echo stripslashes(str_replace('\r', '', str_replace('\n', '', $item->article))); ?>
@@ -95,7 +95,7 @@
               Start Writing an Article</a>
           </div>
       <?php elseif($type == 'headline' && $item->notes): ?>
-        <div class="horizontal-padding-small vertical-padding-xsmall">
+        <div class="horizontal-padding-small bottom-padding-xsmall">
           <article class="content">
             <p class="em"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $item->notes))); ?></p>
           </article>
@@ -230,10 +230,10 @@
                       </span>
                     <?php endif; ?>
                     <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-user"></i>
-                      <a href="<?php echo site_url('user/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
-                    <?php if($h->notes): ?><span class="horizontal-padding-tiny note"><i class="fa fa-3-4 fa-file-text-o"></i> View Note</span><?php endif; ?>
+                      <a href="<?php echo site_url('u/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
+                    <?php if($h->notes): ?><span class="horizontal-padding-tiny note-toggle pointer"><i class="fa fa-3-4 fa-file-text-o"></i> View Note</span><?php endif; ?>
                   </span>
-                  <?php if($h->notes): ?><div class="note-text hidden"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $h->notes))); ?></div><?php endif; ?>
+                  <?php if($h->notes): ?><div class="note-text show-none em top-margin-xsmall left-margin horizontal-padding-small vertical-padding-xsmall"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $h->notes))); ?></div><?php endif; ?>
                 </div>
               <?php endforeach; ?>
             <?php endforeach; ?>
@@ -270,10 +270,10 @@
                     </span>
                   <?php endif; ?>
                   <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-user"></i>
-                    <a href="<?php echo site_url('user/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
+                    <a href="<?php echo site_url('u/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
                   <?php if($h->notes): ?><span class="horizontal-padding-tiny note-toggle pointer"><i class="fa fa-3-4 fa-file-text-o"></i> View Note</span><?php endif; ?>
                 </span>
-                <?php if($h->notes): ?><div class="note-text show-none em"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $h->notes))); ?></div><?php endif; ?>
+                <?php if($h->notes): ?><div class="note-text show-none em top-margin-xsmall horizontal-padding-small vertical-padding-xsmall"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $h->notes))); ?></div><?php endif; ?>
               </div>
             <?php endforeach; ?>
           <?php endif; ?>
@@ -396,7 +396,7 @@
           foreach($contributors as $c)
           {
             if($output) { $output .= ", "; }
-            $output .= '<a href="'.site_url('user/'.strtolower($c->user)).'">'.$c->user.'</a>';
+            $output .= '<a href="'.site_url('u/'.strtolower($c->user)).'">'.$c->user.'</a>';
           }
           echo $output;
           ?>
@@ -462,7 +462,7 @@
                   <img src="<?php echo site_url('media/img/no-image.gif'); ?>" alt="<?php echo $c->user; ?>" width="40" class="left-align right-padding-xsmall">
                 <?php endif; ?>
                 <header>
-                  <a href="<?php echo site_url('user/'.$c->user); ?>" class="grey"><?php echo $c->user; ?></a> |
+                  <a href="<?php echo site_url('u/'.$c->user); ?>" class="grey"><?php echo $c->user; ?></a> |
                   <time class="grey">
                     <?php if($c->editedOn > strtotime(date("m/d/Y"))): ?>
                       Today at <?php echo date("h:ia", $c->editedOn); ?>

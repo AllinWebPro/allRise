@@ -7,6 +7,7 @@ class Lists extends CI_Controller
 
   function __construct()
   {
+    $_POST = $_POST + $_GET;
     parent::__construct();
     $this->load->model('stream_model');
     $this->load->model('utility_model');
@@ -33,7 +34,8 @@ class Lists extends CI_Controller
       if(isset($post['r']) && $post['r']) { $results = $post['r']; $this->data['uri'] .= "&r=".$results; }
       if(isset($post['k']) && $post['k']) { $search = $post['k']; $this->data['uri'] .= "&k=".$search; }
       if(isset($post['u']) && $post['u']) { $userId = $post['u']; $this->data['uri'] .= "&u=".$userId; }
-      if(isset($post['b']) && $post['b']) { $subscription = $post['b']; $this->data['uri'] .= "&b=".$subscription; }
+      if(isset($post['b']) && $post['b'] && $this->session->userdata('isLoggedIn')) { $subscription = $post['b']; $this->data['uri'] .= "&b=".$subscription; }
+      elseif(isset($post['b']) && $post['b']) { $sort = 'score'; }
     }
     $this->data['results'] = $results;
     $this->data['sort'] = $sort;
@@ -49,7 +51,7 @@ class Lists extends CI_Controller
     $this->data['title'] = "Search";
     if($search) { $this->data['title'] .= " [".$search."]"; }
     //print_r($this->data); die();
-    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'])
+    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
     {
       $this->load->view('includes/functions');
       $this->load->view('main/lists', $this->data);

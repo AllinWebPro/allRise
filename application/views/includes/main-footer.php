@@ -1,7 +1,7 @@
 <footer id="bottom-bar" class="pure-g-r vertical-padding-xsmall">
   <div class="pure-u-1 center-text">
     <a href="<?php echo site_url('p/faq'); ?>" title="F.A.Q.">F.A.Q.</a>
-    | <a href="javascript:void(0);" data-ajax="<?php echo site_url('ajax/page/tutorial'); ?>" title="Tutorial" data-modal='modal-page' id="tutorial-link">Tutorial</a>
+    <!--| <a href="javascript:void(0);" data-ajax="<?php echo site_url('ajax/page/tutorial'); ?>" title="Tutorial" data-modal='modal-page' id="tutorial-link">Tutorial</a>-->
     <?php if(!$this->session->userdata('isLoggedIn')): ?>
       | <a href="javascript:void(0);" data-ajax="<?php echo site_url('ajax/page/password'); ?>" title="Forgot Password" data-modal='modal-page'>Forgot Password</a>
     <?php endif; ?>

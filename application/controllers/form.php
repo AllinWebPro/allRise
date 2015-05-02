@@ -31,7 +31,7 @@ class Form extends CI_Controller
       // Load View
       // redirect(substr($type, 0, 1).'/'.$id);
       $this->data['title'] = ($action=='add'?'Create':'Modify')." ".ucfirst($this->data['type']);
-      if(isset($_GET['ajax']) && $_GET['ajax'])
+      if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
       {
         $this->load->view('includes/functions');
         $this->load->view('main/form', $this->data);
@@ -55,7 +55,7 @@ class Form extends CI_Controller
       // Load View
       // redirect(substr($type, 0, 1).'/'.$id);
       $this->data['title'] = ($action=='add'?'Create':'Modify')." ".ucfirst($this->data['type']);
-      if(isset($_GET['ajax']) && $_GET['ajax'])
+      if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
       {
         $this->load->view('includes/functions');
         $this->load->view('main/form', $this->data);
@@ -488,7 +488,11 @@ class Form extends CI_Controller
     $this->form_validation->set_rules('image[]', 'Links', 'trim|prep_url|xss_clean');
     $this->form_validation->set_rules('resource[]', 'Links', 'trim|prep_url|xss_clean');
     if($this->form_validation->run()) { return $this->input->post(); }
-    return false;
+    elseif($_POST)
+    {
+      $this->data['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.';
+      return false;
+    }
   }
 }
 

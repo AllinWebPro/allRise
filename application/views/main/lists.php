@@ -80,7 +80,8 @@
                       <?php elseif(date("Y", $i->editedOn) == date("Y")): ?>
                         <?php echo date("M d", $i->editedOn); ?> <span class="pure-hidden-phone">@ <?php echo date("h:ia", $i->editedOn); ?></span>
                       <?php else: ?>
-                        <?php echo date("M d Y", $i->editedOn); ?>
+                        <span class="pure-hidden-phone"><?php echo date("M d Y", $i->editedOn); ?></span>
+                        <span class="pure-visible-phone"><?php echo date("M Y", $i->editedOn); ?></span>
                       <?php endif; ?>
                     </time>
                   </span>
@@ -109,7 +110,8 @@
                     </span>-->
                     <span class="horizontal-padding-tiny">
                       <input type="checkbox" name="<?php echo $i->type; ?>[]" id="<?php echo $i->type; ?>-<?php echo $i->id; ?>" value="<?php echo $i->id; ?>">
-                      <label for="<?php echo $i->type; ?>-<?php echo $i->id; ?>">Group</label>
+                      <label class="pure-hidden-phone" for="<?php echo $i->type; ?>-<?php echo $i->id; ?>">Group</label>
+                      <label class="pure-visible-phone" for="<?php echo $i->type; ?>-<?php echo $i->id; ?>"><i class="fa fa-link"></i></label>
                     </span>
                   <?php endif; ?>
                 </span>

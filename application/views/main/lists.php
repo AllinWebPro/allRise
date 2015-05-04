@@ -55,6 +55,7 @@
               <input type="hidden" name="uri" value="<?php echo ltrim($uri."&pg=".$current, '&'); ?>">
               <input type="submit" value="Combine Items" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg">
             <?php endif; ?>
+            <div class="clear"></div>
           </div>
           <?php if($items): ?>
             <?php foreach($items as $i): ?>

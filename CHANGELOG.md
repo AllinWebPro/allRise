@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.8.9</h2>
+
+<h4>Fixes:</h4>
+* No JavaScript Enabled / Mobile jQuery issues
+* Design Consistancy (cont.)
+
 <h2>Version 0.7.8.8</h2>
 
 <h4>Fixes:</h4>

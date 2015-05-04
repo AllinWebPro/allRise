@@ -435,7 +435,20 @@
       <?php if($this->session->userdata('isLoggedIn') && !isset($history)): ?>
         <div class="horizontal-padding-small vertical-padding-small">
           <form method="post" action="?comments=create" class="pure-form pure-u-1 vertical-padding-xsmall ajax" novalidate>
-            <div class="errors"></div>
+            <div class="errors">
+              <?php if(isset($comment_error)): ?>
+                <p><?php echo $comment_error; ?></p>
+              <?php endif; ?>
+              <?php if(isset($comment_errors)): ?>
+                <?php if(is_string($comment_errors)): ?>
+                  <p><?php echo $comment_errors; ?></p>
+                <?php else: ?>
+                  <?php foreach($comment_errors as $key => $val): ?>
+                    <p><?php echo $val; ?></p>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              <?php endif; ?>
+            </div>
             <input type="text" name="comment" id="add-comment" class="pure-input-1" placeholder="Share Your Thoughts" value="<?php echo set_value('comment'); ?>" required>
             <div class="pure-controls right-text top-padding">
               <input type="hidden" name="type" value="<?php echo $type; ?>">

@@ -67,13 +67,24 @@ class Item extends CI_Controller
       $this->data['images'] = $this->database_model->get('images', $assets_where+array('active' => 1, 'deleted' => 0));
       $this->data['resources'] = $this->database_model->get('resources', $assets_where+array('active' => 1, 'deleted' => 0));
       $select = 'c.commentId, u.user, c.createdOn, c.editedOn, c.createdBy, c.comment, u.photo';
-      $this->data['comments'] = $this->database_model->get_join('comments c', 'users u', 'c.createdBy = u.userId', $assets_where+array('c.deleted' => 0, 'u.deleted' => 0), $select, false, 'commentId', 'DESC');
+      $comment_where = array($type.'Id' => $id);
+      if(isset($_GET['hId']))
+      {
+        $history_time = $this->data['item']->editedOn;
+        $comment_where['c.createdOn <'] = $history_time;
+        $comment_where['IF(c.deleted = 1, IF(c.editedOn > '.$history_time.', 1, 0), 1) ='] = 1;
+      }
+      $this->data['comments'] = $this->database_model->get_join('comments c', 'users u', 'c.createdBy = u.userId', $comment_where+array('c.deleted' => 0, 'u.deleted' => 0), $select, false, 'commentId', 'DESC');
       // Get Sub Content
       $this->data['contributors'] = $this->stream_model->get_contributors($type, $id);
       $this->data['ranking'] = $this->database_model->get_single('rankings', array($type.'Id' => $id, 'createdBy' => $this->session->userdata('userId')));
       $this->utility_model->metadata($type, $id);
       // Actions
-      if(isset($_GET['comments'])) { $this->comments($_GET['comments'], isset($_GET['commentId'])?$_GET['commentId']:0); }
+      if(isset($_GET['comments']))
+      {
+        $this->comments($_GET['comments'], isset($_GET['commentId'])?$_GET['commentId']:0);
+        $this->data['comments'] = $this->database_model->get_join('comments c', 'users u', 'c.createdBy = u.userId', $comment_where+array('c.deleted' => 0, 'u.deleted' => 0), $select, false, 'commentId', 'DESC');
+      }
       if(isset($_GET['importance'])) { $this->importance($_GET['importance']); }
       if(isset($_GET['quality'])) { $this->quality($_GET['quality']); }
       if(isset($_GET['favorite'])) { $this->favorite($_GET['favorite']); }
@@ -232,7 +243,11 @@ class Item extends CI_Controller
       $this->data['ranking'] = $this->database_model->get_single('rankings', array($type.'Id' => $id, 'createdBy' => $this->session->userdata('userId')));
       $this->utility_model->metadata($type, $id);
       // Actions
-      if(isset($_GET['comments'])) { $this->comments($_GET['comments'], isset($_GET['commentId'])?$_GET['commentId']:0); }
+      if(isset($_GET['comments']))
+      {
+        $this->comments($_GET['comments'], isset($_GET['commentId'])?$_GET['commentId']:0);
+        $this->data['comments'] = $this->database_model->get_join('comments c', 'users u', 'c.createdBy = u.userId', $comment_where+array('c.deleted' => 0, 'u.deleted' => 0), $select, false, 'commentId', 'DESC');
+      }
       if(isset($_GET['importance'])) { $this->importance($_GET['importance']); }
       if(isset($_GET['quality'])) { $this->quality($_GET['quality']); }
       if(isset($_GET['favorite'])) { $this->favorite($_GET['favorite']); }
@@ -366,6 +381,7 @@ class Item extends CI_Controller
           }
         }
       }
+      elseif($_POST) { $this->data['comment_errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     }
     elseif($action == 'modify' && $commentId)
     {
@@ -383,6 +399,7 @@ class Item extends CI_Controller
           $this->database_model->edit('comments', array('commentId' => $post['commentId']), $update);
           unset($this->data['comment']);
         }
+        elseif($_POST) { $this->data['comment_errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
       }
       else { unset($this->data['comment']); }
     }

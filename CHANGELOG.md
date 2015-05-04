@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.8.6</h2>
+
+<h4>Fixes:</h4>
+* Line Breaks in Note Edit
+* Design Consistancy (cont.)
+
 <h2>Version 0.7.8.5</h2>
 
 <h4>Fixes:</h4>

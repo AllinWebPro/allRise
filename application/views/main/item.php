@@ -290,19 +290,19 @@
             <div class="pure-u-1-2 left-align">
               <?php if($ranking && $ranking->iPositive): ?>
                 <span href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?importance=up'); ?>" class="pure-button pure-button-xsmall pure-button-active ajax" data-history="false" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/importance/up/'.$type.'/'.$id); ?>" id="importance-up">
-                  <i class="fa fa-plus fa-7-5 fa-lh-110"></i></span>
+                  <i class="fa fa-plus fa-7-5 top-padding-xsmall"></i></span>
               <?php else: ?>
                 <a href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?importance=up'); ?>" class="pure-button pure-button-xsmall ajax" data-history="false" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/importance/up/'.$type.'/'.$id); ?>" id="importance-up">
-                  <i class="fa fa-plus fa-7-5 fa-lh-110"></i></a>
+                  <i class="fa fa-plus fa-7-5 top-padding-xsmall"></i></a>
               <?php endif; ?>
             </div>
             <div class="pure-u-1-2 left-align">
               <?php if($ranking && $ranking->iNegative): ?>
                 <span href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?importance=down'); ?>" class="pure-button pure-button-xsmall pure-button-active ajax" data-history="false" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/importance/down/'.$type.'/'.$id); ?>" id="importance-down">
-                  <i class="fa fa-minus fa-7-5 fa-lh-110"></i></span>
+                  <i class="fa fa-minus fa-7-5 top-padding-xsmall"></i></span>
               <?php else: ?>
                 <a href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?importance=down'); ?>" class="pure-button pure-button-xsmall ajax" data-history="false" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/importance/down/'.$type.'/'.$id); ?>" id="importance-down">
-                  <i class="fa fa-minus fa-7-5 fa-lh-110"></i></a>
+                  <i class="fa fa-minus fa-7-5 top-padding-xsmall"></i></a>
               <?php endif; ?>
             </div>
           </div>
@@ -311,19 +311,19 @@
             <div class="pure-u-1-2 left-align">
               <?php if($ranking && $ranking->qPositive): ?>
                 <span href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?quality=up'); ?>" class="pure-button pure-button-xsmall pure-button-active ajax" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/quality/up/'.$type.'/'.$id); ?>" id="quality-up">
-                  <i class="fa fa-plus fa-7-5"></i></span>
+                  <i class="fa fa-plus fa-7-5 top-padding-xsmall"></i></span>
               <?php else: ?>
                 <a href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?quality=up'); ?>" class="pure-button pure-button-xsmall ajax" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/quality/up/'.$type.'/'.$id); ?>" id="quality-up">
-                  <i class="fa fa-plus fa-7-5"></i></a>
+                  <i class="fa fa-plus fa-7-5 top-padding-xsmall"></i></a>
               <?php endif; ?>
             </div>
             <div class="pure-u-1-2 left-align">
               <?php if($ranking && $ranking->qNegative): ?>
                 <span href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?quality=down'); ?>" class="pure-button pure-button-xsmall pure-button-active ajax" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/quality/down/'.$type.'/'.$id); ?>" id="quality-down">
-                  <i class="fa fa-minus fa-7-5"></i></span>
+                  <i class="fa fa-minus fa-7-5 top-padding-xsmall"></i></span>
               <?php else: ?>
                 <a href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?quality=down'); ?>" class="pure-button pure-button-xsmall ajax" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/quality/down/'.$type.'/'.$id); ?>" id="quality-down">
-                  <i class="fa fa-minus fa-7-5"></i></a>
+                  <i class="fa fa-minus fa-7-5 top-padding-xsmall"></i></a>
               <?php endif; ?>
             </div>
           </div>

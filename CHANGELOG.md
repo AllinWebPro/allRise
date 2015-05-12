@@ -1,6 +1,12 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.8.10</h2>
+
+<h4>Fixes:</h4>
+
 <h2>Version 0.7.8.9</h2>
+* Design Consistancy (cont.)
+* Line Breaks in Note Edit
 
 <h4>Fixes:</h4>
 * No JavaScript Enabled / Mobile jQuery issues

@@ -3,6 +3,7 @@
 <h2>Version 0.7.8.10</h2>
 
 <h4>Fixes:</h4>
+* Duplicate Tag List issue
 
 <h2>Version 0.7.8.9</h2>
 * Design Consistancy (cont.)

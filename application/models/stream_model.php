@@ -2509,21 +2509,24 @@ class Stream_model extends CI_Model
     $temp_key = key($clusters);
     $t_item = $clusters[$temp_key];
     $t_item = null;
-    $tags = "";
+    $tags = array();
     $resources = array();
     $images = array();
     foreach($clusters as $key => $o)
     {
-      $tags .= ($tags?',':'').$o['item']->tags;
+      foreach(explode(',', $o['item']->tags) as $t)
+      {
+        if(!preg_grep("/\b".$t."\b/i", $tags)) { $tags[] = $t; }
+      }
       $thisResources = $this->ci->database->get_array('resources', array('clusterId' => $o['item']->clusterId, 'deleted' => 0), 'resource');
       foreach($thisResources as $tr)
       {
-        if(!in_array($tr, $resources)) { $resources[] = $tr; }
+        if(!preg_grep("/\b".$tr."/\bi", $resources)) { $resources[] = $tr; }
       }
       $thisImages = $this->ci->database->get_array('images', array('clusterId' => $o['item']->clusterId, 'deleted' => 0), 'image');
       foreach($thisImages as $ti)
       {
-        if(!in_array($ti, $images)) { $images[] = $ti; }
+        if(!preg_grep("/\b".$ti."\b/i", $images)) { $images[] = $ti; }
       }
 
       $score = $o['ovn'] + $o['nvo'];
@@ -2563,21 +2566,24 @@ class Stream_model extends CI_Model
     $t_score = 0;
     $temp_key = key($headlines);
     $t_item = $headlines[$temp_key];
-    $tags = "";
+    $tags = array();
     $resources = array();
     $images = array();
     foreach($headlines as $key => $o)
     {
-      $tags .= ($tags?',':'').$o['item']->tags;
+      foreach(explode(',', $o['item']->tags) as $t)
+      {
+        if(!preg_grep("/\b".$t."\b/i", $tags)) { $tags[] = $t; }
+      }
       $thisResources = $this->ci->database->get_array('resources', array('headlineId' => $o['item']->headlineId, 'deleted' => 0), 'resource');
       foreach($thisResources as $tr)
       {
-        if(!in_array($tr, $resources)) { $resources[] = $tr; }
+        if(!preg_grep("/\b".$tr."\b/i", $resources)) { $resources[] = $tr; }
       }
       $thisImages = $this->ci->database->get_array('images', array('headlineId' => $o['item']->headlineId, 'deleted' => 0), 'image');
       foreach($thisImages as $ti)
       {
-        if(!in_array($ti, $images)) { $images[] = $ti; }
+        if(!preg_grep("/\b".$ti."\b/i", $images)) { $images[] = $ti; }
       }
 
       $score = $o['ovn'] + $o['nvo'];

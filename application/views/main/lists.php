@@ -16,7 +16,7 @@
   <section id="search-filters" class="small">
     <div class="horizontal-margin-small vertical-margin-small">
       <div class="vertical-padding-xsmall horizontal-padding-small">
-        <div class="bottom-padding-xsmall">
+        <div class="bottom-padding-xsmall pure-hidden-phone">
           <strong><a name="search"><i class="fa fa-search"></i></a> Advanced Search</strong>
         </div>
         <form class="pure-u-1 pure-form ajax-list" method="get" action="<?php echo site_url('search'); ?>">
@@ -25,7 +25,7 @@
               <input type="text" name="k" id="filter-k" class="pure-input-1" placeholder="Keywords, Tags (e.g. Dragons)" value="<?php echo $search; ?>">
             </div>
             <div class="pure-g">
-              <select name="r" id="filter-r" class="pure-input-1">
+              <select name="r" id="filter-r" class="pure-input-1 pure-hidden-phone">
                 <option value="all" <?php echo ($results == 'all')?'selected':''; ?>>All Results</option>
                 <option value="visited" <?php echo ($results == 'visited')?'selected':''; ?>>Already Visited</option>
                 <option value="unvisited" <?php echo ($results == 'unvisited')?'selected':''; ?>>Not Yet Visited</option>

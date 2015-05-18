@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.8.11</h2>
+
+<h4>Fixes:</h4>
+* Design Consistancy (cont.)
+
 <h2>Version 0.7.8.10</h2>
 
 <h4>Fixes:</h4>

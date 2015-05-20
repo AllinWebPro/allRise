@@ -263,7 +263,7 @@ class Form extends CI_Controller
         if($this->data['type'] == 'article') { $update['article'] = $this->db->escape_str(str_replace('\r', '', str_replace('\n', '', $post['article']))); }
         $update['active'] = 1;
 
-        $sInsert = array($$this->data['type'].'Id' => $this->data['id'], 'userId' => $userId);
+        $sInsert = array($this->data['type'].'Id' => $this->data['id'], 'userId' => $userId);
         if(!$this->database_model->get_single('subscriptions', $sInsert))
         {
           $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');

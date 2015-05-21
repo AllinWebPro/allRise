@@ -126,7 +126,7 @@ class Form extends CI_Controller
       }
         
       $id = $this->database_model->add($this->data['type']."s", $insert, $this->data['type']."Id");
-      $sInsert = array($$this->data['type'].'Id' => $id, 'userId' => $userId);
+      $sInsert = array($this->data['type'].'Id' => $id, 'userId' => $userId);
       $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
       if($this->data['type'] == 'headline')
       {

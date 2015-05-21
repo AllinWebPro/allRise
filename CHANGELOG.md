@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.9.1</h2>
+
+<h4>Added:</h4>
+* Error in form.php
+* 
 <h2>Version 0.7.9.0</h2>
 
 <h4>Fixes:</h4>

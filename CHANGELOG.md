@@ -4,6 +4,7 @@
 
 <h4>Fixes:</h4>
 * Social Sharing Image issue
+* Manual Join issue
 
 <h2>Version 0.7.9.1</h2>
 

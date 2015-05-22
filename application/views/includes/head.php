@@ -15,14 +15,14 @@
   <meta property="og:type" content="article">
   <meta property="og:locale" content="en_US">
   <meta property="article:publisher" content="https://www.facebook.com/AllRiseCo">
-  <meta property="og:image" content="<?php echo isset($images[0])?stripslashes($images[0]->image):site_url('media/img/allRise-logo.gif'); ?>">
+  <meta property="og:image" content="<?php echo isset($images_output[0])?stripslashes($images_output[0]->image):(isset($images[0])?stripslashes($images[0]->image):site_url('media/img/allRise-logo.gif')); ?>">
   <!--end facebook-->
   <!--twitter-->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@weallrise" />
   <meta name="twitter:title" content="<?php echo $title; ?>">
   <meta name="twitter:description" content="<?php echo metadata('description', isset($description)?$description:''); ?>">
-  <meta name="twitter:image" content="<?php echo isset($images[0])?stripslashes($images[0]->image):site_url('media/img/allRise-logo.gif'); ?>">
+  <meta name="twitter:image" content="<?php echo isset($images_output[0])?stripslashes($images_output[0]->image):(isset($images[0])?stripslashes($images[0]->image):site_url('media/img/allRise-logo.gif')); ?>">
   <!--end twitter-->
   <title><?php echo $title; ?> .::. <?php echo SITE_TITLE; ?></title>
   <link rel="stylesheet" href="//yui.yahooapis.com/pure/0.3.0/pure-min.css">

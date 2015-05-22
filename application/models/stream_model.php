@@ -2537,7 +2537,7 @@ class Stream_model extends CI_Model
       }
     }
 
-    $insert = array('headline' => $t_item['item']->headline, 'tags' => $tags, 'createdOn' => time());
+    $insert = array('headline' => $t_item['item']->headline, 'tags' => implode(',', $tags), 'createdOn' => time());
     if($userId) { $insert['editedBy'] = $userId; }
     $articleId = $this->ci->database->add('articles', $insert, 'articleId');
     $this->database_model->add('subscriptions', array('userId' => 3, 'articleId' => $articleId, 'createdOn' => time()), 'subscriptionId');
@@ -2594,7 +2594,7 @@ class Stream_model extends CI_Model
       }
     }
 
-    $insert = array('headline' => $t_item['item']->headline, 'tags' => $tags, 'createdOn' => time());
+    $insert = array('headline' => $t_item['item']->headline, 'tags' => implode(',', $tags), 'createdOn' => time());
     if($articleId) { $insert['articleId'] = $articleId; }
     if($userId) { $insert['editedBy'] = $userId; }
     $clusterId = $this->ci->database->add('clusters', $insert, 'clusterId');

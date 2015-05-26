@@ -131,7 +131,7 @@ class Form extends CI_Controller
       if($this->data['type'] == 'headline')
       {
         $item = $this->database_model->get_select('headlines', array('headlineId' => $id), 'OLD_PASSWORD(headlineId) AS hashId');
-        $this->utility_model->email_owen("New Headline", "Link: ".site_url('h/'.$item->hashId));
+        $this->utility_model->email_owen("New Headline", "Link: http:".site_url('h/'.$item[0]->hashId));
         $sInsert = array('headlineId' => $id, 'userId' => $userId);
       }
       foreach($post['categoryId'] as $c)

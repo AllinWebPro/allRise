@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.9.3</h2>
+
+<h4>Fixes:</h4>
+* Owen Headline Email
+
 <h2>Version 0.7.9.2</h2>
 
 <h4>Fixes:</h4>

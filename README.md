@@ -5,9 +5,9 @@
 * MySQL Version: 5.6+
 
 <h2>Version Information <sup>[1]</sup> <sup>[2]</sup></h2>
-* Beta Version: 0.7.9.1
-* Staging Version: 0.7.9.1
-* Development Version: 0.7.9.1
+* Beta Version: 0.7.9.3
+* Staging Version: 0.7.9.3
+* Development Version: 0.7.9.3
 
 <h3>Version Formating <sup>[3]</sup> <sup>[4]</sup> <sup>[5]</sup></h3>
 * X.0.0.0 - Has all required mechanics, but may require testing and refinement.

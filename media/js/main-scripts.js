@@ -1151,12 +1151,12 @@ function listMasonry()
   $list.masonry({ columnWidth: columnWidth, itemSelector: 'section' });*/
 }
 
-function streamMasonry(largeItemSelector)
+function streamMasonry()
 {
   columns = Math.floor($("body").width() / 300);
   columnWidth = Math.floor($stream.width() / columns);
   $stream.children('.items').width(columnWidth);
-  if(typeof largeItemSelector !== 'undefined') { $stream.children(largeItemSelector).width(columnWidth*2); }
+  $stream.children(".doublewidth").width(columnWidth*2);
   $stream.masonry({ columnWidth: columnWidth, itemSelector: '.items' });
 }
 

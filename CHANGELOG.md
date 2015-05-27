@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.9.4</h2>
+
+<h4>Fixes:</h4>
+* Design Consistancy (cont.)
+
 <h2>Version 0.7.9.3</h2>
 
 <h4>Fixes:</h4>
@@ -37,10 +42,9 @@
 * Duplicate Tag List issue
 
 <h2>Version 0.7.8.9</h2>
-* Design Consistancy (cont.)
-* Line Breaks in Note Edit
 
 <h4>Fixes:</h4>
+* Line Breaks in Note Edit
 * No JavaScript Enabled / Mobile jQuery issues
 * Design Consistancy (cont.)
 

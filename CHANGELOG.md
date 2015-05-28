@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.9.6</h2>
+
+<h4>Fixes</h4>
+* Facebook Share after AJAX
+
 <h2>Version 0.7.9.5</h2>
 
 <h4>Fixes:</h4>

@@ -719,6 +719,8 @@ $(function() {
             itemMasonry();
           }
           if($(".ui-dialog-titlebar-close") && output) { $(".ui-dialog-titlebar-close").trigger('click'); resources = 0; }
+          
+          FB.XFBML.parse();
         
           $("img").load(function() {
             $comments = $("#comments");
@@ -958,6 +960,9 @@ $(function() {
               clearInterval(timer);
             }
           }, 200);
+          
+          FB.XFBML.parse();
+          
           $("img").load(function() {
             $comments = $("#comments");
             if($stream = $('#stream')) { streamMasonry(); }

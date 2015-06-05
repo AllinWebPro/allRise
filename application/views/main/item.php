@@ -411,7 +411,7 @@
           <strong><a name="social"><i class="fa fa-share"></i></a> Social</strong>
         </div>
         <form class="pure-u-1 pure-form pure-g-r">
-          <?php $tinyurl = file_get_contents('http://tinyurl.com/api-create.php?url=http:'.site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline))); ?>
+          <?php $tinyurl = @file_get_contents('http://tinyurl.com/api-create.php?url=http:'.site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline))); ?>
           <fieldset class="pure-group pure-u-1">
             <input type="text" id="copy" value="<?php echo $tinyurl; ?>" class="pure-input-1" readonly>
           </fieldset>

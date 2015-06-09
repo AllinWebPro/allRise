@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.10.0</h2>
+
+<h4>Added:</h4>
+* YouTube Video on Home Page
+
 <h2>Version 0.7.9.7</h2>
 
 <h4>Fixes</h4>

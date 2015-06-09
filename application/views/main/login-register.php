@@ -1,10 +1,20 @@
+<?php $video_url = 'https://www.youtube.com/embed/mBBqb97IQMo'; ?>
 <aside class="pure-hidden-phone pure-u-7-12 vertical-padding-xlarge">
   <div class="horizontal-padding-xlarge vertical-padding-xlarge">
     <p class="intro-text vertical-padding-xlarge">Collaborative News for Everyone.<br><br>allRise helps communities large and small connect in new ways to share real-time important information and easily build it into high-quality news articles.  It's democratic news by and for everyone.  Our goal is to become the most valuable source of real-time news in the world.</p>
+    <div class="videoWrapper">
+      <!-- Copy & Pasted from YouTube -->
+      <iframe width="560" height="315" src="<?php echo $video_url; ?>" frameborder="0" allowfullscreen></iframe>
+    </div>
   </div>
 </aside>
 <div class="pure-u-7-24 bottom-padding">
   <div class="horizontal-padding-huge vertical-padding-xlarge">
+    <div class="videoWrapper pure-visible-phone">
+      <!-- Copy & Pasted from YouTube -->
+      <iframe width="560" height="315" src="<?php echo $video_url; ?>" frameborder="0" allowfullscreen></iframe>
+    </div>
+    <div class="margin-top pure-visible-phone">&nbsp;</div>
     <section id="login" class="pure-g vertical-padding-xlarge">
       <form class="pure-u-1 pure-form ajax" method="post" action="<?php echo site_url('login'); ?>" novalidate>
         <fieldset class="pure-group">

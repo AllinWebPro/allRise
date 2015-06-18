@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.11.0</h2>
+
+<h4>Added:</h4>
+* YouTube Video to Tutorial popup
+
 <h2>Version 0.7.10.0</h2>
 
 <h4>Added:</h4>

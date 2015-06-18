@@ -11,11 +11,11 @@ var current_page = window.location.href;
 <script src="<?php echo site_url('media/js/vendor/masonry.pkgd.min.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/fix.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/main-scripts.js'); ?>"></script>
-<!--<?php if($this->session->userdata('isLoggedIn') && $this->session->flashdata('tutorial')): ?>
+<?php if($this->session->userdata('isLoggedIn') && $this->session->flashdata('tutorial')): ?>
   <script>setTimeout(function() { $("#tutorial-link").click(); }, 2000);</script>
 <?php elseif(isset($_REQUEST['tutorial'])): ?>
   <script>setTimeout(function() { $("#tutorial-link").click(); }, 2000);</script>
-<?php endif; ?>-->
+<?php endif; ?>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

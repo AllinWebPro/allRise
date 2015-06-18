@@ -1,4 +1,7 @@
-<div id="tutorial" class="pure-g-r top-padding">
+<div class="tutorialWrapper">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/8T6SuEE-NiI" frameborder="0" allowfullscreen></iframe>
+</div>
+<!--<div id="tutorial" class="pure-g-r top-padding">
   <div class="pure-u-1 white-bg grey-border-bottom">
     <div class="vertical-padding-xlarge">
       <h2 class="center-text">Three Components of <span class="branding">all<span class="orange">Rise</span></span></h2>
@@ -102,4 +105,4 @@
       </div>
     </div>
   </div>
-</div>
+</div>-->

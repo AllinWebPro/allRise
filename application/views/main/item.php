@@ -170,7 +170,7 @@
             </div>
             <?php foreach($clusters as $c): ?>
               <div class="pure-u-1 vertical-padding-tiny">
-                <a title="<?php echo stripslashes($c->headline); ?>" href="<?php echo site_url('c/'.$c->hashId.'/'.get_url_string($c->headline)); ?>" class="item ajax" data-type="item">
+                <a title="<?php echo stripslashes($c->headline); ?>" href="<?php echo site_url('c/'.$c->hashId.'/'.get_url_string($c->headline)); ?>" class="item">
                   <div class="icon-box"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div>
                   <?php echo stripslashes($c->headline); ?></a>
                 <span class="grey">
@@ -192,7 +192,7 @@
                   <?php endif; ?>
                   <?php if($c_comments[$c->clusterId]): ?>
                     <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
-                      <a title="<?php echo stripslashes($c->headline); ?>" href="<?php echo site_url('h/'.$c->hashId.'/'.get_url_string($c->headline)); ?>#comments" data-type="item" class="ajax">
+                      <a title="<?php echo stripslashes($c->headline); ?>" href="<?php echo site_url('h/'.$c->hashId.'/'.get_url_string($c->headline)); ?>#comments">
                         <?php echo $c_comments[$c->clusterId]; ?></a>
                     </span>
                   <?php endif; ?>
@@ -203,7 +203,7 @@
               </div>
               <?php foreach($headlines[$c->clusterId] as $h): ?>
                 <div class="pure-u-1 vertical-padding-tiny">
-                  <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>" class="left-padding display-ib item ajax" data-type="item">
+                  <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>" class="left-padding display-ib item">
                     <div class="icon-box"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
                     <?php echo stripslashes($h->headline); ?></a>
                   <span class="grey left-padding display-ib">
@@ -225,7 +225,7 @@
                     <?php endif; ?>
                     <?php if($h_comments[$h->headlineId]): ?>
                       <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
-                        <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>#comments" data-type="item" class="ajax">
+                        <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>#comments">
                           <?php echo $h_comments[$h->headlineId]; ?></a>
                       </span>
                     <?php endif; ?>
@@ -243,7 +243,7 @@
             </div>
             <?php foreach($headlines as $h): ?>
               <div class="pure-u-1 vertical-padding-tiny">
-                <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>" class="item ajax" data-type="item">
+                <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>" class="item">
                   <div class="icon-box"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
                   <?php echo stripslashes($h->headline); ?></a>
                 <span class="grey">
@@ -265,7 +265,7 @@
                   <?php endif; ?>
                   <?php if($h_comments[$h->headlineId]): ?>
                     <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
-                      <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>#comments" class="ajax" data-type="item">
+                      <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>#comments">
                         <?php echo $h_comments[$h->headlineId]; ?></a>
                     </span>
                   <?php endif; ?>

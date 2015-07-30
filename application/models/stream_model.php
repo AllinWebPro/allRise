@@ -157,7 +157,6 @@ class Stream_model extends CI_Model
       }
       $sql .= "GROUP BY u.userid ";
     $sql .= ") contributors ";
-    $sql .= "WHERE deleted = 0 ";
 
     $q = $this->db->query($sql);
     return $q->result();

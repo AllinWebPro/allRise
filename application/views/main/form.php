@@ -35,7 +35,7 @@
         <hr>
         <div class="horizontal-padding-small">
           <strong><a name="images"><i class="fa fa-link"></i></a> Images</strong>
-          <a href="#" id="add_image" name="add_image" class="right-align">Add Image Link</a>
+          <a href="javascript:void(0);" id="add_image" name="add_image" class="right-align">Add Image Link</a>
           <div class="clear"></div>
           <fieldset class="images pure-group pure-u-1">
             <?php if(isset($images_output) && $images_output): ?>
@@ -58,7 +58,7 @@
         <hr>
         <div class="horizontal-padding-small bottom-padding-small">
           <strong><a name="resources"><i class="fa fa-link"></i></a> Resources</strong>
-          <a href="#" id="add_resource" name="add_resource" class="right-align">Add Resource Link</a>
+          <a href="javascript:void(0);" id="add_resource" name="add_resource" class="right-align">Add Resource Link</a>
           <div class="clear"></div>
           <fieldset class="resources pure-group pure-u-1">
             <?php if(isset($resources_output) && $resources_output): ?>

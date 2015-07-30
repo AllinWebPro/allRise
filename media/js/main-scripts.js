@@ -79,11 +79,11 @@ $(function() {
     });
   }
   
-  CKEDITOR.on('instanceCreated', function(ev) {
+  /*CKEDITOR.on('instanceCreated', function(ev) {
     ev.editor.on('resize',function(reEvent){
        if($item = $('#item')) { itemMasonry(); }
      });
-  });
+  });*/
   
   $(this).on('mouseup', "#copy", function() {
     $(this).select();
@@ -95,7 +95,7 @@ $(function() {
   });
 
 
-  if($('textarea[name="article"]'))
+  if($('textarea[name="article"]').length)
   {
     $item = $("#item");
     $('textarea[name="article"]').ckeditor();
@@ -947,7 +947,7 @@ $(function() {
                 $item = $('#item');
                 itemMasonry();
               }
-              if($('textarea[name="article"]'))
+              if($('textarea[name="article"]').length)
               {
                 $('textarea[name="article"]').ckeditor();
                 var timer2 = setInterval(function() {

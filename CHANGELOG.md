@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.11.1</h2>
+
+<h4>Fixes</h4>
+* Contributor Listing for Deleted Accounts
+* CKEditor Mobile Compatibility
+
 <h2>Version 0.7.11.0</h2>
 
 <h4>Added:</h4>

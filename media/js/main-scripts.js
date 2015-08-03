@@ -687,8 +687,7 @@ $(function() {
         dataType: 'json',
         data: post,
         success: function(data, textStatus, jqXHR) {
-          console.log(data);
-          if(!data.success && typeof data.errors != 'undefined') { errors[errors.length] = data.errors; }
+          if(typeof data.errors != 'undefined') { errors[errors.length] = data.errors; }
           else if(typeof data.output != 'undefined') { errors[errors.length] = data.output; output = true; }
           else if(typeof data.redirect != 'undefined') { window.location = data.redirect; }
           else if(typeof data.prepend != 'undefined')

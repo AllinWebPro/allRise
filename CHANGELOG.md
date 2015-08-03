@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.12.2</h2>
+
+<h4>Fixes</h4>
+* Form Submit Fix
+
 <h2>Version 0.7.12.1</h2>
 
 <h4>Fixes</h4>

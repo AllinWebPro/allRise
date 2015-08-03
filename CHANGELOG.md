@@ -1,12 +1,20 @@
 <h1>Changelog</h1>
 
-<h2>Version 0.7.11.2</h2>
+<h2>Version 0.7.12.1</h2>
+
+<h4>Fixes</h4>
+* Facebook JS
+
+<h2>Version 0.7.12.0</h2>
 
 <h4>Added:</h4>
 * Item Images Lightbox
 
 <h4>Fixes</h4>
 * utility_model.php 'get_admin_emails' fix
+
+<h4>Note</h4>
+* Submitted as "Version 0.7.11.2"
 
 <h2>Version 0.7.11.1</h2>
 

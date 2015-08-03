@@ -722,7 +722,7 @@ $(function() {
           }
           if($(".ui-dialog-titlebar-close") && output) { $(".ui-dialog-titlebar-close").trigger('click'); resources = 0; }
           
-          FB.XFBML.parse();
+          if(typeof FB !== 'undefined') { FB.XFBML.parse(); }
         
           $("img").load(function() {
             $comments = $("#comments");
@@ -963,7 +963,7 @@ $(function() {
             }
           }, 200);
           
-          FB.XFBML.parse();
+          if(typeof FB !== 'undefined') { FB.XFBML.parse(); }
           
           $("img").load(function() {
             $comments = $("#comments");

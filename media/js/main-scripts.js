@@ -62,6 +62,8 @@ var $stream,
 
 $(function() {
   
+  $("a[rel^='prettyPhoto']").prettyPhoto();
+  
   var $textareas = jQuery('textarea');  
   if($textareas)
   {

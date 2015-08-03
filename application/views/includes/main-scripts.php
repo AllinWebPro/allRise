@@ -9,6 +9,7 @@ var current_page = window.location.href;
 <script src="<?php echo site_url('ckeditor/config.js'); ?>"></script>
 <script src="<?php echo site_url('ckeditor/adapters/jquery.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/vendor/masonry.pkgd.min.js'); ?>"></script>
+<script src="<?php echo site_url('media/js/jquery.prettyPhoto.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/fix.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/main-scripts.js'); ?>"></script>
 <?php if($this->session->userdata('isLoggedIn') && $this->session->flashdata('tutorial')): ?>

@@ -628,7 +628,7 @@ class Utility_model extends CI_Model
   function get_admin_emails()
   {
     $emails = array();
-    $admins = $this->database->get('users', array('level' => 'a', 'deleted' => 0));
+    $admins = $this->database_model->get('users', array('level' => 'a', 'deleted' => 0));
     foreach($admins as $a) { $emails[] = $a->email; }
     return $emails;
   }

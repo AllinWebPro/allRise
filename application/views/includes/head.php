@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css">
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic">
   <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/ui-lightness/jquery-ui.css">
+  <link rel="stylesheet" href="<?php echo site_url('media/css/prettyPhoto.css'); ?>">
   <link rel="stylesheet" href="<?php echo site_url('media/css/main.css'); ?>">
   <!--<script src="<?php echo site_url('media/js/vendor/modernizr.min.js'); ?>"></script>-->
   <!--[if lt IE 7]><script>for (x in open);</script><![endif]-->

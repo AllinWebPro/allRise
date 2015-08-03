@@ -1,5 +1,13 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.11.2</h2>
+
+<h4>Added:</h4>
+* Item Images Lightbox
+
+<h4>Fixes</h4>
+* utility_model.php 'get_admin_emails' fix
+
 <h2>Version 0.7.11.1</h2>
 
 <h4>Fixes</h4>
@@ -16,7 +24,7 @@
 <h4>Added:</h4>
 * YouTube Video on Home Page
 
-<h2>Version 0.7.9.7</h2>
+<h2>Version 0.7.9.7</h2> 
 
 <h4>Fixes</h4>
 * TinyURL HTTP issue

@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.12.3</h2>
+
+<h4>Fixes</h4>
+* CKEditor responsiveness
+
 <h2>Version 0.7.12.2</h2>
 
 <h4>Fixes</h4>

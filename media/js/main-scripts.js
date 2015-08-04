@@ -81,11 +81,11 @@ $(function() {
     });
   }
   
-  /*CKEDITOR.on('instanceCreated', function(ev) {
+  CKEDITOR.on('instanceCreated', function(ev) {
     ev.editor.on('resize',function(reEvent){
        if($item = $('#item')) { itemMasonry(); }
      });
-  });*/
+  });
   
   $(this).on('mouseup', "#copy", function() {
     $(this).select();

@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.13.0</h2>
+
+<h4>Updates:</h4>
+* Author Notes height
+* Author Notes -> Description
+
 <h2>Version 0.7.12.3</h2>
 
 <h4>Fixes</h4>

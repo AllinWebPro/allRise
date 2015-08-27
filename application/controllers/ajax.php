@@ -887,7 +887,9 @@ class Ajax extends CI_Controller
     $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
     $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
     $this->form_validation->set_rules('image[]', 'Links', 'trim  |prep_url|xss_clean');
+    $this->form_validation->set_rules('remove-image[]', 'Links', 'trim  |prep_url|xss_clean');
     $this->form_validation->set_rules('resource[]', 'Links', 'trim  |prep_url|xss_clean');
+    $this->form_validation->set_rules('remove-resource[]', 'Links', 'trim  |prep_url|xss_clean');
     $this->form_validation->set_rules('categoryId[]', 'Category', 'trim|required|xss_clean');
     if($this->form_validation->run())
     {
@@ -962,16 +964,13 @@ class Ajax extends CI_Controller
         }
       }
       // Edit Images
-      if($images)
+      if(isset($post['remove-image']) && $post['remove-image'])
       {
-        foreach($images as $image)
+        foreach($post['remove-image'] as $image)
         {
-          if(!in_array($image, $post['image']) || $image == '')
-          {
-            $where = array($type.'Id' => $id, 'image' => $image);
-            $image_s = $this->database_model->get_single('images', $where);
-            $this->database_model->edit('images', array('imageId' => $image_s->imageId), $delete);
-          }
+          $where = array($type.'Id' => $id, 'image' => $this->db->escape_str($image), 'deleted' => 0);
+          $image_s = $this->database_model->get_single('images', $where);
+          $this->database_model->edit('images', array('imageId' => $image_s->imageId), $delete);
         }
       }
       if(isset($post['image']) && $post['image'])
@@ -980,7 +979,7 @@ class Ajax extends CI_Controller
         {
           if(!in_array($image, $images) && $image !== '')
           {
-            $where = array($type.'Id' => $id, 'image' => $image);
+            $where = array($type.'Id' => $id, 'image' => $this->db->escape_str($image));
             $image_s = $this->database_model->get_single('images', $where);
             if($image_s) { $this->database_model->edit('images', array('imageId' => $image_s->imageId), $undelete); }
             else { $this->database_model->add('images', $where+array('editedBy' => $userId, 'active' => 1), 'imageId'); }
@@ -988,16 +987,13 @@ class Ajax extends CI_Controller
         }
       }
       // Edit Resources
-      if($resources)
+      if(isset($post['remove-resources']) && $post['remove-resources'])
       {
-        foreach($resources as $resource)
+        foreach($post['remove-resources'] as $resources)
         {
-          if(!in_array($resource, $post['resource']) || $resource == '')
-          {
-            $where = array($type.'Id' => $id, 'resource' => $resource);
+            $where = array($type.'Id' => $id, 'resource' => $this->db->escape_str($resource), 'deleted' => 0);
             $resource_s = $this->database_model->get_single('resources', $where);
             $this->database_model->edit('resources', array('resourceId' => $resource_s->resourceId), $delete);
-          }
         }
       }
       if(isset($post['resource']) && $post['resource'])
@@ -1006,7 +1002,7 @@ class Ajax extends CI_Controller
         {
           if(!in_array($resource, $resources) && $resource !== '')
           {
-            $where = array($type.'Id' => $id, 'resource' => $resource);
+            $where = array($type.'Id' => $id, 'resource' => $this->db->escape_str($resource));
             $resource_s = $this->database_model->get_single('resources', $where);
             if($resource_s) { $this->database_model->edit('resources', array('resourceId' => $resource_s->resourceId), $undelete); }
             else { $this->database_model->add('resources', $where+array('editedBy' => $userId, 'active' => 1), 'resourceId'); }

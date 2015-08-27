@@ -938,6 +938,7 @@ class Stream_model extends CI_Model
       $search = explode(' ', $terms);
       foreach($search as $s)
       {
+        $s = $this->db->escape_str($s, true);
         if($w < 10)
         {
           if($w) { $match .= " + "; }
@@ -959,6 +960,7 @@ class Stream_model extends CI_Model
 
       foreach($search_pair as $s)
       {
+        $s = $this->db->escape_str($s, true);
         if($w < 5)
         {
           if($w) { $match .= " + "; }
@@ -1205,6 +1207,7 @@ class Stream_model extends CI_Model
       $search = explode(' ', $terms);
       foreach($search as $s)
       {
+        $s = $this->db->escape_str($s, true);
         if($w < 10)
         {
           if($w) { $match .= " + "; }
@@ -1226,6 +1229,7 @@ class Stream_model extends CI_Model
 
       foreach($search_pair as $s)
       {
+        $s = $this->db->escape_str($s, true);
         if($w < 5)
         {
           if($w) { $match .= " + "; }

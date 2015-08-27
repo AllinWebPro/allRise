@@ -311,16 +311,13 @@ class Form extends CI_Controller
           }
         }
         // Edit Images
-        if($this->data['images'])
+        if(isset($post['remove-image']) && $post['remove-image'])
         {
-          foreach($this->data['images'] as $image)
+          foreach($post['remove-image'] as $image)
           {
-            if(!in_array($image, $post['image']) || $image == '')
-            {
-              $where = array($this->data['type'].'Id' => $this->data['id'], 'image' => $image);
-              $image_s = $this->database_model->get_single('images', $where);
-              $this->database_model->edit('images', array('imageId' => $image_s->imageId), $delete);
-            }
+            $where = array($this->data['type'].'Id' => $this->data['id'], 'image' => $this->db->escape_str($image), 'deleted' => 0);
+            $image_s = $this->database_model->get_single('images', $where);
+            $this->database_model->edit('images', array('imageId' => $image_s->imageId), $delete);
           }
         }
         if(isset($post['image']) && $post['image'])
@@ -329,7 +326,7 @@ class Form extends CI_Controller
           {
             if(!in_array($image, $this->data['images']) && $image !== '')
             {
-              $where = array($this->data['type'].'Id' => $this->data['id'], 'image' => $image);
+              $where = array($this->data['type'].'Id' => $this->data['id'], 'image' => $this->db->escape_str($image));
               $image_s = $this->database_model->get_single('images', $where);
               if($image_s) { $this->database_model->edit('images', array('imageId' => $image_s->imageId), $undelete); }
               else { $this->database_model->add('images', $where+array('editedBy' => $userId, 'active' => 1), 'imageId'); }
@@ -337,16 +334,13 @@ class Form extends CI_Controller
           }
         }
         // Edit Resources
-        if($this->data['resources'])
+        if(isset($post['remove-resources']) && $post['remove-resources'])
         {
-          foreach($this->data['resources'] as $resource)
+          foreach($post['remove-resources'] as $resources)
           {
-            if(!in_array($resource, $post['resource']) || $resource == '')
-            {
-              $where = array($this->data['type'].'Id' => $this->data['id'], 'resource' => $this->db->escape_str($resource));
+              $where = array($this->data['type'].'Id' => $this->data['id'], 'resource' => $this->db->escape_str($resource), 'deleted' => 0);
               $resources = $this->database_model->get_single('resources', $where);
               $this->database_model->edit('resources', array('resourceId' => $resources->resourceId), $delete);
-            }
           }
         }
         if(isset($post['resource']) && $post['resource'])
@@ -486,7 +480,9 @@ class Form extends CI_Controller
     $this->form_validation->set_rules('categoryId[]', 'Category', 'trim|required|xss_clean');
     $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
     $this->form_validation->set_rules('image[]', 'Links', 'trim|prep_url|xss_clean');
+    $this->form_validation->set_rules('remove-image[]', 'Links', 'trim|prep_url|xss_clean');
     $this->form_validation->set_rules('resource[]', 'Links', 'trim|prep_url|xss_clean');
+    $this->form_validation->set_rules('remove-resource[]', 'Links', 'trim|prep_url|xss_clean');
     if($this->form_validation->run()) { return $this->input->post(); }
     elseif($_POST)
     {

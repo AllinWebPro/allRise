@@ -1,5 +1,12 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.13.1</h2>
+
+<h4>Fixes</h4>
+* Remove image/resource bug
+* Image lightbox bug
+* Search apostrophe bug
+
 <h2>Version 0.7.13.0</h2>
 
 <h4>Updates:</h4>

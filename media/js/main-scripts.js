@@ -92,7 +92,10 @@ $(function() {
   });
 
   $(this).on('click', ".deleteLink", function() {
-    $(this).parent().parent('.pure-g').remove();
+    $parent = $(this).parent().parent('.pure-g');
+    $("input", $parent).attr('name', 'remove-'+$("input", $parent).attr('name'));
+    $parent.hide();
+    //$(this).parent().parent('.pure-g').remove();
     if($item = $('#item')) { itemMasonry(); }
   });
 

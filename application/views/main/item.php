@@ -121,6 +121,7 @@
             <em>No images at this time.</em>
           </div>
         <?php endif; ?>
+        <script>$("a[rel^='prettyPhoto']").prettyPhoto();</script>
       </div>
       <hr>
       <div class="horizontal-padding-small vertical-padding-small top-padding-xsmall">

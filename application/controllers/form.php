@@ -311,51 +311,50 @@ class Form extends CI_Controller
           }
         }
         // Edit Images
-        if(isset($post['remove-image']) && $post['remove-image'])
-        {
-          foreach($post['remove-image'] as $image)
-          {
-            $where = array($this->data['type'].'Id' => $this->data['id'], 'image' => $this->db->escape_str($image), 'deleted' => 0);
-            $image_s = $this->database_model->get_single('images', $where);
-            $this->database_model->edit('images', array('imageId' => $image_s->imageId), $delete);
-          }
-        }
         if(isset($post['image']) && $post['image'])
         {
-          foreach($post['image'] as $image)
+          foreach($post['image'] as $imageId => $image)
           {
-            if(!in_array($image, $this->data['images']) && $image !== '')
-            {
-              $where = array($this->data['type'].'Id' => $this->data['id'], 'image' => $this->db->escape_str($image));
-              $image_s = $this->database_model->get_single('images', $where);
-              if($image_s) { $this->database_model->edit('images', array('imageId' => $image_s->imageId), $undelete); }
-              else { $this->database_model->add('images', $where+array('editedBy' => $userId, 'active' => 1), 'imageId'); }
-            }
+            $this->database_model->edit('images', array('imageId' => $imageId), array('image' => $this->db->escape_str($image), 'editedBy' => $userId));
+          }
+        }
+        if(isset($post['add-image']) && $post['add-image'])
+        {
+          foreach($post['add-image'] as $image)
+          {
+            $this->database_model->add('images', array($this->data['type'].'Id' => $this->data['id'], 'image' => $this->db->escape_str($image), 'editedBy' => $userId, 'active' => 1), 'imageId');
+          }
+        }
+        if(isset($post['remove-image']) && $post['remove-image'])
+        {
+          foreach($post['remove-image'] as $imageId => $image)
+          {
+            $this->database_model->edit('images', array('imageId' => $imageId), $delete);
           }
         }
         // Edit Resources
-        if(isset($post['remove-resources']) && $post['remove-resources'])
-        {
-          foreach($post['remove-resources'] as $resources)
-          {
-              $where = array($this->data['type'].'Id' => $this->data['id'], 'resource' => $this->db->escape_str($resource), 'deleted' => 0);
-              $resources = $this->database_model->get_single('resources', $where);
-              $this->database_model->edit('resources', array('resourceId' => $resources->resourceId), $delete);
-          }
-        }
         if(isset($post['resource']) && $post['resource'])
         {
-          foreach($post['resource'] as $resource)
+          foreach($post['resource'] as $resourceId => $resource)
           {
-            if(!in_array($resource, $this->data['resources']) && $resource !== '')
-            {
-              $where = array($this->data['type'].'Id' => $this->data['id'], 'resource' => $this->db->escape_str($resource));
-              $resources = $this->database_model->get_single('resources', $where);
-              if($resources) { $this->database_model->edit('resources', array('resourceId' => $resources->resourceId), $undelete); }
-              else { $this->database_model->add('resources', $where+array('editedBy' => $userId), 'resourceId'); }
-            }
+            $this->database_model->edit('images', array('resourceId' => $resourceId), array('resource' => $this->db->escape_str($resource), 'editedBy' => $userId));
           }
         }
+        if(isset($post['add-resource']) && $post['add-resource'])
+        {
+          foreach($post['add-resource'] as $resource)
+          {
+            $this->database_model->add('images', array($this->data['type'].'Id' => $this->data['id'], 'resource' => $this->db->escape_str($resource), 'editedBy' => $userId, 'active' => 1), 'resourceId');
+          }
+        }
+        if(isset($post['remove-resource']) && $post['remove-resource'])
+        {
+          foreach($post['remove-resource'] as $resourceId => $resource)
+          {
+            $this->database_model->edit('resources', array('resourceId' => $resourceId), $delete);
+          }
+        }
+        //
         $this->utility_model->metadata($this->data['type'], $this->data['id']);
         redirect($this->data['type'].'/'.$id);
       }
@@ -480,8 +479,10 @@ class Form extends CI_Controller
     $this->form_validation->set_rules('categoryId[]', 'Category', 'trim|required|xss_clean');
     $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
     $this->form_validation->set_rules('image[]', 'Links', 'trim|prep_url|xss_clean');
+    $this->form_validation->set_rules('add-image[]', 'Links', 'trim|prep_url|xss_clean');
     $this->form_validation->set_rules('remove-image[]', 'Links', 'trim|prep_url|xss_clean');
     $this->form_validation->set_rules('resource[]', 'Links', 'trim|prep_url|xss_clean');
+    $this->form_validation->set_rules('add-resource[]', 'Links', 'trim|prep_url|xss_clean');
     $this->form_validation->set_rules('remove-resource[]', 'Links', 'trim|prep_url|xss_clean');
     if($this->form_validation->run()) { return $this->input->post(); }
     elseif($_POST)

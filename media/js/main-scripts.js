@@ -93,12 +93,14 @@ $(function() {
 
   $(this).on('click', ".deleteLink", function() {
     $parent = $(this).parent().parent('.pure-g');
-    $("input", $parent).attr('name', 'remove-'+$("input", $parent).attr('name'));
-    $parent.hide();
-    //$(this).parent().parent('.pure-g').remove();
+    name = $("input", $parent).attr('name');
+    if(name.indexOf('add') != -1) { $parent.remove(); }
+    else {
+      $("input", $parent).attr('name', 'remove-'+name);
+      $parent.hide();
+    }
     if($item = $('#item')) { itemMasonry(); }
   });
-
 
   if($('textarea[name="article"]').length)
   {
@@ -169,7 +171,7 @@ $(function() {
     //$image = $('<input type="text" name="image[]" class="pure-input-1" placeholder="Image Link">');
     $image = $('<div class="pure-g"></div>');
     $input = $('<div class="pure-u-23-24"></div>');
-    $input.append('<input type="text" value="" name="image[]" class="pure-input-1" placeholder="Image Link">');
+    $input.append('<input type="text" value="" name="add-image[]" class="pure-input-1" placeholder="Image Link">');
     $mod = $('<div class="pure-u-1-24 center-text top-padding-xsmall"></div>');
     $link = $('<a class="deleteLink" href="javascript:void(0);"></a>');
     $link.append('<i class="fa fa-trash-o fa-7-5"></i>');
@@ -178,7 +180,13 @@ $(function() {
     $image.append($mod);
     $(".images", $form).prepend($image).height();
     $(this).on('click', ".deleteLink", function() {
-      $(this).parent().parent('.pure-g').remove();
+      $parent = $(this).parent().parent('.pure-g');
+      name = $("input", $parent).attr('name');
+      if(name.indexOf('add') != -1) { $parent.remove(); }
+      else {
+        $("input", $parent).attr('name', 'remove-'+name);
+        $parent.hide();
+      }
       if($item = $('#item')) { itemMasonry(); }
     });
     if($item = $('#item')) { itemMasonry(); }
@@ -189,7 +197,7 @@ $(function() {
     //$resource = $('<input type="text" name="resource[]" class="pure-input-1" placeholder="Resource Link">');
     $resource = $('<div class="pure-g"></div>');
     $input = $('<div class="pure-u-23-24"></div>');
-    $input.append('<input type="text" value="" name="resource[]" class="pure-input-1" placeholder="Resource Link">');
+    $input.append('<input type="text" value="" name="add-resource[]" class="pure-input-1" placeholder="Resource Link">');
     $mod = $('<div class="pure-u-1-24 center-text top-padding-xsmall"></div>');
     $link = $('<a class="deleteLink" href="javascript:void(0);"></a>');
     $link.append('<i class="fa fa-trash-o fa-7-5"></i>');
@@ -198,7 +206,13 @@ $(function() {
     $resource.append($mod);
     $(".resources", $form).prepend($resource).height();
     $(this).on('click', ".deleteLink", function() {
-      $(this).parent().parent('.pure-g').remove();
+      $parent = $(this).parent().parent('.pure-g');
+      name = $("input", $parent).attr('name');
+      if(name.indexOf('add') != -1) { $parent.remove(); }
+      else {
+        $("input", $parent).attr('name', 'remove-'+name);
+        $parent.hide();
+      }
       if($item = $('#item')) { itemMasonry(); }
     });
     if($item = $('#item')) { itemMasonry(); }

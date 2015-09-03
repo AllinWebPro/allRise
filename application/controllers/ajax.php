@@ -964,51 +964,51 @@ class Ajax extends CI_Controller
         }
       }
       // Edit Images
-      if(isset($post['remove-image']) && $post['remove-image'])
-      {
-        foreach($post['remove-image'] as $image)
-        {
-          $where = array($type.'Id' => $id, 'image' => $this->db->escape_str($image), 'deleted' => 0);
-          $image_s = $this->database_model->get_single('images', $where);
-          $this->database_model->edit('images', array('imageId' => $image_s->imageId), $delete);
-        }
-      }
       if(isset($post['image']) && $post['image'])
       {
-        foreach($post['image'] as $image)
+        foreach($post['image'] as $imageId => $image)
         {
-          if(!in_array($image, $images) && $image !== '')
-          {
-            $where = array($type.'Id' => $id, 'image' => $this->db->escape_str($image));
-            $image_s = $this->database_model->get_single('images', $where);
-            if($image_s) { $this->database_model->edit('images', array('imageId' => $image_s->imageId), $undelete); }
-            else { $this->database_model->add('images', $where+array('editedBy' => $userId, 'active' => 1), 'imageId'); }
-          }
+          $this->database_model->edit('images', array('imageId' => $imageId), array('image' => $this->db->escape_str($image), 'editedBy' => $userId));
+        }
+      }
+      if(isset($post['add-image']) && $post['add-image'])
+      {
+        foreach($post['add-image'] as $image)
+        {
+          $this->database_model->add('images', array($type.'Id' => $id, 'image' => $this->db->escape_str($image), 'editedBy' => $userId, 'active' => 1), 'imageId');
+        }
+      }
+      if(isset($post['remove-image']) && $post['remove-image'])
+      {
+        foreach($post['remove-image'] as $imageId => $image)
+        {
+          $this->database_model->edit('images', array('imageId' => $imageId), $delete);
         }
       }
       // Edit Resources
-      if(isset($post['remove-resources']) && $post['remove-resources'])
-      {
-        foreach($post['remove-resources'] as $resources)
-        {
-            $where = array($type.'Id' => $id, 'resource' => $this->db->escape_str($resource), 'deleted' => 0);
-            $resource_s = $this->database_model->get_single('resources', $where);
-            $this->database_model->edit('resources', array('resourceId' => $resource_s->resourceId), $delete);
-        }
-      }
       if(isset($post['resource']) && $post['resource'])
       {
-        foreach($post['resource'] as $resource)
+        foreach($post['resource'] as $resourceId => $resource)
         {
-          if(!in_array($resource, $resources) && $resource !== '')
-          {
-            $where = array($type.'Id' => $id, 'resource' => $this->db->escape_str($resource));
-            $resource_s = $this->database_model->get_single('resources', $where);
-            if($resource_s) { $this->database_model->edit('resources', array('resourceId' => $resource_s->resourceId), $undelete); }
-            else { $this->database_model->add('resources', $where+array('editedBy' => $userId, 'active' => 1), 'resourceId'); }
-          }
+          $this->database_model->edit('images', array('resourceId' => $resourceId), array('resource' => $this->db->escape_str($resource), 'editedBy' => $userId));
         }
       }
+      if(isset($post['add-resource']) && $post['add-resource'])
+      {
+        foreach($post['add-resource'] as $resource)
+        {
+          $this->database_model->add('images', array($type.'Id' => $id, 'resource' => $this->db->escape_str($resource), 'editedBy' => $userId, 'active' => 1), 'resourceId');
+        }
+      }
+      if(isset($post['remove-resource']) && $post['remove-resource'])
+      {
+        foreach($post['remove-resource'] as $resourceId => $resource)
+        {
+          $this->database_model->edit('resources', array('resourceId' => $resourceId), $delete);
+        }
+      }
+      //
+      $this->utility_model->metadata($type, $id);
     }
     elseif($_POST)
     {

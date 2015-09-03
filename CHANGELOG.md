@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.13.2</h2>
+
+<h4>Fixes</h4>
+* Add/Remove image/resource bug
+
 <h2>Version 0.7.13.1</h2>
 
 <h4>Fixes</h4>

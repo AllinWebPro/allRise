@@ -1,5 +1,16 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.14.0</h2>
+
+<h4>Added:</h4>
+* Headline creation in Stream
+
+<h4>Fixes</h4>
+* Removed '#comment' from stream link 
+
+<h4>Updates:</h4>
+* New Font Awesome version
+
 <h2>Version 0.7.13.2</h2>
 
 <h4>Fixes</h4>

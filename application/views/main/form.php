@@ -18,7 +18,7 @@
             <?php endif; ?>
           </div>
           <fieldset class="item pure-group pure-u-1">
-            <input type="text" name="headline" id="item-headline" class="pure-input-1" placeholder="Headline*" value="<?php echo isset($item)?stripslashes($item->headline):''; ?>" required title="Max length 255 characters.">
+            <input type="text" name="headline" id="item-headline" class="pure-input-1" placeholder="Headline*" value="<?php echo isset($_GET['headline'])?$_GET['headline']:(isset($item)?stripslashes($item->headline):''); ?>" required title="Max length 255 characters.">
             <?php if($type == 'headline'): ?>
               <textarea name="notes" id="item-notes" class="pure-input-1" placeholder="Description"><?php echo isset($item->notes)?stripcslashes($item->notes):''; ?></textarea>
             <?php elseif($type == 'article'): ?>
@@ -234,7 +234,7 @@
               </div>
             </div>
           <?php endif; ?>
-          <input type="hidden" name="place" id="headline-place" class="pure-input-1 place-ac" placeholder="Location">
+          <input type="hidden" name="place" id="headline-place" class="pure-input-1 place-ac">
           <input type="hidden" name="placeId" id="headline-placeId">
           <input type="hidden" name="categoryId[]" id="headline-categoryId-1" value="1">
           <?php if($type && isset($id) && $action !== 'add'): ?>

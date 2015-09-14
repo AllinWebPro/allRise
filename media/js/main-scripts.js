@@ -1019,6 +1019,16 @@ $(function() {
     });
     return false;
   });
+  
+  $(this).on('click', "a.ajax-submit", function(e) {
+    e.preventDefault();
+    $(".ajax-loader-overlay, .ajax-loader").show();
+    var ajaxLink = $(this);
+    var link = ajaxLink.attr('href');
+    link = link + '?headline=' + $("#item-headline").val();
+    window.location = link;
+    return false;
+  });
 });
 
 $(window).on('unload',function(){

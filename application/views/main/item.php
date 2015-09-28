@@ -81,17 +81,17 @@
               <?php echo stripcslashes(str_replace('\r', '', str_replace('\n', '', $item->article))); ?>
             </article>
             <?php if($this->session->userdata('isLoggedIn') && !isset($history) && (!$item->adminOnly || ($item->adminOnly && $this->session->userdata('level') == 'a')) && ($type !== 'headline' || ($item->createdBy == $this->session->userdata('userId') || in_array($this->session->userdata('level'), array('m', 'a'))))): ?>
-              <a href="<?php echo site_url(substr($type, 0, 1).'/modify/'.$item->hashId); ?>" class="right-align">Edit this Article</a>
+              <a href="'a/modify/'.$item->hashId); ?>" class="right-align">Edit this Article</a>
             <?php endif; ?>
             <div class="clear"></div>
           <?php elseif($this->session->userdata('isLoggedIn')): ?>
-            <a class="pure-button pure-button-small" href="<?php echo site_url('article/modify/'.$id); ?>" >
+            <a class="pure-button pure-button-small" href="<?php echo site_url('a/modify/'.$item->hashId); ?>" >
               Start Writing an Article</a>
           <?php endif; ?>
         </div>
       <?php elseif($type == 'cluster' && is_null($item->articleId) && $this->session->userdata('isLoggedIn')): ?>
           <div class="horizontal-padding-small vertical-padding-xsmall">
-            <a title="Create Article" class="pure-button pure-button-small" href="<?php echo site_url('article/create/'.$id); ?>">
+            <a title="Create Article" class="pure-button pure-button-small" href="<?php echo site_url('a/create/'.$item->hashId.'/cluster/parent'); ?>">
               Start Writing an Article</a>
           </div>
       <?php elseif($type == 'headline' && $item->notes): ?>
@@ -168,6 +168,10 @@
           <?php if(isset($clusters)): ?>
             <div class="pure-u-1 bottom-padding-small">
               <strong><a name="components"><div class="icon-box"><?php echo file_get_contents('media/svg/article.svg'); ?></div></a> Components</strong>
+              <?php if($this->session->userdata('level') == 'a'): ?>
+                <a href="<?php site_url('c/create/'.$item->hashId.'/article/child'); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg left-margin-xsmall">Create Cluster</a>
+              <?php endif; ?>
+              <a href="<?php site_url('h/create/'.$item->hashId.'/article/child'); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg">Create Headline</a>
             </div>
             <?php foreach($clusters as $c): ?>
               <div class="pure-u-1 vertical-padding-tiny">
@@ -241,6 +245,7 @@
           <?php elseif(isset($headlines)): ?>
             <div class="pure-u-1 bottom-padding-small">
               <strong><a name="components"><div class="icon-box"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div> Components</strong>
+              <a href="<?php site_url('h/create/'.$item->hashId.'/cluster/child'); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg">Create Headline</a>
             </div>
             <?php foreach($headlines as $h): ?>
               <div class="pure-u-1 vertical-padding-tiny">

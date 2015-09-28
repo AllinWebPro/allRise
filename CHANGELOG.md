@@ -1,5 +1,16 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.16.0</h2>
+
+<h4>Added:</h4>
+* Create Solo Article
+* Create Child Cluster
+* Create Child Headline
+
+<h4>Updates:</h4>
+* Updated Headline Creation in Stream View
+* Create/Edit general icons
+
 <h2>Version 0.7.14.0</h2>
 
 <h4>Added:</h4>

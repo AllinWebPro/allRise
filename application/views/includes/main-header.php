@@ -26,8 +26,8 @@
       <div class="pure-g center-text vertical-padding-xsmall">
         <?php if($this->session->userdata('isLoggedIn')): ?>
           <div class="pure-u-1-5">
-            <a href="<?php echo site_url('h/create'); ?>" title="Create Headline">
-              <div class="icon-box med"><?php echo file_get_contents('media/svg/create.svg'); ?></div>
+            <a href="<?php echo site_url('a/create'); ?>" title="Create Article">
+              <div class="icon-box med"><?php echo file_get_contents('media/svg/article-create.svg'); ?></div>
             </a>
           </div>
           <div class="pure-u-1-5">

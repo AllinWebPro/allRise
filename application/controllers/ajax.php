@@ -43,7 +43,7 @@ class Ajax extends CI_Controller
    * @param int
    * @return void
    */
-  public function article($clusterId = 0)
+  public function article($childId = 0, $childType = '')
   {
     $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url|max_length[255]');
     $this->form_validation->set_rules('article', 'Article', 'trim|xss_clean');
@@ -87,6 +87,15 @@ class Ajax extends CI_Controller
       }
       $insert['active'] = 1;
       $id = $this->database_model->add("articles", $insert, "articleId");
+      if($childId && $childType)
+      {
+        $items = array(
+          'headline' => ($childType == 'headline')?array($childId):array(),
+          'cluster' => ($childType == 'cluster')?array($childId):array(),
+          'article' => array($id)
+        );
+        $this->stream_model->manual_join($items);
+      }
       $sInsert = array('articleId' => $id, 'userId' => $userId);
       $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
       $this->database_model->add('subscriptions', array('userId' => 3, 'articleId' => $id, 'createdOn' => time()), 'subscriptionId');
@@ -287,7 +296,7 @@ class Ajax extends CI_Controller
    * @param int
    * @return void
    */
-  public function headline()
+  public function headline($parentId = 0, $parentType = '')
   {
     $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url|max_length[255]');
     $this->form_validation->set_rules('notes', 'Author Notes', 'trim|xss_clean|strip_tags');
@@ -331,6 +340,15 @@ class Ajax extends CI_Controller
       }
       $insert['active'] = 1;
       $id = $this->database_model->add("headlines", $insert, "headlineId");
+      if($parentId && $parentType)
+      {
+        $items = array(
+          'headline' => array($id),
+          'cluster' => ($parentType == 'cluster')?array($parentId):array(),
+          'article' => ($parentType == 'article')?array($parentId):array()
+        );
+        $this->stream_model->manual_join($items);
+      }
       $item = $this->database_model->get_select('headlines', array('headlineId' => $id), 'OLD_PASSWORD(headlineId) AS hashId');
       $this->utility_model->email_owen("New Headline", "Link: http:".site_url('h/'.$item[0]->hashId));
       $sInsert = array('headlineId' => $id, 'userId' => $userId);
@@ -364,6 +382,103 @@ class Ajax extends CI_Controller
       $response['success'] = 1;
       $h = $this->database_model->get_single('headlines', array('headlineId' => $id, 'deleted' => 0), '*, OLD_PASSWORD(headlineId) AS hashId');
       $response['redirect'] = site_url('h/'.$h->hashId."?n=1");
+    }
+    elseif($_POST) { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
+    $this->_output_json($response);
+  }
+  
+  
+
+  /**
+   * Create Cluster
+   *
+   * @access public
+   * @param int
+   * @return void
+   */
+  public function cluster($otherId = 0, $otherType = '')
+  {
+    $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url|max_length[255]');
+    
+    if($this->session->userdata('level') == 'a')
+    {
+      $this->form_validation->set_rules('adminOnly', 'Admin Only', 'trim|xss_clean');
+      $this->form_validation->set_rules('hidden', 'Hidden', 'trim|xss_clean');
+    }
+    
+    $this->form_validation->set_rules('place', 'Location', 'trim|xss_clean');
+    $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
+    $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
+    $this->form_validation->set_rules('image[]', 'Links', 'trim|prep_url|xss_clean');
+    $this->form_validation->set_rules('resource[]', 'Links', 'trim|prep_url|xss_clean');
+    $this->form_validation->set_rules('categoryId[]', 'Category', 'trim|required|xss_clean');
+    if($this->form_validation->run())
+    {
+      $post = $this->input->post();
+      $userId = $this->session->userdata('userId');
+      $insert = array(
+        'headline' => $this->db->escape_str(preg_replace('/\s+/', ' ', $post['headline'])),
+        'tags' => $this->db->escape_str($this->utility_model->clean_tag_list($post['tags'])),
+        'createdBy' => $userId,
+        'createdOn' => time(),
+        'editedBy' => $userId
+      );
+        
+      if($this->session->userdata('level') == 'a')
+      {
+        $update['adminOnly'] = $post['adminOnly'];
+        $update['hidden'] = $post['hidden'];
+      }
+        
+      if($post['placeId']) { $insert['placeId'] = $post['placeId']; }
+      elseif($post['place'])
+      {
+        if($place = $this->database_model->get_single('places', array('place' => $this->db->escape_str($post['place']), 'deleted' => 0))) { $insert['placeId'] = $place->placeId; }
+        else { $insert['placeId'] = $this->database_model->add('places', array('place' => $this->db->escape_str($post['place']), 'editedBy' => $userId), 'placeId'); }
+      }
+      $insert['active'] = 1;
+      $id = $this->database_model->add("clusters", $insert, "clusterId");
+      if($otherId && $otherType)
+      {
+        $items = array(
+          'headline' => ($otherType == 'headline')?array($otherId):array(),
+          'cluster' => array($id),
+          'article' => ($otherType == 'article')?array($otherId):array()
+        );
+        $this->stream_model->manual_join($items);
+      }
+      $item = $this->database_model->get_select('clusters', array('clusterId' => $id), 'OLD_PASSWORD(clusterId) AS hashId');
+      $sInsert = array('clusterId' => $id, 'userId' => $userId);
+      $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
+      $this->database_model->add('subscriptions', array('userId' => 3, 'clusterId' => $id, 'createdOn' => time()), 'subscriptionId');
+      foreach($post['categoryId'] as $c)
+      {
+        $this->database_model->add("catlist", array('clusterId' => $id, 'categoryId' => $c, 'editedBy' => $userId), 'catlistId');
+      }
+      $this->utility_model->add_keywords('cluster', $id, $post['headline'], $post['tags']);
+      if(isset($post['image']) && $post['image'])
+      {
+        foreach($post['image'] as $i)
+        {
+          if($i !== '') { $this->database_model->add("images", array('clusterId' => $id, 'image' => $this->db->escape_str($i), 'editedBy' => $userId), 'imageId'); }
+        }
+      }
+      if(isset($post['resource']) && $post['resource'])
+      {
+        foreach($post['resource'] as $r)
+        {
+          if($r !== '') { $this->database_model->add("resources", array('clusterId' => $id, 'resource' => $this->db->escape_str($r), 'editedBy' => $userId), 'resourceId'); }
+        }
+      }
+      // Metadata
+      $metadata = array('clusterId' => $id, 'quality' => 0, 'importance' => 0);
+      $metadata['credibility'] = $this->utility_model->credibility('cluster', $id);
+      $this->database_model->add('metadata', $metadata, 'metadataId');
+      $this->stream_model->autocompare('cluster', $id);
+      //
+      $response['success'] = 1;
+      $c = $this->database_model->get_single('clusters', array('clusterId' => $id, 'deleted' => 0), '*, OLD_PASSWORD(clusterId) AS hashId');
+      $response['redirect'] = site_url('c/'.$c->hashId."?n=1");
     }
     elseif($_POST) { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     $this->_output_json($response);

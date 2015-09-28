@@ -21,12 +21,14 @@ class Form extends CI_Controller
    * @param int
    * @return void
    */
-  public function index($action = '', $type = '', $id = 0)
+  public function index($action = '', $type = '', $id = 0, $otherType = '', $otherDeclaration = '')
   {
     $this->data['action'] = $action;
     if(in_array($type, array('article', 'cluster', 'headline')))
     {
       $this->data['type'] = $type;
+      $this->data['otherType'] = $otherType;
+      $this->data['otherDeclaration'] = $otherDeclaration;
       $this->$action($id, false);
       // Load View
       // redirect(substr($type, 0, 1).'/'.$id);
@@ -45,12 +47,14 @@ class Form extends CI_Controller
     else { redirect('p/404'); }
   }
 
-  public function hashed($action = '', $type = '', $id = 0)
+  public function hashed($action = '', $type = '', $id = 0, $otherType = '', $otherDeclaration = '')
   {
     $this->data['action'] = $action;
     if(in_array($type, array('article', 'cluster', 'headline')))
     {
       $this->data['type'] = $type;
+      $this->data['otherType'] = $otherType;
+      $this->data['otherDeclaration'] = $otherDeclaration;
       $this->$action($id, true);
       // Load View
       // redirect(substr($type, 0, 1).'/'.$id);
@@ -78,23 +82,25 @@ class Form extends CI_Controller
    * @param int
    * @return void
    */
-  private function add($clusterId = 0, $hashed = false)
+  private function add($otherId = 0, $hashed = false)
   {
     // Vars
-    if($clusterId)
+    if($otherId && $this->data['otherDeclaration'] == 'parent')
     {
-      $this->data['id'] = $clusterId;
+      $this->data['id'] = $parentId;
       if($hashed)
       {
-        $this->data['hashId'] = $clusterId;
-        $this->data['item'] = $this->database_model->get_single('clusters', array('OLD_PASSWORD(clusterId)' => $clusterId, 'deleted' => 0));
+        $this->data['hashId'] = $parentId;
+        
+        $this->data['item'] = $this->database_model->get_single($this->data['otherType'].'s', array('OLD_PASSWORD('.$this->data['otherType'].'Id)' => $otherId, 'deleted' => 0));
         $this->data['id'] = $this->data['item']->clusterId;
       }
       else
       {
-        $this->data['item'] = $this->database_model->get_single('clusters', array('clusterId' => $clusterId, 'deleted' => 0));
+        $this->data['item'] = $this->database_model->get_single($this->data['otherType'].'s', array($this->data['otherType'].'Id' => $otherId, 'deleted' => 0));
       }
-      $assets_where = array('clusterId' => $this->data['id']);
+      $assets_where = array($this->data['otherType'].'Id' => $this->data['id']);
+      
       $this->data['images_output'] = $this->database_model->get('images', $assets_where+array('active' => 1, 'deleted' => 0));
       $this->data['resources_output'] = $this->database_model->get('resources', $assets_where+array('active' => 1, 'deleted' => 0));
     }
@@ -138,7 +144,15 @@ class Form extends CI_Controller
       {
         $this->database_model->add("catlist", array($this->data['type'].'Id' => $id, 'categoryId' => $c, 'editedBy' => $userId), 'catlistId');
       }
-      if($clusterId) { $this->database_model->edit('clusters', array('clusterId' => $clusterId, 'editedBy' => $userId), array($this->data['type'].'Id' => $id)); }
+      if($otherId)
+      {
+        $items = array(
+          'headline' => ($this->data['type'] == 'headline')?array($id):($this->data['otherType'] == 'headline')?array($otherId):array(),
+          'cluster' => ($this->data['type'] == 'cluster')?array($id):($this->data['otherType'] == 'cluster')?array($otherId):array(),
+          'article' => ($this->data['type'] == 'article')?array($id):($this->data['otherType'] == 'article')?array($otherId):array()
+        );
+        $this->stream_model->manual_join($items);
+      }
       $this->utility_model->add_keywords($this->data['type'], $id, $post['headline'], $post['tags']);
       if(isset($post['image']) && $post['image'])
       {
@@ -164,7 +178,7 @@ class Form extends CI_Controller
     }
     else
     {
-      if($clusterId)
+      if($this->data['otherDeclaration'] == 'parent')
       {
         $this->data['headlines'] = array();
         $this->data['h_resources'] = array();

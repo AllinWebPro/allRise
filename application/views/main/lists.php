@@ -44,45 +44,48 @@
       </div>
     </div>
   </section>
-  <section id="new-item" class="large">
-    <div class="horizontal-margin-small vertical-margin-small">
-      <form id="item_form" class="pure-u-1 pure-form ajax" method="post" action="<?php echo site_url('h/create'); ?>" novalidate>
-        <div class="horizontal-margin-small vertical-margin-small">
-          <div class="errors">
-            <?php if(isset($error)): ?>
-              <p><?php echo $error; ?></p>
-            <?php endif; ?> 
-            <?php if(isset($errors)): ?>
-              <?php if(is_string($errors)): ?>
-                <p><?php echo $errors; ?></p>
-              <?php else: ?>
-                <?php foreach($errors as $key => $val): ?>
-                  <p><?php echo $val; ?></p>
-                <?php endforeach; ?>
+  <?php if($this->session->userdata('isLoggedIn')): ?>
+    <section id="new-item" class="large">
+      <div class="horizontal-margin-small vertical-margin-small">
+        <form id="item_form" class="pure-u-1 pure-form ajax" method="post" action="<?php echo site_url('h/create'); ?>" novalidate>
+          <div class="horizontal-margin-small vertical-margin-small">
+            <div class="errors">
+              <?php if(isset($error)): ?>
+                <p><?php echo $error; ?></p>
+              <?php endif; ?> 
+              <?php if(isset($errors)): ?>
+                <?php if(is_string($errors)): ?>
+                  <p><?php echo $errors; ?></p>
+                <?php else: ?>
+                  <?php foreach($errors as $key => $val): ?>
+                    <p><?php echo $val; ?></p>
+                  <?php endforeach; ?>
+                <?php endif; ?>
               <?php endif; ?>
-            <?php endif; ?>
+            </div>
+            <fieldset class="item pure-group pure-u-1">
+              <input type="text" name="headline" id="item-headline" class="pure-input-1" placeholder="Headline" value="" required title="Max length 255 characters.">
+              <input type="hidden" name="tags" id="headline-tags" class="pure-input-1">
+              <input type="hidden" name="place" id="headline-place" class="pure-input-1 place-ac">
+              <input type="hidden" name="placeId" id="headline-placeId">
+              <input type="hidden" name="categoryId[]" id="headline-categoryId-1" value="1">
+              <input type="hidden" name="ajax" value="<?php echo site_url('ajax/headline'); ?>">
+            </fieldset>
+            <div class="pure-u-1">
+              <a href="<?php echo site_url('h/create'); ?>" class="pure-u-1-24 vertical-margin-xsmall horizontal-margin-xsmall ajax-submit">
+                <i class="fa fa-sticky-note-o fa-9-10"></i></a>
+              <a href="<?php echo site_url('h/create'); ?>" class="pure-u-1-24 vertical-margin-xsmall horizontal-margin-xsmall ajax-submit">
+                <i class="fa fa-file-image-o fa-9-10"></i></a>
+              <a href="<?php echo site_url('h/create'); ?>" class="pure-u-1-24 vertical-margin-xsmall horizontal-margin-xsmall ajax-submit">
+                <i class="fa fa-link fa-9-10"></i></a>
+              <button type="submit" class="pure-button pure-button-small pure-u-1-3 horizontal-margin-xsmall right-align">
+                <div class="icon-box"><?php echo file_get_contents('media/svg/headline-create-button.svg'); ?></div> Create<span class="pure-hidden-phone"> Headline</span></button>
+            </div>
           </div>
-          <fieldset class="item pure-group pure-u-1">
-            <input type="text" name="headline" id="item-headline" class="pure-input-1" placeholder="Headline" value="" required title="Max length 255 characters.">
-            <input type="hidden" name="place" id="headline-place" class="pure-input-1 place-ac">
-            <input type="hidden" name="placeId" id="headline-placeId">
-            <input type="hidden" name="categoryId[]" id="headline-categoryId-1" value="1">
-            <input type="hidden" name="ajax" value="<?php echo site_url('ajax/headline'); ?>">
-          </fieldset>
-          <div class="pure-u-1 center-text bottom-margin-xsmall">
-            <a href="<?php echo site_url('h/create'); ?>" class="pure-button pure-u-1-24 horizontal-margin-xsmall right-align grey-light-bg ajax-submit">
-              <i class="fa fa-file-image-o fa-9-10"></i></a>
-            <a href="<?php echo site_url('h/create'); ?>" class="pure-button pure-u-1-24 horizontal-margin-xsmall right-align grey-light-bg ajax-submit">
-              <i class="fa fa-link fa-9-10"></i></a>
-            <a href="<?php echo site_url('h/create'); ?>" class="pure-button pure-u-1-24 horizontal-margin-xsmall right-align grey-light-bg ajax-submit">
-              <i class="fa fa-sticky-note-o fa-9-10"></i></a>
-            <button type="submit" class="pure-button pure-u-1-4 horizontal-margin-xsmall right-align">
-              <i class="fa fa-pencil-square-o fa-9-10"></i> Publish Headline</button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </section>
+        </form>
+      </div>
+    </section>
+  <?php endif; ?>
   <section id="items-list" class="large">
     <div class="horizontal-margin-small vertical-margin-small">
       <form method="post" action="<?php echo site_url('search/join'); ?>" class="ajax-join">

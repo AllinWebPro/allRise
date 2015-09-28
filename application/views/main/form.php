@@ -34,7 +34,7 @@
         <?php endif; ?>
         <hr>
         <div class="horizontal-padding-small">
-          <strong><a name="images"><i class="fa fa-link"></i></a> Images</strong>
+          <strong><a name="images"><i class="fa fa-file-image-o"></i></a> Images</strong>
           <a href="javascript:void(0);" id="add_image" name="add_image" class="right-align">Add Image Link</a>
           <div class="clear"></div>
           <fieldset class="images pure-group pure-u-1">
@@ -75,7 +75,7 @@
         </div>
       </div>
     </section>
-    <?php if($type !== 'headline'): ?>
+    <?php if($type !== 'headline' && isset($id) && $action !== 'add'): ?>
       <section id="components" class="large">
         <div class="horizontal-margin-small vertical-margin-small">
           <div class="horizontal-padding-small vertical-padding-xsmall pure-g">
@@ -241,8 +241,8 @@
             <input type="hidden" name="type" value="<?php echo $type; ?>">
             <input type="hidden" name="id" value="<?php echo $id; ?>">
             <input type="hidden" name="ajax" value="<?php echo site_url('ajax/modify/'.$type.'/'.$id); ?>">
-          <?php elseif($type == 'article'): ?>
-            <input type="hidden" name="ajax" value="<?php echo site_url('ajax/'.$type.'/'.$id); ?>">
+          <?php elseif($type !== 'headline'): ?>
+            <input type="hidden" name="ajax" value="<?php echo site_url('ajax/'.$type.'/'.(isset($id)?$id:'')); ?>">
           <?php else: ?>
             <input type="hidden" name="ajax" value="<?php echo site_url('ajax/headline'); ?>">
           <?php endif; ?>

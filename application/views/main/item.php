@@ -168,10 +168,12 @@
           <?php if(isset($clusters)): ?>
             <div class="pure-u-1 bottom-padding-small">
               <strong><a name="components"><div class="icon-box"><?php echo file_get_contents('media/svg/article.svg'); ?></div></a> Components</strong>
-              <?php if($this->session->userdata('level') == 'a'): ?>
-                <a href="<?php site_url('c/create/'.$item->hashId.'/article/child'); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg left-margin-xsmall">Create Cluster</a>
+              <?php if($this->session->userdata('isLoggedIn')): ?>
+                <?php if($this->session->userdata('level') == 'a'): ?>
+                  <a href="<?php site_url('c/create/'.$item->hashId.'/article/child'); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg left-margin-xsmall">Create Cluster</a>
+                <?php endif; ?>
+                <a href="<?php site_url('h/create/'.$item->hashId.'/article/child'); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg">Create Headline</a>
               <?php endif; ?>
-              <a href="<?php site_url('h/create/'.$item->hashId.'/article/child'); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg">Create Headline</a>
             </div>
             <?php foreach($clusters as $c): ?>
               <div class="pure-u-1 vertical-padding-tiny">
@@ -245,7 +247,9 @@
           <?php elseif(isset($headlines)): ?>
             <div class="pure-u-1 bottom-padding-small">
               <strong><a name="components"><div class="icon-box"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div> Components</strong>
-              <a href="<?php site_url('h/create/'.$item->hashId.'/cluster/child'); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg">Create Headline</a>
+              <?php if($this->session->userdata('isLoggedIn')): ?>
+                <a href="<?php site_url('h/create/'.$item->hashId.'/cluster/child'); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg">Create Headline</a>
+              <?php endif; ?>
             </div>
             <?php foreach($headlines as $h): ?>
               <div class="pure-u-1 vertical-padding-tiny">

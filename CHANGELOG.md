@@ -1,5 +1,12 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.15.1</h2>
+
+<h4>Fixes</h4>
+* Create Solo Article access
+* Create Child Cluster access
+* Create Child Headline access
+
 <h2>Version 0.7.15.0</h2>
 
 <h4>Added:</h4>

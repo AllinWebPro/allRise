@@ -24,7 +24,9 @@ class Form extends CI_Controller
   public function index($action = '', $type = '', $id = 0, $otherType = '', $otherDeclaration = '')
   {
     $this->data['action'] = $action;
-    if(in_array($type, array('article', 'cluster', 'headline')))
+    if(in_array($type, array('article', 'cluster', 'headline')) &&
+       (($type == 'cluster' && $action == 'add' && $this->session->userdata('level') == 'a') 
+       || ($type !== 'cluster' && $action == 'add')))
     {
       $this->data['type'] = $type;
       $this->data['otherType'] = $otherType;
@@ -50,7 +52,9 @@ class Form extends CI_Controller
   public function hashed($action = '', $type = '', $id = 0, $otherType = '', $otherDeclaration = '')
   {
     $this->data['action'] = $action;
-    if(in_array($type, array('article', 'cluster', 'headline')))
+    if(in_array($type, array('article', 'cluster', 'headline')) &&
+       (($type == 'cluster' && $action == 'add' && $this->session->userdata('level') == 'a') 
+       || ($type !== 'cluster' && $action == 'add')))
     {
       $this->data['type'] = $type;
       $this->data['otherType'] = $otherType;

@@ -109,12 +109,14 @@
         <?php if($images): ?>
           <div class="clear"></div>
           <?php foreach($images as $i): ?>
-            <div class="pure-u-1-4">
-              <div class="horizontal-padding-small vertical-padding-small">
-                <a href="<?php echo stripslashes($i->image); ?>" rel="prettyPhoto[galleries]">
-                  <img src="<?php echo stripslashes($i->image); ?>" class="border"></a>
+            <?php if(@getimagesize($i->image)): ?>
+              <div class="pure-u-1-4">
+                <div class="horizontal-padding-small vertical-padding-small">
+                  <a href="<?php echo stripslashes($i->image); ?>" rel="prettyPhoto[galleries]">
+                    <img src="<?php echo stripslashes($i->image); ?>" class="border"></a>
+                </div>
               </div>
-            </div>
+            <?php endif; ?>
           <?php endforeach; ?>
         <?php else: ?>
           <div class="pure-u-1 truncate">

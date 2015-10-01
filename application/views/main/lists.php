@@ -100,67 +100,133 @@
             <div class="clear"></div>
           </div>
           <?php if($items): ?>
-            <?php foreach($items as $i): ?>
-              <div class="height-42 h-overflow pos-rel vertical-padding-xsmall horizontal-padding-small">
-                <?php if($i->image): ?>
-                  <img src="<?php echo $i->image; ?>" height="42" width="42" class="height-inherit left-align right-padding-xsmall">
-                <?php else: ?>
-                  <img src="<?php echo site_url('media/img/no-image.gif'); ?>" height="42" width="42" class="left-align right-padding-xsmall">
-                <?php endif; ?>
-                <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
-                  <span class="item truncate">
-                    <div class="icon-box"><?php echo file_get_contents('media/svg/'.$i->type.'.svg'); ?></div>
-                    <span><?php echo stripslashes($i->headline); ?></span>
-                  </span>
-                </a>
-                <span class="grey space-left">
-                  <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
-                    <time>
-                      <?php if($i->editedOn > strtotime(date("m/d/Y"))): ?>
-                        Today <span class="pure-hidden-phone">at <?php echo date("h:ia", $i->editedOn); ?></span>
-                      <?php elseif($i->editedOn > strtotime(date("m/d/Y", strtotime("-1 day")))): ?>
-                        Yesterday <span class="pure-hidden-phone">at <?php echo date("h:ia", $i->editedOn); ?></span>
-                      <?php elseif(date("Y", $i->editedOn) == date("Y")): ?>
-                        <?php echo date("M d", $i->editedOn); ?> <span class="pure-hidden-phone">@ <?php echo date("h:ia", $i->editedOn); ?></span>
-                      <?php else: ?>
-                        <span class="pure-hidden-phone"><?php echo date("M d Y", $i->editedOn); ?></span>
-                        <span class="pure-visible-phone"><?php echo date("M Y", $i->editedOn); ?></span>
-                      <?php endif; ?>
-                    </time>
-                  </span>
-                  <?php if($i->c_count): ?>
-                    <span class="horizontal-padding-tiny">
-                      <div class="icon-box small grey"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div>
-                      <?php echo $i->c_count; ?></span>
-                  <?php endif; ?>
-                  <?php if($i->h_count): ?>
-                    <span class="horizontal-padding-tiny">
-                      <div class="icon-box small grey"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
-                      <?php echo $i->h_count; ?></span>
-                  <?php endif; ?>
-                  <?php if($i->comments): ?>
-                    <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
-                      <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
-                        <?php echo $i->comments; ?></a></span>
-                  <?php endif; ?>
-                  <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('a'))): ?>
-                    <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-eye"></i> <?php echo round($i->x_score * 10, 2); ?></span>
-                    <!--<span class="horizontal-padding-tiny">
-                      K: <?php echo round($i->search_score * 10, 2); ?>
-                      C: <?php echo round($i->cred_score * 10, 2); ?>
-                      S: <?php echo round($i->sub_score * 10, 2); ?>
-                      Q: <?php echo round($i->decay_score * 10, 2); ?>
-                    </span>-->
-                    <span class="horizontal-padding-tiny">
-                      <input type="checkbox" name="<?php echo $i->type; ?>[]" id="<?php echo $i->type; ?>-<?php echo $i->id; ?>" value="<?php echo $i->id; ?>">
-                      <label class="pure-hidden-phone" for="<?php echo $i->type; ?>-<?php echo $i->id; ?>">Group</label>
-                      <label class="pure-visible-phone" for="<?php echo $i->type; ?>-<?php echo $i->id; ?>"><i class="fa fa-link"></i></label>
+            <div class="pure-g-r">
+              <?php foreach($items as $i): ?>
+                <div class="pure-u-1-2">
+                  <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
+                    <div class="vertical-padding-xsmall horizontal-padding-small">
+                      <div class="list-image right-margin-xsmall left-align">
+                        <?php if($i->image && @getimagesize($i->image)): ?>
+                          <img src="<?php echo $i->image; ?>">
+                        <?php else: ?>
+                          <img src="<?php echo site_url('media/img/no-image.gif'); ?>">
+                        <?php endif; ?>
+                      </div>
+                      <p class="multiline-truncate">
+                        <span class="icon-box"><?php echo file_get_contents('media/svg/'.$i->type.'.svg'); ?></span>
+                        <span class="list-title"><?php echo stripslashes($i->headline); ?></span>
+                      </p>
+                    </div>
+                  </a>
+                  <span class="grey">
+                    <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
+                      <time>
+                        <?php if($i->editedOn > strtotime(date("m/d/Y"))): ?>
+                          Today <span class="pure-visible-desktop">at <?php echo date("h:ia", $i->editedOn); ?></span>
+                        <?php elseif($i->editedOn > strtotime(date("m/d/Y", strtotime("-1 day")))): ?>
+                          Yesterday <span class="pure-visible-desktop">at <?php echo date("h:ia", $i->editedOn); ?></span>
+                        <?php elseif(date("Y", $i->editedOn) == date("Y")): ?>
+                          <?php echo date("M d", $i->editedOn); ?> <span class="pure-visible-desktop">@ <?php echo date("h:ia", $i->editedOn); ?></span>
+                        <?php else: ?>
+                          <span class="pure-hidden-phone"><?php echo date("M d Y", $i->editedOn); ?></span>
+                          <span class="pure-visible-phone"><?php echo date("M Y", $i->editedOn); ?></span>
+                        <?php endif; ?>
+                      </time>
                     </span>
+                    <?php if($i->c_count): ?>
+                      <span class="horizontal-padding-tiny">
+                        <div class="icon-box small grey"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div>
+                        <?php echo $i->c_count; ?></span>
+                    <?php endif; ?>
+                    <?php if($i->h_count): ?>
+                      <span class="horizontal-padding-tiny">
+                        <div class="icon-box small grey"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
+                        <?php echo $i->h_count; ?></span>
+                    <?php endif; ?>
+                    <?php if($i->comments): ?>
+                      <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
+                        <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
+                          <?php echo $i->comments; ?></a></span>
+                    <?php endif; ?>
+                    <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('a'))): ?>
+                      <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-eye"></i> <?php echo round($i->x_score * 10, 2); ?></span>
+                      <span class="horizontal-padding-tiny">
+                        K: <?php echo round($i->search_score * 10, 2); ?>
+                        C: <?php echo round($i->cred_score * 10, 2); ?>
+                        S: <?php echo round($i->sub_score * 10, 2); ?>
+                        Q: <?php echo round($i->decay_score * 10, 2); ?>
+                      </span>
+                      <span class="horizontal-padding-tiny">
+                        <input type="checkbox" name="<?php echo $i->type; ?>[]" id="<?php echo $i->type; ?>-<?php echo $i->id; ?>" value="<?php echo $i->id; ?>">
+                        <label class="pure-hidden-phone" for="<?php echo $i->type; ?>-<?php echo $i->id; ?>">Group</label>
+                        <label class="pure-visible-phone" for="<?php echo $i->type; ?>-<?php echo $i->id; ?>"><i class="fa fa-link"></i></label>
+                      </span>
+                    <?php endif; ?>
+                  </span>
+                </div>
+                
+                <!-- old -->
+                <!--<div class="height-42 h-overflow pos-rel vertical-padding-xsmall horizontal-padding-small">
+                  <?php if($i->image): ?>
+                    <img src="<?php echo $i->image; ?>" height="42" width="42" class="height-inherit left-align right-padding-xsmall">
+                  <?php else: ?>
+                    <img src="<?php echo site_url('media/img/no-image.gif'); ?>" height="42" width="42" class="left-align right-padding-xsmall">
                   <?php endif; ?>
-                </span>
-                <div class="clear"></div>
-              </div>
-            <?php endforeach; ?>
+                  <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
+                    <span class="item truncate">
+                      <div class="icon-box"><?php echo file_get_contents('media/svg/'.$i->type.'.svg'); ?></div>
+                      <span><?php echo stripslashes($i->headline); ?></span>
+                    </span>
+                  </a>
+                  <span class="grey space-left">
+                    <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
+                      <time>
+                        <?php if($i->editedOn > strtotime(date("m/d/Y"))): ?>
+                          Today <span class="pure-hidden-phone">at <?php echo date("h:ia", $i->editedOn); ?></span>
+                        <?php elseif($i->editedOn > strtotime(date("m/d/Y", strtotime("-1 day")))): ?>
+                          Yesterday <span class="pure-hidden-phone">at <?php echo date("h:ia", $i->editedOn); ?></span>
+                        <?php elseif(date("Y", $i->editedOn) == date("Y")): ?>
+                          <?php echo date("M d", $i->editedOn); ?> <span class="pure-hidden-phone">@ <?php echo date("h:ia", $i->editedOn); ?></span>
+                        <?php else: ?>
+                          <span class="pure-hidden-phone"><?php echo date("M d Y", $i->editedOn); ?></span>
+                          <span class="pure-visible-phone"><?php echo date("M Y", $i->editedOn); ?></span>
+                        <?php endif; ?>
+                      </time>
+                    </span>
+                    <?php if($i->c_count): ?>
+                      <span class="horizontal-padding-tiny">
+                        <div class="icon-box small grey"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div>
+                        <?php echo $i->c_count; ?></span>
+                    <?php endif; ?>
+                    <?php if($i->h_count): ?>
+                      <span class="horizontal-padding-tiny">
+                        <div class="icon-box small grey"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
+                        <?php echo $i->h_count; ?></span>
+                    <?php endif; ?>
+                    <?php if($i->comments): ?>
+                      <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
+                        <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
+                          <?php echo $i->comments; ?></a></span>
+                    <?php endif; ?>
+                    <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('a'))): ?>
+                      <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-eye"></i> <?php echo round($i->x_score * 10, 2); ?></span>
+                      <span class="horizontal-padding-tiny">
+                        K: <?php echo round($i->search_score * 10, 2); ?>
+                        C: <?php echo round($i->cred_score * 10, 2); ?>
+                        S: <?php echo round($i->sub_score * 10, 2); ?>
+                        Q: <?php echo round($i->decay_score * 10, 2); ?>
+                      </span>
+                      <span class="horizontal-padding-tiny">
+                        <input type="checkbox" name="<?php echo $i->type; ?>[]" id="<?php echo $i->type; ?>-<?php echo $i->id; ?>" value="<?php echo $i->id; ?>">
+                        <label class="pure-hidden-phone" for="<?php echo $i->type; ?>-<?php echo $i->id; ?>">Group</label>
+                        <label class="pure-visible-phone" for="<?php echo $i->type; ?>-<?php echo $i->id; ?>"><i class="fa fa-link"></i></label>
+                      </span>
+                    <?php endif; ?>
+                  </span>
+                  <div class="clear"></div>
+                </div>-->
+              <?php endforeach; ?>
+            </div>
           <?php else: ?>
             <div class="vertical-padding-xsmall horizontal-padding-xsmall">
               <span class="item">No results found.</span>

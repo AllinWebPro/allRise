@@ -1,5 +1,13 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.16.0</h2>
+
+<h4>Fixes</h4>
+* Hide Broken Images
+
+<h4>Updates:</h4>
+* Stream Layout
+
 <h2>Version 0.7.15.1</h2>
 
 <h4>Fixes</h4>

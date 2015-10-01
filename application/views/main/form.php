@@ -47,7 +47,7 @@
                     </div>
                   </div>
                   <div class="pure-u-11-12">
-                    <input type="text" value="<?php echo stripslashes($i->image); ?>" name="image[<?php echo $i->imageId; ?>]" class="pure-input-1" placeholder="Image Link">
+                    <input type="text" value="<?php echo stripslashes($i->image); ?>" name="<?php echo (@getimagesize($i->image))?'':'remove-'; ?>image[<?php echo $i->imageId; ?>]" class="pure-input-1" placeholder="Image Link">
                   </div>
                   <div class="pure-u-1-24 center-text top-padding-xsmall"><a class="deleteLink" href="javascript:void(0);"><i class="fa fa-trash-o fa-7-5"></i></a></div>
                 </div>

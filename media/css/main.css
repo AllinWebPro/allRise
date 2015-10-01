@@ -68,6 +68,9 @@ article.content img { border:1px solid #333;margin:5px;padding:5px; }
 #tutorial h3 { font-size:1.4em !important; }
 #tutorial p { font-size:.9em !important; }
 
+.list-image { display:block;height:100px;overflow:hidden;position:relative;width:100px; }
+.list-image img { left:0;min-height:100px;min-width:100px;position:absolute;top:0;width:100%; }
+
 [data-page=login-register] {
   background-attachment:fixed;
   background-image:url('../img/background.jpg');
@@ -206,6 +209,9 @@ a[data-type=vote]:hover i { color:#666 !important; }
 .right-padding-tiny { padding-right:0.15em; }
 .right-padding-xsmall { padding-right:0.3em; }
 
+.right-margin-tiny { margin-right:0.15em; }
+.right-margin-xsmall { margin-right:0.3em; }
+
 .top-padding-xsmall { padding-top:0.3em; }
 .top-padding-small { padding-top:0.6em; }
 .top-padding { padding-top:0.9em; }
@@ -264,6 +270,18 @@ a[data-type=vote]:hover i { color:#666 !important; }
 .no-underline { text-decoration:none !important; }
 
 .truncate { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+
+.multiline-truncate {
+    display: -webkit-box;
+    max-height: 64px;
+    margin: 0 auto;
+    line-height: 1em;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.multiline-truncate:after { font-size:16px; }
 
 .h-overflow { overflow:hidden; }
 

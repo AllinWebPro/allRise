@@ -56,7 +56,7 @@
         </div>
         <?php $this->load->view('main/notices'); ?>
         <?php if($pages > 1): ?>
-          <?php $url = "search?s=".$sort."&".ltrim($uri."&pg=", '&'); ?>
+          <?php $url = "search?pg="; ?>
           <div class="vertical-padding-small horizontal-padding-small">
             <ul class="pure-paginator">
               <?php if($current > 1): ?>

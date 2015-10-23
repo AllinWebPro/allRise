@@ -1,5 +1,16 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.7.17.0</h2>
+
+<h4>Fixes</h4>
+* Remove Old List Code
+* Form 404
+* "Edit link" issue
+* Form Resource issue
+
+<h4>Updates:</h4>
+* Remove CKEditor
+
 <h2>Version 0.7.16.0</h2>
 
 <h4>Fixes</h4>

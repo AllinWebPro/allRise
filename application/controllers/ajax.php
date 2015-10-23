@@ -1105,14 +1105,14 @@ class Ajax extends CI_Controller
       {
         foreach($post['resource'] as $resourceId => $resource)
         {
-          $this->database_model->edit('images', array('resourceId' => $resourceId), array('resource' => $this->db->escape_str($resource), 'editedBy' => $userId));
+          $this->database_model->edit('resources', array('resourceId' => $resourceId), array('resource' => $this->db->escape_str($resource), 'editedBy' => $userId));
         }
       }
       if(isset($post['add-resource']) && $post['add-resource'])
       {
         foreach($post['add-resource'] as $resource)
         {
-          $this->database_model->add('images', array($type.'Id' => $id, 'resource' => $this->db->escape_str($resource), 'editedBy' => $userId, 'active' => 1), 'resourceId');
+          $this->database_model->add('resources', array($type.'Id' => $id, 'resource' => $this->db->escape_str($resource), 'editedBy' => $userId, 'active' => 1), 'resourceId');
         }
       }
       if(isset($post['remove-resource']) && $post['remove-resource'])

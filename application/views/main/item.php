@@ -81,7 +81,7 @@
               <?php echo stripcslashes(str_replace('\r', '', str_replace('\n', '', $item->article))); ?>
             </article>
             <?php if($this->session->userdata('isLoggedIn') && !isset($history) && (!$item->adminOnly || ($item->adminOnly && $this->session->userdata('level') == 'a')) && ($type !== 'headline' || ($item->createdBy == $this->session->userdata('userId') || in_array($this->session->userdata('level'), array('m', 'a'))))): ?>
-              <a href="'a/modify/'.$item->hashId); ?>" class="right-align">Edit this Article</a>
+              <a href="<?php echo site_url('a/modify/'.$item->hashId); ?>" class="right-align">Edit this Article</a>
             <?php endif; ?>
             <div class="clear"></div>
           <?php elseif($this->session->userdata('isLoggedIn')): ?>
@@ -123,7 +123,7 @@
             <em>No images at this time.</em>
           </div>
         <?php endif; ?>
-        <script>$("a[rel^='prettyPhoto']").prettyPhoto();</script>
+        <script>if(window.jQuery) { $("a[rel^='prettyPhoto']").prettyPhoto(); }</script>
       </div>
       <hr>
       <div class="horizontal-padding-small vertical-padding-small top-padding-xsmall">

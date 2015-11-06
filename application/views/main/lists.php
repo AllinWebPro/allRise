@@ -66,9 +66,14 @@
             <fieldset class="item pure-group pure-u-1">
               <input type="text" name="headline" id="item-headline" class="pure-input-1" placeholder="Headline" value="" required title="Max length 255 characters.">
               <input type="hidden" name="tags" id="headline-tags" class="pure-input-1">
+              <input type="hidden" name="notes" id="headline-notes">
               <input type="hidden" name="place" id="headline-place" class="pure-input-1 place-ac">
               <input type="hidden" name="placeId" id="headline-placeId">
               <input type="hidden" name="categoryId[]" id="headline-categoryId-1" value="1">
+              <?php if($this->session->userdata('level') == 'a'): ?>
+                <input type="hidden" name="adminOnly" id="headline-adminOnly" value="0">
+                <input type="hidden" name="hidden" id="headline-hidden" value="0">
+              <?php endif; ?>
               <input type="hidden" name="ajax" value="<?php echo site_url('ajax/headline'); ?>">
             </fieldset>
             <div class="pure-u-1">

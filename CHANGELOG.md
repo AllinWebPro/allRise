@@ -1,5 +1,14 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.8.0.0</h2>
+
+<h4>Added:</h4>
+* CKEditor reinstalled
+
+<h4>Fixes</h4>
+* Create Article issue
+* Create Headline issues
+
 <h2>Version 0.7.17.0</h2>
 
 <h4>Fixes</h4>

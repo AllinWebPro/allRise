@@ -5,6 +5,8 @@ var current_page = window.location.href;
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src="<?php echo site_url('media/ckeditor/ckeditor.js'); ?>"></script>
+<script src="<?php echo site_url('media/ckeditor/adapters/jquery.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/vendor/masonry.pkgd.min.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/vendor/jquery.prettyPhoto.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/fix.js'); ?>"></script>

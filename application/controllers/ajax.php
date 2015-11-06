@@ -46,7 +46,7 @@ class Ajax extends CI_Controller
   public function article($childId = 0, $childType = '')
   {
     $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url|max_length[255]');
-    $this->form_validation->set_rules('article', 'Article', 'trim|xss_clean');
+    $this->form_validation->set_rules('article', 'Article', 'trim');
     
     if($this->session->userdata('level') == 'a')
     {
@@ -99,7 +99,15 @@ class Ajax extends CI_Controller
       $sInsert = array('articleId' => $id, 'userId' => $userId);
       $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
       $this->database_model->add('subscriptions', array('userId' => 3, 'articleId' => $id, 'createdOn' => time()), 'subscriptionId');
-      $this->database_model->edit('clusters', array('clusterId' => $clusterId), array('articleId' => $id));
+      if($childId)
+      {
+        $items = array(
+          'headline' => ($childType == 'headline')?array($childId):array(),
+          'cluster' => ($childType == 'cluster')?array($childId):array(),
+          'article' => array($id)
+        );
+        $this->stream_model->manual_join($items);
+      }
       foreach($post['categoryId'] as $c)
       {
         $this->database_model->add("catlist", array('articleId' => $id, 'categoryId' => $c, 'editedBy' => $userId), 'catlistId');
@@ -706,7 +714,7 @@ class Ajax extends CI_Controller
       $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url');
       if($type == 'article')
       {
-        $this->form_validation->set_rules('article', 'Article', 'trim|xss_clean');
+        $this->form_validation->set_rules('article', 'Article', 'trim');
       }
       $this->form_validation->set_rules('place', 'Location', 'trim|xss_clean');
       $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
@@ -991,7 +999,7 @@ class Ajax extends CI_Controller
     }
     if($type == 'article')
     {
-      $this->form_validation->set_rules('article', 'Article', 'trim|xss_clean');
+      $this->form_validation->set_rules('article', 'Article', 'trim');
     }
     if($this->session->userdata('level') == 'a')
     {

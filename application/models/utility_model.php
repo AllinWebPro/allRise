@@ -198,7 +198,7 @@ class Utility_model extends CI_Model
     $this->email->subject($subject);
     $this->email->message($message);
 
-    return $this->email->send();
+    return @$this->email->send();
   }
 
   public function emails_notification($user, $notice)

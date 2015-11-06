@@ -92,10 +92,10 @@ class Form extends CI_Controller
     // Vars
     if($otherId && $this->data['otherDeclaration'] == 'parent')
     {
-      $this->data['id'] = $parentId;
+      $this->data['id'] = $otherId;
       if($hashed)
       {
-        $this->data['hashId'] = $parentId;
+        $this->data['hashId'] = $otherId;
         
         $this->data['item'] = $this->database_model->get_single($this->data['otherType'].'s', array('OLD_PASSWORD('.$this->data['otherType'].'Id)' => $otherId, 'deleted' => 0));
         $this->data['id'] = $this->data['item']->clusterId;
@@ -486,7 +486,7 @@ class Form extends CI_Controller
     }
     if($this->data['type'] == 'article')
     {
-      $this->form_validation->set_rules('article', 'Article', 'trim|xss_clean');
+      $this->form_validation->set_rules('article', 'Article', 'trim');
     }
     if($this->session->userdata('level') == 'a')
     {

@@ -112,7 +112,7 @@
                     <div class="vertical-padding-xsmall horizontal-padding-small">
                       <div class="list-image right-margin-xsmall left-align">
                         <?php if($i->image && @getimagesize($i->image)): ?>
-                          <img src="<?php echo $i->image; ?>">
+                          <img src="<?php echo $i->image; ?>" class="list-border">
                         <?php else: ?>
                           <img src="<?php echo site_url('media/img/no-image.gif'); ?>">
                         <?php endif; ?>

@@ -80,6 +80,7 @@
             <article class="content">
               <?php echo stripcslashes(str_replace('\r', '', str_replace('\n', '', $item->article))); ?>
             </article>
+            <div class="clear"></div>
             <?php if($this->session->userdata('isLoggedIn') && !isset($history) && (!$item->adminOnly || ($item->adminOnly && $this->session->userdata('level') == 'a')) && ($type !== 'headline' || ($item->createdBy == $this->session->userdata('userId') || in_array($this->session->userdata('level'), array('m', 'a'))))): ?>
               <a href="<?php echo site_url('a/modify/'.$item->hashId); ?>" class="right-align">Edit this Article</a>
             <?php endif; ?>

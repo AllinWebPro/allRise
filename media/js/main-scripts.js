@@ -87,6 +87,18 @@ $(function() {
     });
   });
   
+  CKEDITOR.on('dialogDefinition', function(ev) {
+    var dialogName = ev.data.name;
+    var dialogDefinition = ev.data.definition;
+
+    if(dialogName == 'link') {
+      var infoTab = dialogDefinition.getContents('target');
+
+      var linkTargetType = infoTab.get('linkTargetType');
+      linkTargetType['default'] = '_blank';
+    }
+  });
+  
   $(this).on('mouseup', "#copy", function() {
     $(this).select();
   });

@@ -70,6 +70,7 @@ article.content img { border:1px solid #333;margin:5px;padding:5px; }
 
 .list-image { display:block;height:100px;overflow:hidden;position:relative;width:100px; }
 .list-image img { left:0;min-height:100px;min-width:100px;position:absolute;top:0;width:100%; }
+.list-border { border:3px #808080 solid;box-sizing:border-box; }
 
 [data-page=login-register] {
   background-attachment:fixed;

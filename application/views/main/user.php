@@ -141,7 +141,7 @@
           </div>
         <?php endforeach; ?>
         <div class="h-overflow vertical-padding-tiny horizontal-padding-small">
-          <a title="Search User Headlines"  href="<?php echo site_url('search/'.$headline_url); ?>" class="right-align">See More &gt;</a>
+          <a title="Search User Headlines"  href="<?php echo site_url('search'.$headline_url); ?>" class="right-align">See More &gt;</a>
         </div>
       </div>
     </div>
@@ -214,7 +214,7 @@
           </div>
         <?php endforeach; ?>
         <div class="h-overflow vertical-padding-tiny horizontal-padding-small">
-          <a title="Search User Contributions"  href="<?php echo site_url('search/'.$url); ?>" class="right-align">See More &gt;</a>
+          <a title="Search User Contributions"  href="<?php echo site_url('search'.$url); ?>" class="right-align">See More &gt;</a>
         </div>
       </div>
     </div>
@@ -287,7 +287,7 @@
           </div>
         <?php endforeach; ?>
         <div class="h-overflow vertical-padding-tiny horizontal-padding-small">
-          <a title="Search User Latest"  href="<?php echo site_url('search/'.$latest_url); ?>" class="right-align">See More &gt;</a>
+          <a title="Search User Latest"  href="<?php echo site_url('search'.$latest_url); ?>" class="right-align">See More &gt;</a>
         </div>
       </div>
     </div>

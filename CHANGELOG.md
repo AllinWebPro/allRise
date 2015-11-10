@@ -1,5 +1,15 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.8.1.0</h2>
+
+<h4>Updates:</h4>
+* Stream image border added
+* CKEditor links default target "_blank"
+
+<h4>Fixes</h4>
+* Clear added after article
+* User Link issue
+
 <h2>Version 0.8.0.0</h2>
 
 <h4>Added:</h4>

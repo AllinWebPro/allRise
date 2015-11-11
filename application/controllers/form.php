@@ -486,7 +486,7 @@ class Form extends CI_Controller
     }
     if($this->data['type'] == 'article')
     {
-      $this->form_validation->set_rules('article', 'Article', 'trim');
+      $this->form_validation->set_rules('article', 'Article', 'trim|strip_html_tags');
     }
     if($this->session->userdata('level') == 'a')
     {

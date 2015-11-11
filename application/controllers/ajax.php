@@ -46,7 +46,7 @@ class Ajax extends CI_Controller
   public function article($childId = 0, $childType = '')
   {
     $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url|max_length[255]');
-    $this->form_validation->set_rules('article', 'Article', 'trim');
+    $this->form_validation->set_rules('article', 'Article', 'trim|strip_html_tags');
     
     if($this->session->userdata('level') == 'a')
     {
@@ -999,7 +999,7 @@ class Ajax extends CI_Controller
     }
     if($type == 'article')
     {
-      $this->form_validation->set_rules('article', 'Article', 'trim');
+      $this->form_validation->set_rules('article', 'Article', 'trim|strip_html_tags');
     }
     if($this->session->userdata('level') == 'a')
     {

@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.8.2.0</h2>
+
+<h4>Updates:</h4>
+* Clean HTML input from CKEditor
+
 <h2>Version 0.8.1.0</h2>
 
 <h4>Updates:</h4>

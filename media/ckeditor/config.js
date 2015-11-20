@@ -16,4 +16,9 @@ CKEDITOR.editorConfig = function(config) {
 	];
 	
 	config.removeDialogTabs = 'link:advanced;image:advanced;iframe:advanced;table:advanced';
-};
+	
+	config.disableNativeSpellChecker = false;
+	
+	config.enterMode = CKEDITOR.ENTER_P;
+	config.shiftEnterMode = CKEDITOR.ENTER_BR;
+};d

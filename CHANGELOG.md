@@ -1,5 +1,15 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.8.3.0</h2>
+
+<h4>Updates:</h4>
+* CKEditor: Shift+Enter insert "<br>"
+
+<h4>Fixes</h4>
+* CKEditor spellcheck enabled
+* List line spacing
+* Image Aspect Ratio for Stream
+
 <h2>Version 0.8.2.0</h2>
 
 <h4>Updates:</h4>

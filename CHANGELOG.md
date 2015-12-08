@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.9.1.0</h2>
+
+<h4>Updates:</h4>
+* Cache Added
+
 <h2>Version 0.9.0.0</h2>
 
 <h4>Updates:</h4>

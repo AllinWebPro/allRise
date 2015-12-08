@@ -703,8 +703,8 @@ class Utility_model extends CI_Model
     }
     else { $update['importance'] = 0; }
     $update['credibility'] = $this->credibility($type, $id);
-    $metadata = $this->ci->database->get_single('metadata', array($type.'Id' => $id));
-    $this->ci->database->edit('metadata', array('metadataId' => $metadata->metadataId), $update);
+    $update['score'] = $update['quality'] + $update['importance'] + $update['credibility'];
+    $this->ci->database->edit('metadata', array($type.'Id' => $id), $update);
   }
 
   /**

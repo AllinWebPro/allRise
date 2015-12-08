@@ -246,6 +246,7 @@
           <?php else: ?>
             <input type="hidden" name="ajax" value="<?php echo site_url('ajax/headline'); ?>">
           <?php endif; ?>
+          <input type="hidden" name="form-page" value="1">
           <div class="pure-u-1 center-text bottom-margin-small">
             <button type="submit" class="pure-button pure-u-1 no-lr-padding">
               <i class="fa fa-pencil-square-o fa-9-10"></i> Publish <?php echo ucfirst($type); ?></button>

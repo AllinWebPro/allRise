@@ -159,7 +159,7 @@
                         K: <?php echo round($i->search_score * 10, 2); ?>
                         C: <?php echo round($i->cred_score * 10, 2); ?>
                         S: <?php echo round($i->sub_score * 10, 2); ?>
-                        Q: <?php echo round($i->decay_score * 10, 2); ?>
+                        D: <?php echo round($i->decay_score * 10, 2); ?>
                       </span>
                       <span class="horizontal-padding-tiny">
                         <input type="checkbox" name="<?php echo $i->type; ?>[]" id="<?php echo $i->type; ?>-<?php echo $i->id; ?>" value="<?php echo $i->id; ?>">

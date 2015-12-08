@@ -28,7 +28,8 @@ class Login extends CI_Controller
       $post = $this->input->post();
       $where = array(
         'deleted' => 0,
-        "(user = '".$this->db->escape_str($post['login'])."' OR email = '".$this->db->escape_str($post['login'])."')" => null
+        "(user = '".$this->db->escape_str($post['login'])."' 
+          OR email = '".$this->db->escape_str($post['login'])."')" => null
       );
       if($user = $this->database_model->get_single('users', $where))
       {

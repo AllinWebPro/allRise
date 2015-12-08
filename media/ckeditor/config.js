@@ -21,4 +21,4 @@ CKEDITOR.editorConfig = function(config) {
 	
 	config.enterMode = CKEDITOR.ENTER_P;
 	config.shiftEnterMode = CKEDITOR.ENTER_BR;
-};d
+};

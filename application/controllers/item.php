@@ -88,7 +88,11 @@ class Item extends CI_Controller
       if(isset($_GET['importance'])) { $this->importance($_GET['importance']); }
       if(isset($_GET['quality'])) { $this->quality($_GET['quality']); }
       if(isset($_GET['favorite'])) { $this->favorite($_GET['favorite']); }
-      if(isset($_GET['importance']) || isset($_GET['quality']) || isset($_GET['favorite'])) { redirect($type.'/'.$id); }
+      if(isset($_GET['importance']) || isset($_GET['quality']) || isset($_GET['favorite']))
+      {
+        $this->utility_model->metadata($type, $id);
+        redirect($type.'/'.$id);
+      }
       //
       if($type !== 'headline')
       {
@@ -251,7 +255,11 @@ class Item extends CI_Controller
       if(isset($_GET['importance'])) { $this->importance($_GET['importance']); }
       if(isset($_GET['quality'])) { $this->quality($_GET['quality']); }
       if(isset($_GET['favorite'])) { $this->favorite($_GET['favorite']); }
-      if(isset($_GET['importance']) || isset($_GET['quality']) || isset($_GET['favorite'])) { redirect($type.'/'.$id); }
+      if(isset($_GET['importance']) || isset($_GET['quality']) || isset($_GET['favorite']))
+      {
+        $this->utility_model->metadata($type, $id);
+        redirect($type.'/'.$id);
+      }
       //
       if($type !== 'headline')
       {
@@ -518,14 +526,14 @@ class Item extends CI_Controller
       $score = $this->stream_model->get_score_by_user($user->userId);
       $update = array('score' => (($score->q_score_sum + $score->i_score_sum) / $score->total_items));
       $this->database_model->edit('users', array('userId' => $user->userId), $update);
-      foreach($this->data['cats'] as $c)
+      /*foreach($this->data['cats'] as $c)
       {
         $cat_score = $this->stream_model->get_score_by_user($user->userId, $c);
         $data = array('score' => (($cat_score->q_score_sum + $cat_score->i_score_sum) / $cat_score->total_items));
         $where = array('userId' => $user->userId, 'categoryId' => $c);
         if($item = $this->database_model->get_single('scores', $where)) { $this->database_model->edit('scores', array('scoreId' => $item->scoreId), $data); }
         else { $this->database_model->add('scores', $where+$data, 'scoreId'); }
-      }
+      }*/
     }
   }
 }

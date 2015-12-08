@@ -5,7 +5,7 @@ class Stream_model extends CI_Model
   private $ci;
   private $generic_select = "s.headline, s.tags, s.createdBy, s.createdOn, s.editedBy, s.editedOn, p.place, s.placeId, s.flagId, s.deleted ";
   private $places_join = "LEFT JOIN places p ON p.placeId = s.placeId ";
-  private $decay_score = "LOG10(((s.createdOn - 1385884800) + (s.editedOn - 1385884800)) / 4)";
+  private $decay_score = "s.decay ";
 
   public function __construct() { parent::__construct(); }
 
@@ -972,8 +972,8 @@ class Stream_model extends CI_Model
       }
     }
 
-    $article_scores = $scores = "(quality + importance + credibility) AS cred_score, ";
-    $article_scores = $scores .= "(LOG10(((s.createdOn - 1385884800) + (s.editedOn - 1385884800)) / 4) / 10) AS decay_score, ";
+    $article_scores = $scores = "m.score AS cred_score, ";
+    $article_scores = $scores .= "s.decay AS decay_score, ";
     if($terms)
     {
       $scores .= "((".$match.") / ".$w.") AS search_score ";
@@ -999,8 +999,8 @@ class Stream_model extends CI_Model
     $image_include .= "WHERE deleted = 0 AND active = 1 ";
     $image_include .= "LIMIT 1 ";
 
-    $sub_score = "SUM(quality + importance + credibility) AS cred_score, ";
-    $sub_score .= "SUM(LOG10(((s.createdOn - 1385884800) + (s.editedOn - 1385884800)) / 4) / 10) AS decay_score, ";
+    $sub_score = "SUM(m.score) AS cred_score, ";
+    $sub_score .= "SUM(s.decay) AS decay_score, ";
     if($terms) { $sub_score .= "SUM((".$match.") / ".$w.") AS search_score "; }
     else { $sub_score .= "0 AS search_score "; }
 
@@ -1021,7 +1021,7 @@ class Stream_model extends CI_Model
     if($userId && !$subscriptions) { $global_select .= "s.createdBy, s.editedBy, "; }
 
     $sql = "SELECT ";
-      $sql .= "*, OLD_PASSWORD(id) AS hashId, ((search_score + (cred_score / 2) + (sub_score / 2)) / decay_score) AS score, ((cred_score / 2) / decay_score) AS x_score ";
+      $sql .= "*, OLD_PASSWORD(id) AS hashId, ((search_score + (cred_score / 2) + (sub_score / 2)) * decay_score) AS score, ((cred_score / 2) * decay_score) AS x_score ";
     $sql .= "FROM ( ";
       if(!in_array($results, array('clusters', 'articles')))
       {
@@ -1075,7 +1075,7 @@ class Stream_model extends CI_Model
       {
         $sql .= "SELECT ";
           $sql .= "'cluster' AS type, s.clusterId AS id, IF(views IS NULL, 0, views) AS views, h_count, 0 AS c_count, ";
-          $sql .= "(((h.search_score + (h.cred_score / 2)) / h.decay_score) / h_count) AS sub_score, ";
+          $sql .= "(((h.search_score + (h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
           $sql .= $global_select;
           if($comments) { $sql .= "comments, "; }
           if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
@@ -1124,7 +1124,7 @@ class Stream_model extends CI_Model
       {
         $sql .= "SELECT ";
           $sql .= "'article' AS type, s.articleId AS id, IF(views IS NULL, 0, views) AS views, h_count, c_count, ";
-          $sql .= "(((c.search_score + (c.cred_score / 2) + c.sub_score) / c.decay_score) / c_count) AS sub_score, ";
+          $sql .= "(((c.search_score + (c.cred_score / 2) + c.sub_score) * c.decay_score) / c_count) AS sub_score, ";
           $sql .= $global_select;
           if($comments) { $sql .= "comments, "; }
           if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
@@ -1144,7 +1144,7 @@ class Stream_model extends CI_Model
         $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.articleId = s.articleId) ";
         $sql .= "LEFT JOIN ( ";
           $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, SUM(h.h_count) AS h_count, ";
-          $sql .= "(((h.search_score + (h.cred_score / 2)) / h.decay_score) / h_count) AS sub_score, ";
+          $sql .= "(((h.search_score + (h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
           $sql .= $sub_score;
           $sql .= "FROM clusters s ";
           $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
@@ -1176,7 +1176,7 @@ class Stream_model extends CI_Model
         $sql .= "GROUP BY s.articleId ";
       }
     $sql .= ") items ";
-    $sql .= "WHERE decay_score > 0 ";
+    $sql .= "WHERE 1 = 1 ";
     if($terms) { $sql .= "AND (search_score > 0 OR sub_score > 0) "; }
     if($where) { $sql .= "AND ".$where." "; }
     if($results == 'visited') { $sql .= "AND visited = 1 "; }
@@ -1241,8 +1241,8 @@ class Stream_model extends CI_Model
       }
     }
 
-    $article_scores = $scores = "(quality + importance + credibility) AS cred_score, ";
-    $article_scores = $scores .= "(LOG10(((s.createdOn - 1385884800) + (s.editedOn - 1385884800)) / 4) / 10) AS decay_score, ";
+    $article_scores = $scores = "(m.score) AS cred_score, ";
+    $article_scores = $scores .= "s.decay AS decay_score, ";
     if($terms)
     {
       $scores .= "((".$match.") / ".$w.") AS search_score ";
@@ -1257,8 +1257,8 @@ class Stream_model extends CI_Model
     $viewed_include .= "FROM views ";
     $viewed_include .= "WHERE userId = ".$this->session->userdata('userId')." ";
 
-    $sub_score = "SUM(quality + importance + credibility) AS cred_score, ";
-    $sub_score .= "SUM(LOG10(((s.createdOn - 1385884800) + (s.editedOn - 1385884800)) / 4) / 10) AS decay_score, ";
+    $sub_score = "SUM(m.score) AS cred_score, ";
+    $sub_score .= "SUM(s.decay) AS decay_score, ";
     if($terms) { $sub_score .= "SUM((".$match.") / ".$w.") AS search_score "; }
     else { $sub_score .= "0 AS search_score "; }
 
@@ -1312,7 +1312,7 @@ class Stream_model extends CI_Model
       {
         $sql .= "SELECT ";
           $sql .= "'cluster' AS type, s.clusterId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, h_count, 0 AS c_count, ";
-          $sql .= "(((h.search_score + (h.cred_score / 2)) / h.decay_score) / h_count) AS sub_score, ";
+          $sql .= "(((h.search_score + (h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
           if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
           $sql .= $scores;
         $sql .= "FROM clusters s ";
@@ -1343,7 +1343,7 @@ class Stream_model extends CI_Model
       {
         $sql .= "SELECT ";
           $sql .= "'article' AS type, s.articleId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, h_count, c_count, ";
-          $sql .= "(((c.search_score + (c.cred_score / 2) + c.sub_score) / c.decay_score) / c_count) AS sub_score, ";
+          $sql .= "(((c.search_score + (c.cred_score / 2) + c.sub_score) * c.decay_score) / c_count) AS sub_score, ";
           if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
           $sql .= $article_scores;
         $sql .= "FROM articles s ";
@@ -1355,7 +1355,7 @@ class Stream_model extends CI_Model
         $sql .= ") v ON v.articleId = s.articleId ";
         $sql .= "LEFT JOIN ( ";
           $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, SUM(h.h_count) AS h_count, ";
-          $sql .= "(((h.search_score + (h.cred_score / 2)) / h.decay_score) / h_count) AS sub_score, ";
+          $sql .= "(((h.search_score + (h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
           $sql .= $sub_score;
           $sql .= "FROM clusters s ";
           $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
@@ -1377,7 +1377,7 @@ class Stream_model extends CI_Model
           if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
       }
     $sql .= ") items ";
-    $sql .= "WHERE decay_score > 0 ";
+    $sql .= "WHERE 1 = 1 ";
     if($terms) { $sql .= "AND (search_score > 0 OR sub_score > 0) "; }
     if($where) { $sql .= "AND ".$where." "; }
     if($results == 'visited') { $sql .= "AND visited = 1 "; }
@@ -1567,9 +1567,9 @@ class Stream_model extends CI_Model
 
     $sql = "SELECT *, OLD_PASSWORD(id) AS hashId, (keyword_score + category_score + place_score ";
     if($meta) { $sql .= "+ quality_score + importance_score + credibility_score"; }
-    $sql .= " + 1) / decay_score AS score, (0 ";
+    $sql .= " + 1) * decay_score AS score, (0 ";
     if($meta) { $sql .= "+ quality_score + importance_score + credibility_score"; }
-    $sql .= " + 1) / decay_score AS x_score ";
+    $sql .= " + 1) * decay_score AS x_score ";
     $sql .= "FROM ( ";
       if(!in_array($results, array('clusters', 'articles')))
       {

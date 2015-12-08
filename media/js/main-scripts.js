@@ -58,6 +58,7 @@ var $stream,
     success = 0,
     type,
     id,
+    form_submit = false,
     browsers = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
 
 $(function() {
@@ -716,6 +717,8 @@ $(function() {
         dataType: 'json',
         data: post,
         success: function(data, textStatus, jqXHR) {
+          form_submit = true;
+          
           if(typeof data.errors != 'undefined') { errors[errors.length] = data.errors; }
           else if(typeof data.output != 'undefined') { errors[errors.length] = data.output; output = true; }
           else if(typeof data.redirect != 'undefined') { window.location = data.redirect; }
@@ -977,10 +980,17 @@ $(function() {
                 $item = $('#item');
                 itemMasonry();
               }
-              if($('textarea[name="article"]').length)
+              if($('[name="form-page"]').length)
               {
+                form_submit = false;
+                $(window).on('beforeunload', function() {
+                  if(!form_submit)
+                  {
+                    return 'The changes you made will be lost if you navigate away from this page.';
+                  }
+                });
                 $('textarea[name="article"]').ckeditor();
-                var timer2 = setInterval(function() {
+                var timer2 = setIntervald(function() {
                   if($("#cke_item-article").height()) {
                     itemMasonry();
                     clearInterval(timer2);
@@ -1066,6 +1076,17 @@ $(window).load(function() {
   var isItem = (url.indexOf("/h/") || url.indexOf("/c/") || url.indexOf("/a/")) ? true : false;
   var state = { "pageURL": url, "pageTitle": title, "isList": isList, "isItem": isItem };
   saveURL(state, title, url);
+  
+  if($('[name="form-page"]').length)
+  {
+    form_submit = false;
+    $(window).on('beforeunload', function() {
+      if(!form_submit)
+      {
+        return 'The changes you made will be lost if you navigate away from this page.';
+      }
+    });
+  }
 
   $("img").load(function() {
     $comments = $("#comments");

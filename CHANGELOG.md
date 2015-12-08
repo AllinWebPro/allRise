@@ -1,5 +1,17 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.9.0.0</h2>
+
+<h4>Updates:</h4>
+* Query Optimization
+** Metadata Sum
+** Decay Score
+
+<h2>Version 0.8.4.0</h2>
+
+<h4>Updates:</h4>
+* Alert on leaving a form page
+
 <h2>Version 0.8.3.0</h2>
 
 <h4>Updates:</h4>

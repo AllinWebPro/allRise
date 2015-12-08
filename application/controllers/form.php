@@ -113,12 +113,15 @@ class Form extends CI_Controller
     if($post = $this->validate())
     {
       $userId = $this->session->userdata('userId');
+      $time = time();
+      $decay = $time - 1385884800;
       $insert = array(
         'headline' => $this->db->escape_str(preg_replace('/\s+/', ' ', $post['headline'])),
         'tags' => $this->db->escape_str($this->utility_model->clean_tag_list($post['tags'])),
         'createdBy' => $userId,
-        'createdOn' => time(),
-        'editedBy' => $userId
+        'createdOn' => $time,
+        'editedBy' => $userId,
+        'decay' => (log10($decay + $decay) / 4) / 10
       );
       if($post['placeId']) { $insert['placeId'] = $post['placeId']; }
       elseif($post['place'])
@@ -259,6 +262,7 @@ class Form extends CI_Controller
           'tags' => $this->db->escape_str($this->utility_model->clean_tag_list($post['tags'])),
           'editedBy' => $userId
         );
+        $update['decay'] = (log10(($this->data['item']->createdOn - 1385884800) + (time() - 1385884800)) / 4) / 10;
         if($this->data['place'] && $post['placeId'] == $this->data['place']->placeId)
         {
           if(empty($post['place'])) { $update['placeId'] = null; }

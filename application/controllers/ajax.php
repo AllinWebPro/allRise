@@ -64,13 +64,16 @@ class Ajax extends CI_Controller
     {
       $post = $this->input->post();
       $userId = $this->session->userdata('userId');
+      $time = time();
+      $decay = $time - 1385884800;
       $insert = array(
         'headline' => $this->db->escape_str(preg_replace('/\s+/', ' ', $post['headline'])),
         'article' => $this->db->escape_str(str_replace('\r', '', str_replace('\n', '', $post['article']))),
         'tags' => $this->db->escape_str($this->utility_model->clean_tag_list($post['tags'])),
         'createdBy' => $userId,
-        'createdOn' => time(),
-        'editedBy' => $userId
+        'createdOn' => $time,
+        'editedBy' => $userId,
+        'decay' => (log10($decay + $decay) / 4) / 10
       );
         
       if($this->session->userdata('level') == 'a')
@@ -128,8 +131,13 @@ class Ajax extends CI_Controller
         }
       }
       // Metadata
-      $metadata = array('articleId' => $id, 'quality' => 0, 'importance' => 0);
-      $metadata['credibility'] = $this->utility_model->credibility('article', $id);
+      $metadata = array(
+        'articleId' => $id,
+        'quality' => 0,
+        'importance' => 0,
+        'credibility' => $this->utility_model->credibility('article', $id)
+      );
+      $metadata['score'] = $metadata['credibility'];
       $this->database_model->add('metadata', $metadata, 'metadataId');
       $this->stream_model->autocompare('article', $id);
       $response['success'] = 1;
@@ -325,13 +333,16 @@ class Ajax extends CI_Controller
     {
       $post = $this->input->post();
       $userId = $this->session->userdata('userId');
+      $time = time();
+      $decay = $time - 1385884800;
       $insert = array(
         'headline' => $this->db->escape_str(preg_replace('/\s+/', ' ', $post['headline'])),
         'notes' => $this->db->escape_str($post['notes']),
         'tags' => $this->db->escape_str($this->utility_model->clean_tag_list($post['tags'])),
         'createdBy' => $userId,
-        'createdOn' => time(),
-        'editedBy' => $userId
+        'createdOn' => $time,
+        'editedBy' => $userId,
+        'decay' => (log10($decay + $decay) / 4) / 10
       );
         
       if($this->session->userdata('level') == 'a')
@@ -382,8 +393,13 @@ class Ajax extends CI_Controller
         }
       }
       // Metadata
-      $metadata = array('headlineId' => $id, 'quality' => 0, 'importance' => 0);
-      $metadata['credibility'] = $this->utility_model->credibility('headline', $id);
+      $metadata = array(
+        'headlineId' => $id,
+        'quality' => 0,
+        'importance' => 0,
+        'credibility' => $this->utility_model->credibility('headline', $id)
+      );
+      $metadata['score'] = $metadata['credibility'];
       $this->database_model->add('metadata', $metadata, 'metadataId');
       $this->stream_model->autocompare('headline', $id);
       //
@@ -424,12 +440,15 @@ class Ajax extends CI_Controller
     {
       $post = $this->input->post();
       $userId = $this->session->userdata('userId');
+      $time = time();
+      $decay = $time - 1385884800;
       $insert = array(
         'headline' => $this->db->escape_str(preg_replace('/\s+/', ' ', $post['headline'])),
         'tags' => $this->db->escape_str($this->utility_model->clean_tag_list($post['tags'])),
         'createdBy' => $userId,
-        'createdOn' => time(),
-        'editedBy' => $userId
+        'createdOn' => $time,
+        'editedBy' => $userId,
+        'decay' => (log10($decay + $decay) / 4) / 10
       );
         
       if($this->session->userdata('level') == 'a')
@@ -479,8 +498,13 @@ class Ajax extends CI_Controller
         }
       }
       // Metadata
-      $metadata = array('clusterId' => $id, 'quality' => 0, 'importance' => 0);
-      $metadata['credibility'] = $this->utility_model->credibility('cluster', $id);
+      $metadata = array(
+        'clusterId' => $id,
+        'quality' => 0,
+        'importance' => 0,
+        'credibility' => $this->utility_model->credibility('cluster', $id)
+      );
+      $metadata['score'] = $metadata['credibility'];
       $this->database_model->add('metadata', $metadata, 'metadataId');
       $this->stream_model->autocompare('cluster', $id);
       //
@@ -1021,6 +1045,7 @@ class Ajax extends CI_Controller
       $item['headline'] = $this->db->escape_str(preg_replace('/\s+/', ' ', $post['headline']));
       $item['tags'] = $this->db->escape_str($this->utility_model->clean_tag_list($post['tags']));
       $item['editedBy'] = $userId;
+      $item['decay'] = (log10(($item['createdOn'] - 1385884800) + (time() - 1385884800)) / 4) / 10;
       $item['active'] = 1;
       if($this->session->userdata('level') == 'a')
       {
@@ -1219,9 +1244,10 @@ class Ajax extends CI_Controller
     $this->data['id'] = $id;
     $this->data['type'] = $type;
     $this->data['ranking'] = $this->database_model->get_single('rankings', array($type.'Id' => $id, 'createdBy' => $userId));
-    $this->data['cats'] = $this->database_model->get_array('catlist', array($type.'Id' => $id, 'deleted' => 0), 'categoryId');
+    //$this->data['cats'] = $this->database_model->get_array('catlist', array($type.'Id' => $id, 'deleted' => 0), 'categoryId');
     $this->data['contributors'] = $this->stream_model->get_contributors($type, $id);
     $this->$target($dir);
+    $this->utility_model->metadata($type, $id);
   }
 
   /**
@@ -1313,14 +1339,14 @@ class Ajax extends CI_Controller
       $score = $this->stream_model->get_score_by_user($user->userId);
       $update = array('score' => (($score->q_score_sum + $score->i_score_sum) / $score->total_items));
       $this->database_model->edit('users', array('userId' => $user->userId), $update);
-      foreach($this->data['cats'] as $c)
+      /*foreach($this->data['cats'] as $c)
       {
         $cat_score = $this->stream_model->get_score_by_user($user->userId, $c);
         $data = array('score' => (($cat_score->q_score_sum + $cat_score->i_score_sum) / $cat_score->total_items));
         $where = array('userId' => $user->userId, 'categoryId' => $c);
         if($item = $this->database_model->get_single('scores', $where)) { $this->database_model->edit('scores', array('scoreId' => $item->scoreId), $data); }
         else { $this->database_model->add('scores', $where+$data, 'scoreId'); }
-      }
+      }*/
     }
   }
 

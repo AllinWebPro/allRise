@@ -5,7 +5,9 @@ class Database_model extends CI_Model
   public function __construct()
   {
     parent::__construct();
-    $this->load->driver('cache', array('adapter' => 'file'));
+    if($this->load->is_supported('apc')) { $this->load->driver('cache', array('adapter' => 'apc')); }
+    elseif($this->load->is_supported('memcached')) { $this->load->driver('cache', array('adapter' => 'memcached')); }
+    elseif($this->load->is_supported('file')) { $this->load->driver('cache', array('adapter' => 'file')); }
   }
   
   /**

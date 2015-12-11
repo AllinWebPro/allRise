@@ -7,9 +7,9 @@ class Database_model extends CI_Model
     parent::__construct();
     //
     $this->load->driver('cache');
-    if($this->cache->is_supported('apc')) { $this->cache->__construct(array('adapter' => 'apc')); }
-    elseif($this->cache->is_supported('memcached')) { $this->cache->__construct(array('adapter' => 'memcached')); }
-    elseif($this->cache->is_supported('file')) { $this->cache->__construct(array('adapter' => 'file')); }
+    if($this->cache->apc->is_supported('apc')) { $this->cache->__construct(array('adapter' => 'apc')); }
+    elseif($this->cache->memcached->is_supported('memcached')) { $this->cache->__construct(array('adapter' => 'memcached')); }
+    elseif($this->cache->file->is_supported('file')) { $this->cache->__construct(array('adapter' => 'file')); }
   }
   
   /**

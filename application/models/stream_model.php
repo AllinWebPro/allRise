@@ -10,9 +10,11 @@ class Stream_model extends CI_Model
   public function __construct()
   {
     parent::__construct();
-    if($this->load->is_supported('apc')) { $this->load->driver('cache', array('adapter' => 'apc')); }
-    elseif($this->load->is_supported('memcached')) { $this->load->driver('cache', array('adapter' => 'memcached')); }
-    elseif($this->load->is_supported('file')) { $this->load->driver('cache', array('adapter' => 'file')); }
+    //
+    $this->load->driver('cache');
+    if($this->cache->is_supported('apc')) { $this->cache->__construct(array('adapter' => 'apc')); }
+    elseif($this->cache->is_supported('memcached')) { $this->cache->__construct(array('adapter' => 'memcached')); }
+    elseif($this->cache->is_supported('file')) { $this->cache->__construct(array('adapter' => 'file')); }
   }
 
   // -- here --

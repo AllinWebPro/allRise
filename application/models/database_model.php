@@ -5,11 +5,6 @@ class Database_model extends CI_Model
   public function __construct()
   {
     parent::__construct();
-    //
-    $this->load->driver('cache');
-    if($this->cache->apc->is_supported('apc')) { $this->cache->__construct(array('adapter' => 'apc')); }
-    elseif($this->cache->memcached->is_supported('memcached')) { $this->cache->__construct(array('adapter' => 'memcached')); }
-    elseif($this->cache->file->is_supported('file')) { $this->cache->__construct(array('adapter' => 'file')); }
   }
   
   /**
@@ -73,16 +68,9 @@ class Database_model extends CI_Model
    */
   public function get($table = '', $where = array(), $limit = 0, $n = 0)
   {
-    $cacheId = 'get-'.$table.'-'.implode('&', $where).'-'.$limit.'-'.$n;
-    if(!$results = $this->cache->get($cacheId))
-    {
-      if($limit) { $this->db->limit($limit, ($limit*$n)); }
-      $q = $this->db->get_where($table, $where);
-      $results =  $q->result();
-      
-      // Save into the cache for 5 minutes
-      $this->cache->save($cacheId, $results, 60*15);
-    }
+    if($limit) { $this->db->limit($limit, ($limit*$n)); }
+    $q = $this->db->get_where($table, $where);
+    $results =  $q->result();
     
     return $results;
   }
@@ -99,18 +87,11 @@ class Database_model extends CI_Model
    */
   public function get_or($table = '', $where = array(), $or_where = array(), $limit = 0, $n = 0)
   {
-    $cacheId = 'get_or-'.$table.'-'.implode('&', $where).'-'.implode('&', $or_where).'-'.$limit.'-'.$n;
-    if(!$results = $this->cache->get($cacheId))
-    {
-      if($limit) { $this->db->limit($limit, ($limit*$n)); }
-      $this->db->where($where);
-      $this->db->or_where($or_where);
-      $q = $this->db->get($table);
-      $results =  $q->result();
-      
-      // Save into the cache for 5 minutes
-      $this->cache->save($cacheId, $results, 60*15);
-    }
+    if($limit) { $this->db->limit($limit, ($limit*$n)); }
+    $this->db->where($where);
+    $this->db->or_where($or_where);
+    $q = $this->db->get($table);
+    $results =  $q->result();
     
     return $results;
   }
@@ -157,16 +138,9 @@ class Database_model extends CI_Model
    */
   public function get_count($table = '', $where = array(), $group_by = '')
   {
-    $cacheId = 'get_count-'.$table.'-'.implode('&', $where).'-'.$group_by;
-    if(!$count = $this->cache->get($cacheId))
-    {
-      $this->db->where($where);
-      if($group_by) { $this->db->group_by($group_by); }
-      $count = $this->db->count_all_results($table);
-      
-      // Save into the cache for 5 minutes
-      $this->cache->save($cacheId, $count, 60*15);
-    }
+    $this->db->where($where);
+    if($group_by) { $this->db->group_by($group_by); }
+    $count = $this->db->count_all_results($table);
     
     return $count;
   }
@@ -181,19 +155,12 @@ class Database_model extends CI_Model
    */
   public function get_join($table = '', $join = '', $on = '', $where = array(), $select = '*', $row = false, $order = '', $dir = '')
   {
-    $cacheId = 'get_join-'.$table.'-'.$join.'-'.$on.'-'.implode('&', $where).'-'.$select.'-'.($row?1:0).'-'.$order.'-'.$dir;
-    if(!$results = $this->cache->get($cacheId))
-    {
-      $this->db->select($select);
-      if($join) { $this->db->join($join, $on, 'left'); }
-      if($order) { $this->db->order_by($order, $dir); }
-      $q = $this->db->get_where($table, $where);
-      if($row) { return $q->row(); }
-      $results =  $q->result();
-      
-      // Save into the cache for 5 minutes
-      $this->cache->save($cacheId, $results, 60*15);
-    }
+    $this->db->select($select);
+    if($join) { $this->db->join($join, $on, 'left'); }
+    if($order) { $this->db->order_by($order, $dir); }
+    $q = $this->db->get_where($table, $where);
+    if($row) { return $q->row(); }
+    $results =  $q->result();
     
     return $results;
   }
@@ -210,35 +177,21 @@ class Database_model extends CI_Model
    */
   public function get_single($table = '', $where = array(), $select = '*', $group_by = '', $order = '', $dir = '')
   {
-    $cacheId = 'get_single-'.$table.'-'.implode('&', $where).'-'.$select.'-'.$group_by.'-'.$order.'-'.$dir;
-    if(!$results = $this->cache->get($cacheId))
-    {
     $this->db->select($select, false);
     if($group_by) { $this->db->group_by($group_by); }
     if($order) { $this->db->order_by($order, $dir); }
     $q = $this->db->get_where($table, $where);
-      $results =  $q->row();
-      
-      // Save into the cache for 5 minutes
-      $this->cache->save($cacheId, $results, 60*15);
-    }
+    $results =  $q->row();
     
     return $results;
   }
 
   public function get_select($table = '', $where = array(), $select = '*', $order = '', $dir = '')
   {
-    $cacheId = 'get_select-'.$table.'-'.implode('&', $where).'-'.$select.'-'.$order.'-'.$dir;
-    if(!$results = $this->cache->get($cacheId))
-    {
-      $this->db->select($select, false);
-      if($order) { $this->db->order_by($order, $dir); }
-      $q = $this->db->get_where($table, $where);
-      $results =  $q->result();
-      
-      // Save into the cache for 5 minutes
-      $this->cache->save($cacheId, $results, 60*15);
-    }
+    $this->db->select($select, false);
+    if($order) { $this->db->order_by($order, $dir); }
+    $q = $this->db->get_where($table, $where);
+    $results =  $q->result();
     
     return $results;
   }

@@ -957,9 +957,9 @@ class Stream_model extends CI_Model
         if($w < 10)
         {
           if($w) { $match .= " + "; }
-          $match .= "IF((s.headline REGEXP '[[:<:]]".$s."[[:>:]]'), 1, IF((s.headline REGEXP '".$s."'), .75, 0)) ";
-          $match .= "+ IF((s.tags REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.tags REGEXP '".$s."'), .25, 0)) ";
-          $article_match .= "+ IF((s.article REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.article REGEXP '".$s."'), .25, 0)) ";
+          $match .= "IF(s.headline LIKE '%".$s."%', IF((s.headline REGEXP '[[:<:]]".$s."[[:>:]]'), 1, IF((s.headline REGEXP '".$s."'), .75, 0)), 0) ";
+          $match .= "+ IF(s.tags LIKE '%".$s."%', IF((s.tags REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.tags REGEXP '".$s."'), .25, 0)), 0) ";
+          $article_match .= "+ IF(s.article LIKE '%".$s."%', IF((s.article REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.article REGEXP '".$s."'), .25, 0)), 0) ";
         }
         $w++;
       }
@@ -979,9 +979,9 @@ class Stream_model extends CI_Model
         if($w < 5)
         {
           if($w) { $match .= " + "; }
-          $match .= "IF((s.headline REGEXP '[[:<:]]".$s."[[:>:]]'), 1, IF((s.headline REGEXP '".$s."'), .75, 0)) ";
-          $match .= "+ IF((s.tags REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.tags REGEXP '".$s."'), .25, 0)) ";
-          $article_match .= "+ IF((s.article REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.article REGEXP '".$s."'), .25, 0)) ";
+          $match .= "IF(s.headline LIKE '%".$s."%', IF((s.headline REGEXP '[[:<:]]".$s."[[:>:]]'), 1, IF((s.headline REGEXP '".$s."'), .75, 0)), 0) ";
+          $match .= "+ IF(s.tags LIKE '%".$s."%', IF((s.tags REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.tags REGEXP '".$s."'), .25, 0)), 0) ";
+          $article_match .= "+ IF(s.article LIKE '%".$s."%', IF((s.article REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.article REGEXP '".$s."'), .25, 0)), 0) ";
         }
         $w++;
       }

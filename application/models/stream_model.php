@@ -941,60 +941,43 @@ class Stream_model extends CI_Model
     $this->ci =& get_instance();
     $this->ci->load->model('database_model', 'database', true);
     $this->ci->load->model('utility_model', 'utility', true);
-
-    $w = 0;
-    $match = "";
-    $article_match = "";
-    $terms = str_replace(",", " ", $terms);
-    $terms = preg_replace('/[^A-Za-z0-9 ]/', '', $terms);
-    $terms = $this->ci->utility->blwords_strip($terms, 'regEx_spaces', ' ');
+    
     if($terms)
     {
-      $search = explode(' ', $terms);
-      foreach($search as $s)
+      $terms = str_replace(",", " ", $terms);
+      $terms = preg_replace('/[^A-Za-z0-9 ]/', '', $terms);
+      $terms = $this->ci->utility->blwords_strip($terms, 'regEx_spaces', ' ');
+      
+      $w = 0;
+      $h_search = "(";
+      $c_search = "(";
+      $a_search = "(";
+      $terms_array = explode(' ', $terms);
+      foreach($terms_array as $t)
       {
-        $s = $this->db->escape_str($s, true);
-        if($w < 10)
-        {
-          if($w) { $match .= " + "; }
-          $match .= "IF(s.headline LIKE '%".$s."%', IF((s.headline REGEXP '[[:<:]]".$s."[[:>:]]'), 1, IF((s.headline REGEXP '".$s."'), .75, 0)), 0) ";
-          $match .= "+ IF(s.tags LIKE '%".$s."%', IF((s.tags REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.tags REGEXP '".$s."'), .25, 0)), 0) ";
-          $article_match .= "+ IF(s.article LIKE '%".$s."%', IF((s.article REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.article REGEXP '".$s."'), .25, 0)), 0) ";
-        }
+        $t = $this->db->escape_str($t, true);
+        
+        $h_temp = "s.headline LIKE '%".$t."%' ";
+        $h_temp .= "OR s.tags LIKE '%".$t."%' ";
+        $c_temp = "h_headline LIKE '%".$t."%' ";
+        $c_temp .= "OR h_tags LIKE '%".$t."%' ";
+        $a_temp = "s.article LIKE '%".$t."%' ";
+        $a_temp .= "OR c_headline LIKE '%".$t."%' ";
+        $a_temp .= "OR c_tags LIKE '%".$t."%' ";
+        
+        $h_search .= ($w?"OR ":"").$h_temp;
+        $c_search .= ($w?"OR ":"").$h_temp."OR ".$c_temp;
+        $a_search .= ($w?"OR ":"").$h_temp."OR ".$c_temp."OR ".$a_temp;
+        
         $w++;
       }
-
-      $search_pair = array();
-      $search_temp = $search;
-      for($j = 0; $j < sizeof($search); $j++)
-      {
-        $imp = implode(' ', array_splice($search_temp, $j, 2));
-        if(strpos($imp, ' ')) { $search_pair[] = $imp; }
-        $search_temp = $search;
-      }
-
-      foreach($search_pair as $s)
-      {
-        $s = $this->db->escape_str($s, true);
-        if($w < 5)
-        {
-          if($w) { $match .= " + "; }
-          $match .= "IF(s.headline LIKE '%".$s."%', IF((s.headline REGEXP '[[:<:]]".$s."[[:>:]]'), 1, IF((s.headline REGEXP '".$s."'), .75, 0)), 0) ";
-          $match .= "+ IF(s.tags LIKE '%".$s."%', IF((s.tags REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.tags REGEXP '".$s."'), .25, 0)), 0) ";
-          $article_match .= "+ IF(s.article LIKE '%".$s."%', IF((s.article REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.article REGEXP '".$s."'), .25, 0)), 0) ";
-        }
-        $w++;
-      }
+      $h_search .= ") ";
+      $c_search .= ") ";
+      $a_search .= ") ";
     }
 
     $article_scores = $scores = "m.score AS cred_score, ";
-    $article_scores = $scores .= "s.decay AS decay_score, ";
-    if($terms)
-    {
-      $scores .= "((".$match.") / ".$w.") AS search_score ";
-      $article_scores .= "((".$match.$article_match.") / ".$w.") AS search_score ";
-    }
-    else { $article_scores = $scores .= "0 AS search_score "; }
+    $article_scores = $scores .= "s.decay AS decay_score ";
 
     if($comments)
     {
@@ -1015,14 +998,13 @@ class Stream_model extends CI_Model
     $image_include .= "LIMIT 1 ";
 
     $sub_score = "SUM(m.score) AS cred_score, ";
-    $sub_score .= "SUM(s.decay) AS decay_score, ";
-    if($terms) { $sub_score .= "SUM((".$match.") / ".$w.") AS search_score "; }
-    else { $sub_score .= "0 AS search_score "; }
+    $sub_score .= "SUM(s.decay) AS decay_score ";
 
     if($results !== 'headlines')
     {
       $headline_include = "LEFT JOIN ( ";
         $headline_include .= "SELECT s.clusterId, COUNT(s.headlineId) AS h_count, ";
+        $headline_include .= "s.headline AS h_headline, s.tags AS h_tags, ";
         $headline_include .= $sub_score;
         $headline_include .= "FROM headlines s ";
         $headline_include .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
@@ -1032,16 +1014,18 @@ class Stream_model extends CI_Model
       $headline_include .= ") h ON h.clusterId = s.clusterId ";
     }
 
-    $global_select = "s.headline, i2.image, s.createdOn, s.editedOn, ";
+    $global_select = "s.headline, s.tags, i2.image, s.createdOn, s.editedOn, ";
     if($userId && !$subscriptions) { $global_select .= "s.createdBy, s.editedBy, "; }
 
     $sql = "SELECT ";
-      $sql .= "*, OLD_PASSWORD(id) AS hashId, ((search_score + (cred_score / 2) + (sub_score / 2)) * decay_score) AS score, ((cred_score / 2) * decay_score) AS x_score ";
+      $sql .= "*, OLD_PASSWORD(id) AS hashId, ((cred_score + sub_score) / decay_score) AS temp_score ";
+      //$sql .= "*, OLD_PASSWORD(id) AS hashId, (((cred_score / 2) + (sub_score / 2)) * decay_score) AS score, ((cred_score / 2) * decay_score) AS x_score ";
     $sql .= "FROM ( ";
       if(!in_array($results, array('clusters', 'articles')))
       {
         $sql .= "SELECT ";
           $sql .= "'headline' AS type, s.headlineId AS id, IF(views IS NULL, 0, views) AS views, 0 AS h_count, 0 AS c_count, 0 AS sub_score, ";
+          $sql .= "s.notes AS article, '' AS c_headline, '' AS c_tags, '' AS h_headline, '' AS h_tags, ";
           $sql .= $global_select;
           if($comments) { $sql .= "comments, "; }
           if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
@@ -1078,6 +1062,7 @@ class Stream_model extends CI_Model
         }
         $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
           $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
+          if($terms) { $sql .= "AND ".$h_search; }
           if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
           if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR h.editedBy = ".$userId.") "; }
           if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
@@ -1090,7 +1075,8 @@ class Stream_model extends CI_Model
       {
         $sql .= "SELECT ";
           $sql .= "'cluster' AS type, s.clusterId AS id, IF(views IS NULL, 0, views) AS views, h_count, 0 AS c_count, ";
-          $sql .= "(((h.search_score + (h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+          $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+          $sql .= "'' AS article, '' AS c_headline, '' AS c_tags, GROUP_CONCAT(h_headline SEPARATOR ' '), GROUP_CONCAT(h_tags SEPARATOR ' '), ";
           $sql .= $global_select;
           if($comments) { $sql .= "comments, "; }
           if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
@@ -1127,6 +1113,7 @@ class Stream_model extends CI_Model
         }
         $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
           $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
+          if($terms) { $sql .= "AND ".$c_search; }
           if($exclusive && !$subscriptions) { $sql .= "AND s.articleId IS null "; }
           if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR c.editedBy = ".$userId.") "; }
           if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
@@ -1139,7 +1126,8 @@ class Stream_model extends CI_Model
       {
         $sql .= "SELECT ";
           $sql .= "'article' AS type, s.articleId AS id, IF(views IS NULL, 0, views) AS views, h_count, c_count, ";
-          $sql .= "(((c.search_score + (c.cred_score / 2) + c.sub_score) * c.decay_score) / c_count) AS sub_score, ";
+          $sql .= "((((c.cred_score / 2) + c.sub_score) * c.decay_score) / c_count) AS sub_score, ";
+          $sql .= "s.article, GROUP_CONCAT(c_headline SEPARATOR ' '), GROUP_CONCAT(c_tags SEPARATOR ' '), h_headline, h_tags, ";
           $sql .= $global_select;
           if($comments) { $sql .= "comments, "; }
           if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
@@ -1159,7 +1147,8 @@ class Stream_model extends CI_Model
         $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.articleId = s.articleId) ";
         $sql .= "LEFT JOIN ( ";
           $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, SUM(h.h_count) AS h_count, ";
-          $sql .= "(((h.search_score + (h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+          $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+          $sql .= "s.headline AS c_headline, s.tags AS c_tags, h_headline, h_tags, ";
           $sql .= $sub_score;
           $sql .= "FROM clusters s ";
           $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
@@ -1186,22 +1175,124 @@ class Stream_model extends CI_Model
         }
         $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
           $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
+          if($terms) { $sql .= "AND ".$a_search; }
           if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR a.editedBy = ".$userId.") "; }
           if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
         $sql .= "GROUP BY s.articleId ";
       }
     $sql .= ") items ";
     $sql .= "WHERE 1 = 1 ";
-    if($terms) { $sql .= "AND (search_score > 0 OR sub_score > 0) "; }
     if($where) { $sql .= "AND ".$where." "; }
     if($results == 'visited') { $sql .= "AND visited = 1 "; }
     if($results == 'unvisited') { $sql .= "AND visited = 0 "; }
-    $sql .= "ORDER BY ".$order." DESC, ";
-    $sql .= "search_score DESC, cred_score DESC, decay_score DESC ";
+    if($order !== 'score') { $sql .= "ORDER BY ".$order." DESC "; }
+    else { $sql .= "ORDER BY temp_score DESC "; }
     if($limit) { $sql .= "LIMIT ".(($page-1) * $limit).", ".$limit; }
 
     $q = $this->db->query($sql);
     $results = $q->result();
+    
+    if($terms && $order == "score")
+    {
+      $total = array();
+      $search = array();
+      $sub = array();
+      $cred = array();
+      $decay = array();
+      foreach($results as $key => $r)
+      {
+        $score = 0;
+        foreach($terms_array as $t)
+        {
+          if(preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->headline))
+          {
+            if(preg_match('/(\b'.$t.'\b)/i', $r->headline, $matches)) { $score += 1.00 * sizeof($matches);  }
+            if(preg_match('/(\B'.$t.'\b)/i', $r->headline, $matches)) { $score += 0.85 * sizeof($matches);  }
+            if(preg_match('/(\b'.$t.'\B)/i', $r->headline, $matches)) { $score += 0.85 * sizeof($matches);  }
+            if(preg_match('/(\B'.$t.'\B)/i', $r->headline, $matches)) { $score += 0.70 * sizeof($matches);  }
+          }
+          if(preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->tags))
+          {
+            if(preg_match('/(\b'.$t.'\b)/i', $r->tags, $matches)) { $score += 0.90 * sizeof($matches);  }
+            if(preg_match('/(\B'.$t.'\b)/i', $r->tags, $matches)) { $score += 0.75 * sizeof($matches);  }
+            if(preg_match('/(\b'.$t.'\B)/i', $r->tags, $matches)) { $score += 0.75 * sizeof($matches);  }
+            if(preg_match('/(\B'.$t.'\B)/i', $r->tags, $matches)) { $score += 0.60 * sizeof($matches);  }
+          }
+          if($r->type == "article")
+          {
+            if($r->article && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->article))
+            {
+              if(preg_match('/(\b'.$t.'\b)/i', $r->article, $matches)) { $score += 0.90 * sizeof($matches);  }
+              if(preg_match('/(\B'.$t.'\b)/i', $r->article, $matches)) { $score += 0.75 * sizeof($matches);  }
+              if(preg_match('/(\b'.$t.'\B)/i', $r->article, $matches)) { $score += 0.75 * sizeof($matches);  }
+              if(preg_match('/(\B'.$t.'\B)/i', $r->article, $matches)) { $score += 0.60 * sizeof($matches);  }
+            }
+            if($r->c_headline && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->c_headline))
+            {
+              if(preg_match('/(\b'.$t.'\b)/i', $r->c_headline, $matches)) { $score += 0.80 * sizeof($matches) / $r->c_count;  }
+              if(preg_match('/(\B'.$t.'\b)/i', $r->c_headline, $matches)) { $score += 0.65 * sizeof($matches) / $r->c_count;  }
+              if(preg_match('/(\b'.$t.'\B)/i', $r->c_headline, $matches)) { $score += 0.65 * sizeof($matches) / $r->c_count;  }
+              if(preg_match('/(\B'.$t.'\B)/i', $r->c_headline, $matches)) { $score += 0.50 * sizeof($matches) / $r->c_count;  }
+            }
+            if($r->c_tags && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->c_tags))
+            {
+              if(preg_match('/(\b'.$t.'\b)/i', $r->c_tags, $matches)) { $score += 0.70 * sizeof($matches) / $r->c_count;  }
+              if(preg_match('/(\B'.$t.'\b)/i', $r->c_tags, $matches)) { $score += 0.55 * sizeof($matches) / $r->c_count;  }
+              if(preg_match('/(\b'.$t.'\B)/i', $r->c_tags, $matches)) { $score += 0.55 * sizeof($matches) / $r->c_count;  }
+              if(preg_match('/(\B'.$t.'\B)/i', $r->c_tags, $matches)) { $score += 0.40 * sizeof($matches) / $r->c_count;  }
+            }
+            if($r->h_headline && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->h_headline))
+            {
+              if(preg_match('/(\b'.$t.'\b)/i', $r->h_headline, $matches)) { $score += 0.60 * sizeof($matches) / $r->h_count;  }
+              if(preg_match('/(\B'.$t.'\b)/i', $r->h_headline, $matches)) { $score += 0.45 * sizeof($matches) / $r->h_count;  }
+              if(preg_match('/(\b'.$t.'\B)/i', $r->h_headline, $matches)) { $score += 0.45 * sizeof($matches) / $r->h_count;  }
+              if(preg_match('/(\B'.$t.'\B)/i', $r->h_headline, $matches)) { $score += 0.30 * sizeof($matches) / $r->h_count;  }
+            }
+            if($r->h_tags && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->h_tags))
+            {
+              if(preg_match('/(\b'.$t.'\b)/i', $r->h_tags, $matches)) { $score += 0.50 * sizeof($matches) / $r->h_count;  }
+              if(preg_match('/(\B'.$t.'\b)/i', $r->h_tags, $matches)) { $score += 0.35 * sizeof($matches) / $r->h_count;  }
+              if(preg_match('/(\b'.$t.'\B)/i', $r->h_tags, $matches)) { $score += 0.35 * sizeof($matches) / $r->h_count;  }
+              if(preg_match('/(\B'.$t.'\B)/i', $r->h_tags, $matches)) { $score += 0.20 * sizeof($matches) / $r->h_count;  }
+            }
+          }
+          elseif($r->type == "cluster")
+          {
+            if($r->h_headline && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->h_headline))
+            {
+              if(preg_match('/(\b'.$t.'\b)/i', $r->h_headline, $matches)) { $score += 0.80 * sizeof($matches) / $r->h_count;  }
+              if(preg_match('/(\B'.$t.'\b)/i', $r->h_headline, $matches)) { $score += 0.65 * sizeof($matches) / $r->h_count;  }
+              if(preg_match('/(\b'.$t.'\B)/i', $r->h_headline, $matches)) { $score += 0.65 * sizeof($matches) / $r->h_count;  }
+              if(preg_match('/(\B'.$t.'\B)/i', $r->h_headline, $matches)) { $score += 0.50 * sizeof($matches) / $r->h_count;  }
+            }
+            if($r->h_tags && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->h_tags))
+            {
+              if(preg_match('/(\b'.$t.'\b)/i', $r->h_tags, $matches)) { $score += 0.70 * sizeof($matches) / $r->h_count;  }
+              if(preg_match('/(\B'.$t.'\b)/i', $r->h_tags, $matches)) { $score += 0.55 * sizeof($matches) / $r->h_count;  }
+              if(preg_match('/(\b'.$t.'\B)/i', $r->h_tags, $matches)) { $score += 0.55 * sizeof($matches) / $r->h_count;  }
+              if(preg_match('/(\B'.$t.'\B)/i', $r->h_tags, $matches)) { $score += 0.40 * sizeof($matches) / $r->h_count;  }
+            }
+          }
+          else
+          {  
+            if($r->article && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->article))
+            {
+              if(preg_match('/(\b'.$t.'\b)/i', $r->article, $matches)) { $score += 0.90 * sizeof($matches);  }
+              if(preg_match('/(\B'.$t.'\b)/i', $r->article, $matches)) { $score += 0.75 * sizeof($matches);  }
+              if(preg_match('/(\b'.$t.'\B)/i', $r->article, $matches)) { $score += 0.75 * sizeof($matches);  }
+              if(preg_match('/(\B'.$t.'\B)/i', $r->article, $matches)) { $score += 0.60 * sizeof($matches);  }
+            }
+          }
+        }
+        
+        $search[$key] = $score / sizeof($terms_array);
+        $total[$key]  = ($search[$key] + $r->cred_score + $r->sub_score) / $r->decay_score;
+        $sub[$key] = $r->sub_score;
+        $cred[$key] = $r->cred_score;
+        $decay[$key] = $r->decay_score;
+      }
+      array_multisort($total, SORT_DESC, $search, SORT_DESC, $sub, SORT_DESC, $cred, SORT_DESC, $decay, SORT_DESC, $results);
+    }
     
     return $results;
   }
@@ -1212,58 +1303,42 @@ class Stream_model extends CI_Model
     $this->ci->load->model('database_model', 'database', true);
     $this->ci->load->model('utility_model', 'utility', true);
 
-    $w = 0;
-    $match = "";
-    $article_match = "";
-    $terms = preg_replace('/[^A-Za-z0-9\' ]/', '', $terms);
-    $terms = $this->ci->utility->blwords_strip($terms, 'regEx_spaces', ' ');
     if($terms)
     {
-      $search = explode(' ', $terms);
-      foreach($search as $s)
+      $terms = str_replace(",", " ", $terms);
+      $terms = preg_replace('/[^A-Za-z0-9 ]/', '', $terms);
+      $terms = $this->ci->utility->blwords_strip($terms, 'regEx_spaces', ' ');
+      
+      $w = 0;
+      $h_search = "(";
+      $c_search = "(";
+      $a_search = "(";
+      $t_list = explode(' ', $terms);
+      foreach($t_list as $t)
       {
-        $s = $this->db->escape_str($s, true);
-        if($w < 10)
-        {
-          if($w) { $match .= " + "; }
-          $match .= "IF((headline REGEXP '[[:<:]]".$s."[[:>:]]'), 1, IF((headline REGEXP '".$s."'), .75, 0)) ";
-          $match .= "+ IF((tags REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((tags REGEXP '".$s."'), .25, 0)) ";
-          $article_match .= "+ IF((article REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((article REGEXP '".$s."'), .25, 0)) ";
-        }
+        $t = $this->db->escape_str($t, true);
+        
+        $h_temp = "s.headline LIKE '%".$t."%' ";
+        $h_temp .= "OR s.tags LIKE '%".$t."%' ";
+        $c_temp = "h_headline LIKE '%".$t."%' ";
+        $c_temp .= "OR h_tags LIKE '%".$t."%' ";
+        $a_temp = "s.article LIKE '%".$t."%' ";
+        $a_temp .= "OR c_headline LIKE '%".$t."%' ";
+        $a_temp .= "OR c_tags LIKE '%".$t."%' ";
+        
+        $h_search .= ($w?"OR ":"").$h_temp;
+        $c_search .= ($w?"OR ":"").$h_temp."OR ".$c_temp;
+        $a_search .= ($w?"OR ":"").$h_temp."OR ".$c_temp."OR ".$a_temp;
+      
         $w++;
       }
-
-      $search_pair = array();
-      $search_temp = $search;
-      for($j = 0; $j < sizeof($search); $j++)
-      {
-        $imp = implode(' ', array_splice($search_temp, $j, 2));
-        if(strpos($imp, ' ')) { $search_pair[] = $imp; }
-        $search_temp = $search;
-      }
-
-      foreach($search_pair as $s)
-      {
-        $s = $this->db->escape_str($s, true);
-        if($w < 5)
-        {
-          if($w) { $match .= " + "; }
-          $match .= "IF((headline REGEXP '[[:<:]]".$s."[[:>:]]'), 1, IF((headline REGEXP '".$s."'), .75, 0)) ";
-          $match .= "+ IF((tags REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((tags REGEXP '".$s."'), .25, 0)) ";
-          $article_match .= "+ IF((article REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((article REGEXP '".$s."'), .25, 0)) ";
-        }
-        $w++;
-      }
+      $h_search .= ") ";
+      $c_search .= ") ";
+      $a_search .= ") ";
     }
 
     $article_scores = $scores = "(m.score) AS cred_score, ";
-    $article_scores = $scores .= "s.decay AS decay_score, ";
-    if($terms)
-    {
-      $scores .= "((".$match.") / ".$w.") AS search_score ";
-      $article_scores .= "((".$match.$article_match.") / ".$w.") AS search_score ";
-    }
-    else { $article_scores = $scores .= "0 AS search_score "; }
+    $article_scores = $scores .= "s.decay AS decay_score ";
 
     $view_include = "COUNT(viewId) AS views ";
     $view_include .= "FROM views ";
@@ -1273,14 +1348,13 @@ class Stream_model extends CI_Model
     $viewed_include .= "WHERE userId = ".$this->session->userdata('userId')." ";
 
     $sub_score = "SUM(m.score) AS cred_score, ";
-    $sub_score .= "SUM(s.decay) AS decay_score, ";
-    if($terms) { $sub_score .= "SUM((".$match.") / ".$w.") AS search_score "; }
-    else { $sub_score .= "0 AS search_score "; }
+    $sub_score .= "SUM(s.decay) AS decay_score ";
 
     if($results !== 'headline')
     {
       $headline_include = "LEFT JOIN ( ";
         $headline_include .= "SELECT s.clusterId, COUNT(s.headlineId) AS h_count, ";
+        $headline_include .= "s.headline AS h_headline, s.tags AS h_tags, ";
         $headline_include .= $sub_score;
         $headline_include .= "FROM headlines s ";
         $headline_include .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
@@ -1316,6 +1390,7 @@ class Stream_model extends CI_Model
           $sql .= ") d ON d.headlineId = s.headlineId ";
         }
         $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+          if($terms) { $sql .= "AND ".$h_search; }
           if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
           if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
           if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
@@ -1327,7 +1402,7 @@ class Stream_model extends CI_Model
       {
         $sql .= "SELECT ";
           $sql .= "'cluster' AS type, s.clusterId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, h_count, 0 AS c_count, ";
-          $sql .= "(((h.search_score + (h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+          $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
           if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
           $sql .= $scores;
         $sql .= "FROM clusters s ";
@@ -1347,6 +1422,7 @@ class Stream_model extends CI_Model
           $sql .= ") d ON d.clusterId = s.clusterId ";
         }
         $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+          if($terms) { $sql .= "AND ".$c_search; }
           if(!$subscriptions) { $sql .= "AND s.articleId IS null "; }
           if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
           if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
@@ -1358,7 +1434,7 @@ class Stream_model extends CI_Model
       {
         $sql .= "SELECT ";
           $sql .= "'article' AS type, s.articleId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, h_count, c_count, ";
-          $sql .= "(((c.search_score + (c.cred_score / 2) + c.sub_score) * c.decay_score) / c_count) AS sub_score, ";
+          $sql .= "((((c.cred_score / 2) + c.sub_score) * c.decay_score) / c_count) AS sub_score, ";
           if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
           $sql .= $article_scores;
         $sql .= "FROM articles s ";
@@ -1370,7 +1446,8 @@ class Stream_model extends CI_Model
         $sql .= ") v ON v.articleId = s.articleId ";
         $sql .= "LEFT JOIN ( ";
           $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, SUM(h.h_count) AS h_count, ";
-          $sql .= "(((h.search_score + (h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+          $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+          $sql .= "s.headline AS c_headline, s.tags AS c_tags, h_headline, h_tags, ";
           $sql .= $sub_score;
           $sql .= "FROM clusters s ";
           $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
@@ -1388,12 +1465,12 @@ class Stream_model extends CI_Model
           $sql .= ") d ON d.articleId = s.articleId ";
         }
         $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+          if($terms) { $sql .= "AND ".$a_search; }
           if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
           if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
       }
     $sql .= ") items ";
     $sql .= "WHERE 1 = 1 ";
-    if($terms) { $sql .= "AND (search_score > 0 OR sub_score > 0) "; }
     if($where) { $sql .= "AND ".$where." "; }
     if($results == 'visited') { $sql .= "AND visited = 1 "; }
     if($results == 'unvisited') { $sql .= "AND visited = 0 "; }

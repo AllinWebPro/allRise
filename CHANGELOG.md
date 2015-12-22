@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.9.4.0</h2>
+
+<h4>Updates:</h4>
+* Query Optimization
+** Rework Search Score Calculation
+
 <h2>Version 0.9.3.0</h2>
 
 <h4>Updates:</h4>

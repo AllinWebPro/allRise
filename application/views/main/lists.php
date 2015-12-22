@@ -156,7 +156,6 @@
                     <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('a'))): ?>
                       <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-eye"></i> <?php echo round($i->x_score * 10, 2); ?></span>
                       <span class="horizontal-padding-tiny">
-                        K: <?php echo round($i->search_score * 10, 2); ?>
                         C: <?php echo round($i->cred_score * 10, 2); ?>
                         S: <?php echo round($i->sub_score * 10, 2); ?>
                         D: <?php echo round($i->decay_score * 10, 2); ?>

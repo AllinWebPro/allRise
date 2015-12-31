@@ -950,7 +950,6 @@ class Stream_model extends CI_Model
       'subscriptions' => $subscriptions,
       'exclusive' => $exclusive
     ));
-    print_r($filters); die();
     
     $this->ci =& get_instance();
     $this->ci->load->model('database_model', 'database', true);

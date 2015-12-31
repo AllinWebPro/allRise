@@ -944,12 +944,13 @@ class Stream_model extends CI_Model
       'order' => $order,
       'results' => $results,
       'comments' => $comments,
-      'limit' => ($order=='score')?$limit:0,
-      'page' => ($order=='score')?$page:0,
+      'limit' => ($order !== "score")?$limit:0,
+      'page' => ($order !== "score")?$page:0,
       'userId' => $userId,
       'subscriptions' => $subscriptions,
       'exclusive' => $exclusive
     ));
+    print_r($filters); die();
     
     $this->ci =& get_instance();
     $this->ci->load->model('database_model', 'database', true);

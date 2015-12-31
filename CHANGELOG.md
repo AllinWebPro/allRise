@@ -1,5 +1,13 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.9.5.0</h2>
+
+<h4>Updates:</h4>
+* Query Optimization
+** Extend Search to Phrases
+** Fix Small Effiency Problem
+** Fixed Pagination issue
+
 <h2>Version 0.9.4.0</h2>
 
 <h4>Updates:</h4>

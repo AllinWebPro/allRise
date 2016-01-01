@@ -155,11 +155,11 @@
                     <?php endif; ?>
                     <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('a'))): ?>
                       <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-eye"></i> <?php echo round($i->x_score * 10, 2); ?></span>
-                      <span class="horizontal-padding-tiny">
+                      <!--<span class="horizontal-padding-tiny">
                         C: <?php echo round($i->cred_score * 10, 2); ?>
                         S: <?php echo round($i->sub_score * 10, 2); ?>
                         D: <?php echo round($i->decay_score * 10, 2); ?>
-                      </span>
+                      </span>-->
                       <span class="horizontal-padding-tiny">
                         <input type="checkbox" name="<?php echo $i->type; ?>[]" id="<?php echo $i->type; ?>-<?php echo $i->id; ?>" value="<?php echo $i->id; ?>">
                         <label class="pure-hidden-phone" for="<?php echo $i->type; ?>-<?php echo $i->id; ?>">Group</label>

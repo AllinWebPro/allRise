@@ -961,7 +961,7 @@ class Stream_model extends CI_Model
     {
       $results = json_decode($query->data);
       
-      $results = array_slice($results, ($page-1) * $limit, $limit);
+      if($order == 'score') { $results = array_slice($results, ($page-1) * $limit, $limit); }
     }
     else
     {
@@ -1049,7 +1049,7 @@ class Stream_model extends CI_Model
       if($userId && !$subscriptions) { $global_select .= "s.createdBy, s.editedBy, "; }
   
       $sql = "SELECT ";
-        $sql .= "*, OLD_PASSWORD(id) AS hashId, ((cred_score + sub_score) / decay_score) AS temp_score ";
+        $sql .= "*, OLD_PASSWORD(id) AS hashId, ((cred_score + sub_score) / decay_score) AS x_score ";
         //$sql .= "*, OLD_PASSWORD(id) AS hashId, (((cred_score / 2) + (sub_score / 2)) * decay_score) AS score, ((cred_score / 2) * decay_score) AS x_score ";
       $sql .= "FROM ( ";
         if(!in_array($results, array('clusters', 'articles')))
@@ -1217,7 +1217,7 @@ class Stream_model extends CI_Model
       if($results == 'visited') { $sql .= "AND visited = 1 "; }
       if($results == 'unvisited') { $sql .= "AND visited = 0 "; }
       if($order !== 'score') { $sql .= "ORDER BY ".$order." DESC "; }
-      else { $sql .= "ORDER BY temp_score DESC "; }
+      else { $sql .= "ORDER BY x_score DESC "; }
       if($limit && $order !== 'score') { $sql .= "LIMIT ".(($page-1) * $limit).", ".$limit; }
   
       $q = $this->db->query($sql);
@@ -1324,7 +1324,7 @@ class Stream_model extends CI_Model
         $this->ci->database->add('search', array('filters' => $filters, 'data' => json_encode($results)));
       }
       
-      $results = array_slice($results, ($page-1) * $limit, $limit);
+      if($order == 'score') { $results = array_slice($results, ($page-1) * $limit, $limit); }
     }
     
     return $results;

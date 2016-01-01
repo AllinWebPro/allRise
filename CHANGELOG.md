@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.9.5.2</h2>
+
+<h4>Fixes:</h4>
+* Stream x_score error
+* Slice only on score
+
 <h2>Version 0.9.5.1</h2>
 
 <h4>Fixes:</h4>

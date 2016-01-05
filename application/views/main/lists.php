@@ -205,3 +205,4 @@
     </div>
   </section>-->
 </div>
+<script>if(window.jQuery) { $("#k").val($("#filter-k").val()); }</script>

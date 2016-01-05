@@ -479,5 +479,11 @@ a.pure-button i { color:#fff;text-shadow:1px 1px 1px rgba(0, 0, 0, 1); }
 	width: 100%;
 	height: 100%;
 }
+@media (orientation: landscape) {
+  .tutorialWrapper {
+    padding-bottom: 36%;
+    padding-top: 0;
+  }
+}
 
 #item-notes { height:96px; }

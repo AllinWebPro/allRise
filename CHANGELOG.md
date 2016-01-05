@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.9.6.1</h2>
+
+<h4>Fixes:</h4>
+* Keep both search fields in sync
+* Mobile Landscape Tutorial Pop-Up size
+
 <h2>Version 0.9.6.0</h2>
 
 <h4>Updates:</h4>

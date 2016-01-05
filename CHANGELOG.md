@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.9.6.0</h2>
+
+<h4>Updates:</h4>
+* Search Pagination from Cache
+
 <h2>Version 0.9.5.2</h2>
 
 <h4>Fixes:</h4>

@@ -46,7 +46,7 @@ class Lists extends CI_Controller
     $this->data['sort'] = $sort;
     if($subscription) { $userId = $this->session->userdata('userId'); }
     $this->data['items'] = $this->stream_model->search($search, $where, $sort, $results, $comments, $limit, $current, $userId, $subscription);
-    $count = $this->stream_model->search_count($search, $where, $sort, $results, $userId, $subscription);
+    $count = $this->stream_model->search_count($search, $where, $sort, $results, $comments, $limit, $current, $userId, $subscription);
     $this->data['pages'] = ceil(($count->items) / $limit);
     $this->data['title'] = "Search";
     if($search) { $this->data['title'] .= " [".$search."]"; }

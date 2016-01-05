@@ -1330,188 +1330,219 @@ class Stream_model extends CI_Model
     return $results;
   }
 
-  function search_count($terms = "", $where = "", $order = "score", $results = "all", $userId = null, $subscriptions = false, $exclusive = true)
+  function search_count($terms = "", $where = "", $order = "score", $results = "all", $comments = false, $limit = 0, $page = 1, $userId = null, $subscriptions = false, $exclusive = true)
   {
+    
     $this->ci =& get_instance();
     $this->ci->load->model('database_model', 'database', true);
     $this->ci->load->model('utility_model', 'utility', true);
-
-    if($terms)
+    
+    if($order == "score")
     {
-      $terms = str_replace(",", " ", $terms);
-      $terms = preg_replace('/[^A-Za-z0-9 ]/', '', $terms);
-      $terms = $this->ci->utility->blwords_strip($terms, 'regEx_spaces', ' ');
-      
-      $w = 0;
-      $h_search = "(";
-      $c_search = "(";
-      $a_search = "(";
-      $t_list = explode(' ', $terms);
-      foreach($t_list as $t)
+      $filters = json_encode(array(
+        'terms' => $terms,
+        'where' => $where,
+        'order' => $order,
+        'results' => $results,
+        'comments' => $comments,
+        'limit' => ($order !== "score")?$limit:0,
+        'page' => ($order !== "score")?$page:0,
+        'userId' => $userId,
+        'subscriptions' => $subscriptions,
+        'exclusive' => $exclusive
+      ));
+    
+      $query = $this->ci->database->get_single('search', array('filters' => $filters));
+    
+      if($query && $query->editedOn > time()-(60*60))
       {
-        $t = $this->db->escape_str($t, true);
+        $results = json_decode($query->data);
         
-        $h_temp = "s.headline LIKE '%".$t."%' ";
-        $h_temp .= "OR s.tags LIKE '%".$t."%' ";
-        $c_temp = "h_headline LIKE '%".$t."%' ";
-        $c_temp .= "OR h_tags LIKE '%".$t."%' ";
-        $a_temp = "s.article LIKE '%".$t."%' ";
-        $a_temp .= "OR c_headline LIKE '%".$t."%' ";
-        $a_temp .= "OR c_tags LIKE '%".$t."%' ";
-        
-        $h_search .= ($w?"OR ":"").$h_temp;
-        $c_search .= ($w?"OR ":"").$h_temp."OR ".$c_temp;
-        $a_search .= ($w?"OR ":"").$h_temp."OR ".$c_temp."OR ".$a_temp;
-      
-        $w++;
+        $count = sizeof($results);
       }
-      $h_search .= ") ";
-      $c_search .= ") ";
-      $a_search .= ") ";
     }
-
-    $article_scores = $scores = "(m.score) AS cred_score, ";
-    $article_scores = $scores .= "s.decay AS decay_score ";
-
-    $view_include = "COUNT(viewId) AS views ";
-    $view_include .= "FROM views ";
-
-    $viewed_include = "IF(viewId IS NULL, 0, 1) AS viewed ";
-    $viewed_include .= "FROM views ";
-    $viewed_include .= "WHERE userId = ".$this->session->userdata('userId')." ";
-
-    $sub_score = "SUM(m.score) AS cred_score, ";
-    $sub_score .= "SUM(s.decay) AS decay_score ";
-
-    if($results !== 'headline')
+    
+    if(isset($count))
     {
-      $headline_include = "LEFT JOIN ( ";
-        $headline_include .= "SELECT s.clusterId, COUNT(s.headlineId) AS h_count, ";
-        $headline_include .= "s.headline AS h_headline, s.tags AS h_tags, ";
-        $headline_include .= $sub_score;
-        $headline_include .= "FROM headlines s ";
-        $headline_include .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
-        $headline_include .= "WHERE s.clusterId IS NOT NULL ";
-        $headline_include .= "AND s.deleted = 0 ";
-        $headline_include .= "GROUP BY clusterId ";
-      $headline_include .= ") h ON h.clusterId = s.clusterId ";
-    }
 
-    $sql = "SELECT ";
-      $sql .= "COUNT(id) AS items ";
-    $sql .= "FROM ( ";
-      if(!in_array($results, array('clusters', 'articles')))
+      if($terms)
       {
-        $sql .= "SELECT ";
-          $sql .= "'headline' AS type, s.headlineId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, 0 AS h_count, 0 AS c_count, 0 AS sub_score, ";
-          if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-          $sql .= $scores;
-        $sql .= "FROM headlines s ";
-        $sql .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT headlineId, ";
-          $sql .= $view_include;
-          $sql .= "GROUP BY headlineId ";
-        $sql .= ") v ON v.headlineId = s.headlineId ";
-        if($subscriptions) { $sql .= "JOIN subscriptions b ON b.headlineId = s.headlineId "; }
-        if(in_array($results, array('visited', 'unvisited')))
+        $terms = str_replace(",", " ", $terms);
+        $terms = preg_replace('/[^A-Za-z0-9 ]/', '', $terms);
+        $terms = $this->ci->utility->blwords_strip($terms, 'regEx_spaces', ' ');
+        
+        $w = 0;
+        $h_search = "(";
+        $c_search = "(";
+        $a_search = "(";
+        $t_list = explode(' ', $terms);
+        foreach($t_list as $t)
         {
-          $sql .= "LEFT JOIN (";
+          $t = $this->db->escape_str($t, true);
+          
+          $h_temp = "s.headline LIKE '%".$t."%' ";
+          $h_temp .= "OR s.tags LIKE '%".$t."%' ";
+          $c_temp = "h_headline LIKE '%".$t."%' ";
+          $c_temp .= "OR h_tags LIKE '%".$t."%' ";
+          $a_temp = "s.article LIKE '%".$t."%' ";
+          $a_temp .= "OR c_headline LIKE '%".$t."%' ";
+          $a_temp .= "OR c_tags LIKE '%".$t."%' ";
+          
+          $h_search .= ($w?"OR ":"").$h_temp;
+          $c_search .= ($w?"OR ":"").$h_temp."OR ".$c_temp;
+          $a_search .= ($w?"OR ":"").$h_temp."OR ".$c_temp."OR ".$a_temp;
+        
+          $w++;
+        }
+        $h_search .= ") ";
+        $c_search .= ") ";
+        $a_search .= ") ";
+      }
+  
+      $article_scores = $scores = "(m.score) AS cred_score, ";
+      $article_scores = $scores .= "s.decay AS decay_score ";
+  
+      $view_include = "COUNT(viewId) AS views ";
+      $view_include .= "FROM views ";
+  
+      $viewed_include = "IF(viewId IS NULL, 0, 1) AS viewed ";
+      $viewed_include .= "FROM views ";
+      $viewed_include .= "WHERE userId = ".$this->session->userdata('userId')." ";
+  
+      $sub_score = "SUM(m.score) AS cred_score, ";
+      $sub_score .= "SUM(s.decay) AS decay_score ";
+  
+      if($results !== 'headline')
+      {
+        $headline_include = "LEFT JOIN ( ";
+          $headline_include .= "SELECT s.clusterId, COUNT(s.headlineId) AS h_count, ";
+          $headline_include .= "s.headline AS h_headline, s.tags AS h_tags, ";
+          $headline_include .= $sub_score;
+          $headline_include .= "FROM headlines s ";
+          $headline_include .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
+          $headline_include .= "WHERE s.clusterId IS NOT NULL ";
+          $headline_include .= "AND s.deleted = 0 ";
+          $headline_include .= "GROUP BY clusterId ";
+        $headline_include .= ") h ON h.clusterId = s.clusterId ";
+      }
+  
+      $sql = "SELECT ";
+        $sql .= "COUNT(id) AS items ";
+      $sql .= "FROM ( ";
+        if(!in_array($results, array('clusters', 'articles')))
+        {
+          $sql .= "SELECT ";
+            $sql .= "'headline' AS type, s.headlineId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, 0 AS h_count, 0 AS c_count, 0 AS sub_score, ";
+            if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
+            $sql .= $scores;
+          $sql .= "FROM headlines s ";
+          $sql .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
+          $sql .= "LEFT JOIN ( ";
             $sql .= "SELECT headlineId, ";
-            $sql .= $viewed_include;
+            $sql .= $view_include;
             $sql .= "GROUP BY headlineId ";
-          $sql .= ") d ON d.headlineId = s.headlineId ";
+          $sql .= ") v ON v.headlineId = s.headlineId ";
+          if($subscriptions) { $sql .= "JOIN subscriptions b ON b.headlineId = s.headlineId "; }
+          if(in_array($results, array('visited', 'unvisited')))
+          {
+            $sql .= "LEFT JOIN (";
+              $sql .= "SELECT headlineId, ";
+              $sql .= $viewed_include;
+              $sql .= "GROUP BY headlineId ";
+            $sql .= ") d ON d.headlineId = s.headlineId ";
+          }
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+            if($terms) { $sql .= "AND ".$h_search; }
+            if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
+            if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
+            if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
         }
-        $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
-          if($terms) { $sql .= "AND ".$h_search; }
-          if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
-          if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
-          if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
-      }
-
-      if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
-
-      if(!in_array($results, array('headlines', 'articles')))
-      {
-        $sql .= "SELECT ";
-          $sql .= "'cluster' AS type, s.clusterId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, h_count, 0 AS c_count, ";
-          $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
-          if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-          $sql .= $scores;
-        $sql .= "FROM clusters s ";
-        $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT clusterId, ";
-          $sql .= $view_include;
-          $sql .= "GROUP BY clusterId ";
-        $sql .= ") v ON v.clusterId = s.clusterId ";
-        $sql .= $headline_include;
-        if($exclusive && $subscriptions) { $sql .= "JOIN subscriptions b ON b.clusterId = s.clusterId "; }
-        if(in_array($results, array('visited', 'unvisited')))
+  
+        if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
+  
+        if(!in_array($results, array('headlines', 'articles')))
         {
-          $sql .= "LEFT JOIN (";
-            $sql .= "SELECT clusterId, ";
-            $sql .= $viewed_include;
-          $sql .= ") d ON d.clusterId = s.clusterId ";
-        }
-        $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
-          if($terms) { $sql .= "AND ".$c_search; }
-          if(!$subscriptions) { $sql .= "AND s.articleId IS null "; }
-          if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
-          if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
-      }
-
-      if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
-
-      if(!in_array($results, array('headlines', 'clusters')))
-      {
-        $sql .= "SELECT ";
-          $sql .= "'article' AS type, s.articleId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, h_count, c_count, ";
-          $sql .= "((((c.cred_score / 2) + c.sub_score) * c.decay_score) / c_count) AS sub_score, ";
-          if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-          $sql .= $article_scores;
-        $sql .= "FROM articles s ";
-        $sql .= "LEFT JOIN metadata m ON m.articleId = s.articleId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT articleId, ";
-          $sql .= $view_include;
-          $sql .= "GROUP BY articleId ";
-        $sql .= ") v ON v.articleId = s.articleId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, SUM(h.h_count) AS h_count, ";
-          $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
-          $sql .= "s.headline AS c_headline, s.tags AS c_tags, h_headline, h_tags, ";
-          $sql .= $sub_score;
+          $sql .= "SELECT ";
+            $sql .= "'cluster' AS type, s.clusterId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, h_count, 0 AS c_count, ";
+            $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+            if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
+            $sql .= $scores;
           $sql .= "FROM clusters s ";
           $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
+          $sql .= "LEFT JOIN ( ";
+            $sql .= "SELECT clusterId, ";
+            $sql .= $view_include;
+            $sql .= "GROUP BY clusterId ";
+          $sql .= ") v ON v.clusterId = s.clusterId ";
           $sql .= $headline_include;
-          $sql .= "WHERE s.articleId IS NOT NULL ";
-          $sql .= "AND s.deleted = 0 ";
-          $sql .= "GROUP BY articleId ";
-        $sql .= ") c ON c.articleId = s.articleId ";
-        if($subscriptions) { $sql .= "JOIN subscriptions b ON b.articleId = s.articleId "; }
-        if(in_array($results, array('visited', 'unvisited')))
-        {
-          $sql .= "LEFT JOIN (";
-            $sql .= "SELECT articleId, ";
-            $sql .= $viewed_include;
-          $sql .= ") d ON d.articleId = s.articleId ";
+          if($exclusive && $subscriptions) { $sql .= "JOIN subscriptions b ON b.clusterId = s.clusterId "; }
+          if(in_array($results, array('visited', 'unvisited')))
+          {
+            $sql .= "LEFT JOIN (";
+              $sql .= "SELECT clusterId, ";
+              $sql .= $viewed_include;
+            $sql .= ") d ON d.clusterId = s.clusterId ";
+          }
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+            if($terms) { $sql .= "AND ".$c_search; }
+            if(!$subscriptions) { $sql .= "AND s.articleId IS null "; }
+            if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
+            if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
         }
-        $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
-          if($terms) { $sql .= "AND ".$a_search; }
-          if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
-          if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
-      }
-    $sql .= ") items ";
-    $sql .= "WHERE 1 = 1 ";
-    if($where) { $sql .= "AND ".$where." "; }
-    if($results == 'visited') { $sql .= "AND visited = 1 "; }
-    if($results == 'unvisited') { $sql .= "AND visited = 0 "; }
-
-    $q = $this->db->query($sql);
-    $results = $q->row();
+  
+        if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
+  
+        if(!in_array($results, array('headlines', 'clusters')))
+        {
+          $sql .= "SELECT ";
+            $sql .= "'article' AS type, s.articleId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, h_count, c_count, ";
+            $sql .= "((((c.cred_score / 2) + c.sub_score) * c.decay_score) / c_count) AS sub_score, ";
+            if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
+            $sql .= $article_scores;
+          $sql .= "FROM articles s ";
+          $sql .= "LEFT JOIN metadata m ON m.articleId = s.articleId ";
+          $sql .= "LEFT JOIN ( ";
+            $sql .= "SELECT articleId, ";
+            $sql .= $view_include;
+            $sql .= "GROUP BY articleId ";
+          $sql .= ") v ON v.articleId = s.articleId ";
+          $sql .= "LEFT JOIN ( ";
+            $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, SUM(h.h_count) AS h_count, ";
+            $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+            $sql .= "s.headline AS c_headline, s.tags AS c_tags, h_headline, h_tags, ";
+            $sql .= $sub_score;
+            $sql .= "FROM clusters s ";
+            $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
+            $sql .= $headline_include;
+            $sql .= "WHERE s.articleId IS NOT NULL ";
+            $sql .= "AND s.deleted = 0 ";
+            $sql .= "GROUP BY articleId ";
+          $sql .= ") c ON c.articleId = s.articleId ";
+          if($subscriptions) { $sql .= "JOIN subscriptions b ON b.articleId = s.articleId "; }
+          if(in_array($results, array('visited', 'unvisited')))
+          {
+            $sql .= "LEFT JOIN (";
+              $sql .= "SELECT articleId, ";
+              $sql .= $viewed_include;
+            $sql .= ") d ON d.articleId = s.articleId ";
+          }
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+            if($terms) { $sql .= "AND ".$a_search; }
+            if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
+            if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
+        }
+      $sql .= ") items ";
+      $sql .= "WHERE 1 = 1 ";
+      if($where) { $sql .= "AND ".$where." "; }
+      if($results == 'visited') { $sql .= "AND visited = 1 "; }
+      if($results == 'unvisited') { $sql .= "AND visited = 0 "; }
+  
+      $q = $this->db->query($sql);
+      $count = $q->row();
     
-    return $results;
+    }
+    
+    return $count;
   }
 
   function autocompare($type, $id)

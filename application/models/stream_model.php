@@ -1362,7 +1362,7 @@ class Stream_model extends CI_Model
       }
     }
     
-    if(isset($count))
+    if(!isset($count))
     {
 
       if($terms)
@@ -1538,7 +1538,9 @@ class Stream_model extends CI_Model
       if($results == 'unvisited') { $sql .= "AND visited = 0 "; }
   
       $q = $this->db->query($sql);
-      $count = $q->row();
+      $results = $q->row();
+      
+      $count = $results->items;
     
     }
     

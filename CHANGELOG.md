@@ -6,6 +6,9 @@
 * Keep both search fields in sync
 * Mobile Landscape Tutorial Pop-Up size
 
+<h4>Notes:</h4>
+* "Modify Comment on Mobile" bug not found
+
 <h2>Version 0.9.6.0</h2>
 
 <h4>Updates:</h4>

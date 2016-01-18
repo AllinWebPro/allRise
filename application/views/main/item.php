@@ -103,9 +103,9 @@
         </div>
       <?php endif; ?>
       <hr>
-      <div class="horizontal-padding-small vertical-padding-xsmall pure-g-r">
+      <div class="horizontal-padding-small vertical-padding-xsmall pure-g-r" id="item-images">
         <div class="pure-u-1 bottom-padding-small">
-          <strong><a name="resources"><i class="fa fa-camera"></i></a> Images</strong>
+          <strong><a name="images"><i class="fa fa-camera"></i></a> Images</strong>
         </div>
         <?php if($images): ?>
           <div class="clear"></div>

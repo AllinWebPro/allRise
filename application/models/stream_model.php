@@ -754,7 +754,6 @@ class Stream_model extends CI_Model
         }
         // Update Headline Matches
         $newCluster = array();
-        $i = 0;
         foreach($selected['headline'] as $h)
         {
           $headline = $this->database_model->get_single('headlines', array('headlineId' => $h), 'adminOnly');
@@ -783,21 +782,11 @@ class Stream_model extends CI_Model
             }
             else
             {
-              $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => 0, 'nvo' => 0);
+              $newCluster[] = array('id' => $h);
             }
           }
         }
-        if($newCluster)
-        {
-          $clusterId = $this->new_cluster($newCluster, $selected['article'][0], $userId);
-          foreach($newCluster as $o)
-          {
-            $nInsert = array('headlineId' => $o['id'], 'parentId' => $clusterId, 'createdOn' => time());
-            $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o['id'], 'deleted' => 0));
-            foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-            $this->ci->database->edit('headlines', array('headlineId' => $o['id']), array('clusterId' => $clusterId));
-          }
-        }
+        if($newCluster) { $this->new_cluster($newCluster, $userId, $selected['article'][0]); }
       }
     }
     elseif(sizeof($selected['cluster']) == 1)
@@ -824,31 +813,17 @@ class Stream_model extends CI_Model
       // Update Cluster Matches
       $articleId = 0;
       $newArticle = array();
-      $i = 0;
       foreach($selected['cluster'] as $c)
       {
-        $cluster = $this->database_model->get_single('clusters', array('clusterId' => $c), 'adminOnly');
+        $cluster = $this->database_model->get_single('clusters', array('clusterId' => $c));
         if(!$cluster->adminOnly || $this->session->userdata('level') == 'a')
         {
-          $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
-          $newArticle[] = array('id' => $c, 'item' => $cl, 'ovn' => $i, 'nvo' => $i);
-          $i++;
+          $newArticle[] = array('id' => $c);
         }
       }
-      if($newArticle)
-      {
-        $articleId = $this->new_article($newArticle, $userId);
-        foreach($newArticle as $o)
-        {
-          $nInsert = array('clusterId' => $o['id'], 'parentId' => $articleId, 'createdOn' => time());
-          $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $o['id'], 'deleted' => 0));
-          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-          $this->ci->database->edit('clusters', array('clusterId' => $o['id']), array('articleId' => $articleId));
-        }
-      }
+      if($newArticle) { $this->new_article($newArticle, $userId); }
       // Update Headline Matches
       $newCluster = array();
-      $i = 0;
       foreach($selected['headline'] as $h)
       {
         $headline = $this->database_model->get_single('headlines', array('headlineId' => $h), 'adminOnly');
@@ -873,21 +848,11 @@ class Stream_model extends CI_Model
           }
           else
           {
-            $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => 0, 'nvo' => 0);
+            $newCluster[] = array('id' => $h);
           }
         }
       }
-      if($newCluster)
-      {
-        $clusterId = $this->new_cluster($newCluster, $articleId, $userId);
-        foreach($newCluster as $o)
-        {
-          $nInsert = array('headlineId' => $o['id'], 'parentId' => $clusterId, 'createdOn' => time());
-          $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o['id'], 'deleted' => 0));
-          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-          $this->ci->database->edit('headlines', array('headlineId' => $o['id']), array('clusterId' => $clusterId));
-        }
-      }
+      if($newCluster) { $this->new_cluster($newCluster, $userId, $articleId); }
     }
     elseif(sizeof($selected['headline']) > 1)
     {
@@ -918,21 +883,11 @@ class Stream_model extends CI_Model
           }
           else
           {
-            $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => 0, 'nvo' => 0);
+            $newCluster[] = array('id' => $h);
           }
         }
       }
-      if($newCluster)
-      {
-        $clusterId = $this->new_cluster($newCluster, 0, $userId);
-        foreach($newCluster as $o)
-        {
-          $nInsert = array('headlineId' => $o['id'], 'parentId' => $clusterId, 'createdOn' => time());
-          $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o['id'], 'deleted' => 0));
-          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-          $this->ci->database->edit('headlines', array('headlineId' => $o['id']), array('clusterId' => $clusterId));
-        }
-      }
+      if($newCluster) { $this->new_cluster($newCluster, $userId); }
     }
   }
 
@@ -1564,473 +1519,344 @@ class Stream_model extends CI_Model
       'cluster' => array(),
       'article' => array()
     );
-
-    $a_where = $where;
-    if($type = 'article') { $a_where['articleId !='] = $id; }
-    $a_list = $this->ci->database->get('articles', $a_where);
-    foreach($a_list as $i)
+    
+    if($type == 'cluster')
     {
-      if($score = $this->item_compare($i, $o_headline, $o_tags))
+      // Get Matching Articles
+      $a_where = $where;
+      if($type = 'article') { $a_where['articleId !='] = $id; }
+      $a_list = $this->ci->database->get('articles', $a_where);
+      foreach($a_list as $i)
       {
-        $o_success['article'][] = array('id' => $i->articleId, 'ovn' => $score);
-      }
-    }
-
-    $c_where = $where;
-    if($type = 'cluster') { $c_where['clusterId !='] = $id; }
-    $c_list = $this->ci->database->get('clusters', $c_where+array('articleId' => null));
-    foreach($c_list as $i)
-    {
-      if($score = $this->item_compare($i, $o_headline, $o_tags))
-      {
-        $o_success['cluster'][] = array('id' => $i->clusterId, 'ovn' => $score);
-      }
-    }
-
-    $h_where = $where;
-    if($type = 'headline') { $h_where['headlineId !='] = $id; }
-    $h_list = $this->ci->database->get('headlines', $h_where+array('clusterId' => null));
-    foreach($h_list as $i)
-    {
-      if($score = $this->item_compare($i, $o_headline, $o_tags))
-      {
-        $o_success['headline'][] = array('id' => $i->headlineId, 'ovn' => $score);
-      }
-    }
-
-    foreach($o_success['article'] as $key => $o)
-    {
-      $n_item = $this->ci->database->get_single("articles", array("articleId" => $o['id']));
-      $n_headline = $this->ci->utility->blwords_strip($n_item->headline, 'regEx_spaces', ' ');
-      $n_tags = $this->ci->utility->blwords_strip($n_item->tags, 'regEx_commas', ' ');
-
-      if($score = $this->item_compare($original, $n_headline, $n_tags))
-      {
-        $o_success['article'][$key]['item'] = $n_item;
-        $o_success['article'][$key]['nvo'] = $score;
-      }
-      else { unset($o_success['article'][$key]); }
-    }
-    $o_success['article'] = array_values($o_success['article']);
-
-    foreach($o_success['cluster'] as $key => $o)
-    {
-      $n_item = $this->ci->database->get_single("clusters", array("clusterId" => $o['id']));
-      $n_headline = $this->ci->utility->blwords_strip($n_item->headline, 'regEx_spaces', ' ');
-      $n_tags = $this->ci->utility->blwords_strip($n_item->tags, 'regEx_commas', ' ');
-
-      if($score = $this->item_compare($original, $n_headline, $n_tags))
-      {
-        $o_success['cluster'][$key]['item'] = $n_item;
-        $o_success['cluster'][$key]['nvo'] = $score;
-      }
-      else { unset($o_success['cluster'][$key]); }
-    }
-    $o_success['cluster'] = array_values($o_success['cluster']);
-
-    foreach($o_success['headline'] as $key => $o)
-    {
-      $n_item = $this->ci->database->get_single("headlines", array("headlineId" => $o['id']));
-      $n_headline = $this->ci->utility->blwords_strip($n_item->headline, 'regEx_spaces', ' ');
-      $n_tags = $this->ci->utility->blwords_strip($n_item->tags, 'regEx_commas', ' ');
-
-      if($score = $this->item_compare($original, $n_headline, $n_tags))
-      {
-        $o_success['headline'][$key]['item'] = $n_item;
-        $o_success['headline'][$key]['nvo'] = $score;
-      }
-      else { unset($o_success['headline'][$key]); }
-    }
-    $o_success['headline'] = array_values($o_success['headline']);
-
-    if(sizeof($o_success['article']) == 1)
-    {
-      $article_where = array('articleId' => $o_success['article'][0]['id']);
-      $resources = array();
-      $images = array();
-      // get
-      $articleResources = $this->ci->database->get_array('resources', $article_where+array('deleted' => 0), 'resource');
-      foreach($articleResources as $ar)
-      {
-        if(!in_array($ar, $resources)) { $resources[] = $ar; }
-      }
-      $articleImages = $this->ci->database->get_array('images', $article_where+array('deleted' => 0), 'image');
-      foreach($articleImages as $ai)
-      {
-        if(!in_array($ai, $images)) { $images[] = $ai; }
-      }
-      if($type == 'cluster')
-      {
-        $nInsert = array('clusterId' => $id, 'parentId' => $o_success['article'][0]['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $id), $article_where);
-        // transfer
-        $cluster_where = array('clusterId' => $id, 'deleted' => 0);
-        $thisResources = $this->ci->database->get_array('resources', $cluster_where, 'resource');
-        foreach($thisResources as $tr)
+        if($score = $this->item_compare($i, $o_headline, $o_tags))
         {
-          if(!in_array($tr, $resources))
-          {
-            $resources[] = $tr;
-            $this->ci->database->add('resources', $article_where+array('resource' => $tr, 'deleted' => 0), 'resourceId');
-          }
-        }
-        $thisImages = $this->ci->database->get_array('images', $cluster_where, 'image');
-        foreach($thisImages as $ti)
-        {
-          if(!in_array($ti, $images))
-          {
-            $images[] = $ti;
-            $this->ci->database->add('images', $article_where+array('image' => $ti, 'deleted' => 0), 'imageId');
-          }
+          $o_success['article'][] = array('id' => $i->articleId, 'ovn' => $score, 'item' => $i);
         }
       }
+
+      foreach($o_success['article'] as $key => $o)
+      {
+        $n_headline = $this->ci->utility->blwords_strip($o['item']->headline, 'regEx_spaces', ' ');
+        $n_tags = $this->ci->utility->blwords_strip($o['item']->tags, 'regEx_commas', ' ');
+  
+        if($score = $this->item_compare($original, $n_headline, $n_tags))
+        {
+          $o_success['article'][$key]['nvo'] = $score;
+        }
+        else { unset($o_success['article'][$key]); }
+      }
+      $o_success['article'] = array_values($o_success['article']);
+    }
+    
+    if(($type == 'cluster' && !sizeof($o_success['article'])) || $type !== 'cluster')
+    {
+      // Get Matching Clusters
+      $c_where = $where;
+      if($type = 'cluster') { $c_where['clusterId !='] = $id; }
+      $c_list = $this->ci->database->get('clusters', $c_where+array('articleId' => null));
+      foreach($c_list as $i)
+      {
+        if($score = $this->item_compare($i, $o_headline, $o_tags))
+        {
+          $o_success['cluster'][] = array('id' => $i->clusterId, 'ovn' => $score, 'item' => $i);
+        }
+      }
+  
       foreach($o_success['cluster'] as $key => $o)
       {
-        $nInsert = array('clusterId' => $o['id'], 'parentId' => $o_success['article'][0]['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $o['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $o['id']), $article_where);
-        // transfer
-        $cluster_where = array('clusterId' => $o['id'], 'deleted' => 0);
-        $thisResources = $this->ci->database->get_array('resources', $cluster_where, 'resource');
-        foreach($thisResources as $tr)
+        $n_headline = $this->ci->utility->blwords_strip($o['item']->headline, 'regEx_spaces', ' ');
+        $n_tags = $this->ci->utility->blwords_strip($o['item']->tags, 'regEx_commas', ' ');
+  
+        if($score = $this->item_compare($original, $n_headline, $n_tags))
         {
-          if(!in_array($tr, $resources))
-          {
-            $resources[] = $tr;
-            $this->ci->database->add('resources', $article_where+array('resource' => $tr, 'deleted' => 0), 'resourceId');
-          }
+          $o_success['cluster'][$key]['nvo'] = $score;
         }
-        $thisImages = $this->ci->database->get_array('images', $cluster_where, 'image');
-        foreach($thisImages as $ti)
+        else { unset($o_success['cluster'][$key]); }
+      }
+      $o_success['cluster'] = array_values($o_success['cluster']);
+    }
+
+    if($type !== 'article')
+    {
+      // Get Matching Headlines
+      $h_where = $where;
+      if($type = 'headline') { $h_where['headlineId !='] = $id; }
+      $h_list = $this->ci->database->get('headlines', $h_where+array('clusterId' => null));
+      foreach($h_list as $i)
+      {
+        if($score = $this->item_compare($i, $o_headline, $o_tags))
         {
-          if(!in_array($ti, $images))
-          {
-            $images[] = $ti;
-            $this->ci->database->add('images', $article_where+array('image' => $ti, 'deleted' => 0), 'imageId');
-          }
+          $o_success['headline'][] = array('id' => $i->headlineId, 'ovn' => $score, 'item' => $i);
         }
       }
-      $o_success['cluster'] = array();
-    }
-    elseif($o_success['article'])
-    {
-      foreach($o_success['cluster'] as $o)
+  
+      foreach($o_success['headline'] as $key => $o)
       {
-        $t_score = 0;
-        $t_item = null;
+        $n_headline = $this->ci->utility->blwords_strip($o['item']->headline, 'regEx_spaces', ' ');
+        $n_tags = $this->ci->utility->blwords_strip($o['item']->tags, 'regEx_commas', ' ');
+  
+        if($score = $this->item_compare($original, $n_headline, $n_tags))
+        {
+          $o_success['headline'][$key]['nvo'] = $score;
+        }
+        else { unset($o_success['headline'][$key]); }
+      }
+      $o_success['headline'] = array_values($o_success['headline']);
+    }
+    
+    // Add Items to Items
+    if($type == 'article')
+    {
+      if(sizeof($o_success['cluster']))
+      {
+        foreach($o_success['cluster'] as $i)
+        {
+          if(!$i['item']->parentId)
+          {
+            // Add Clusters to Article
+            $nInsert = array('clusterId' => $i['id'], 'parentId' => $id, 'createdOn' => time());
+            $subscribers = $this->ci->database->get('subscriptions', array('clusterId' => $i['id'], 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('clusters', array('clusterId' => $i['id']), array('articleId' => $id));
+          } 
+        }
+      }
+    }
+    elseif($type == 'cluster')
+    {
+      if(sizeof($o_success['article']) > 1)
+      {
+        // Find Best Matching Article for Cluster
+        $temp_score = 0;
+        $temp_item = null;
         foreach($o_success['article'] as $key => $n)
         {
           $n_headline = $this->ci->utility->blwords_strip($n['item']->headline, 'regEx_spaces', ' ');
           $n_tags = $this->ci->utility->blwords_strip($n['item']->tags, 'regEx_commas', ' ');
-
-          if($score = $this->item_compare($o['item'], $n_headline, $n_tags))
+          
+          $score = $n['ovn'] + $n['nvo'];
+          if($score > $temp_score)
           {
-            if($score > $t_score)
-            {
-              $t_score = $score;
-              $t_item = $n;
-            }
+            $temp_score = $score;
+            $temp_item = $n;
           }
         }
-        $article_where = array('articleId' => $t_item['id']);
+        
+        // Add Cluster to Best Matching Article
+        $nInsert = array('clusterId' => $id, 'parentId' => $temp_item['id'], 'createdOn' => time());
+        $subscribers = $this->ci->database->get('subscriptions', array('clusterId' => $id, 'deleted' => 0));
+        foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+        $this->ci->database->edit('clusters', array('clusterId' => $id), array('articleId' => $temp_item['id']));
+      }
+      elseif(sizeof($o_success['article']) == 1)
+      {
+        // Add Cluster to Article
+        $articleId = $o_success['article'][key($o_success['article'])]['id'];
+        $nInsert = array('clusterId' => $id, 'parentId' => $articleId, 'createdOn' => time());
+        $subscribers = $this->ci->database->get('subscriptions', array('clusterId' => $id, 'deleted' => 0));
+        foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+        $this->ci->database->edit('clusters', array('clusterId' => $id), array('articleId' => $articleId));
+      }
+      elseif(sizeof($o_success['cluster']))
+      {
+        // Find Available Clusters and Sort by Highest Rated Cluster
+        $clusters = array($id);
+        $meta_scores = array(0);
+        foreach($o_success['cluster'] as $i)
+        {
+          if(!$i['item']->parentId && !$i['item']->adminOnly)
+          {
+            $clusters[] = $i['id'];
+            $meta = $this->ci->database->get_single('metadata', array('clusterId' => $i['id']), $select = 'score');
+            $meta_scores[] = $meta->score;
+          }
+        }
+        array_multisort($meta_scores, SORT_DESC, $clusters);
+        
+        // Get Data from Clusters
+        $top_item = null;
+        $tags = array();
         $resources = array();
         $images = array();
-        // get
-        $articleResources = $this->ci->database->get_array('resources', $article_where+array('deleted' => 0), 'resource');
-        foreach($articleResources as $ar)
+        foreach($clusters as $c)
         {
-          if(!in_array($ar, $resources)) { $resources[] = $ar; }
-        }
-        $articleImages = $this->ci->database->get_array('images', $article_where+array('deleted' => 0), 'image');
-        foreach($articleImages as $ai)
-        {
-          if(!in_array($ai, $images)) { $images[] = $ai; }
-        }
-        //
-        $nInsert = array('clusterId' => $o['id'], 'parentId' => $t_item['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $o['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $o['id']), $article_where);
-        // transfer
-        $cluster_where = array('clusterId' => $o['id'], 'deleted' => 0);
-        $thisResources = $this->ci->database->get_array('resources', $cluster_where, 'resource');
-        foreach($thisResources as $tr)
-        {
-          if(!in_array($tr, $resources))
+          $temp_item = $this->ci->database->get_single('clusters', array('clusterId' => $c), 'headline, tags');
+          if(!$top_item) { $top_item = $temp_item; }
+          
+          foreach(explode(',', $temp_item->tags) as $t)
           {
-            $resources[] = $tr;
-            $this->ci->database->add('resources', $article_where+array('resource' => $tr, 'deleted' => 0), 'resourceId');
+            if(!preg_grep("/\b".$t."\b/i", $tags)) { $tags[] = $t; }
+          }
+          
+          $temp_resources = $this->ci->database->get_array('resources', array('clusterId' => $c, 'deleted' => 0), 'resource');
+          foreach($temp_resources as $r)
+          {
+            if(!preg_grep("/\b".$r."/\bi", $resources)) { $resources[] = $r; }
+          }
+          
+          $temp_images = $this->ci->database->get_array('images', array('clusterId' => $c, 'deleted' => 0), 'image');
+          foreach($temp_images as $i)
+          {
+            if(!preg_grep("/\b".$i."\b/i", $images)) { $images[] = $i; }
           }
         }
-        $thisImages = $this->ci->database->get_array('images', $cluster_where, 'image');
-        foreach($thisImages as $ti)
+        
+        // Create Article
+        $insert = array('headline' => $top_item->headline, 'tags' => implode(',', $tags), 'createdOn' => time());
+        $articleId = $this->ci->database->add('articles', $insert, 'articleId');
+        $this->database_model->add('subscriptions', array('userId' => 3, 'articleId' => $articleId, 'createdOn' => time()), 'subscriptionId');
+        
+        // Add Metadata
+        $metadata = array('articleId' => $articleId, 'quality' => 0, 'importance' => 0);
+        $metadata['credibility'] = $this->ci->utility->credibility('article', $articleId);
+        $this->ci->database->add('metadata', $metadata, 'metadataId');
+        
+        // Add Images/Resources/etc.
+        $clusters_update = array('articleId' => $articleId);
+        $this->ci->database->add('catlist', array('categoryId' => 1)+$clusters_update, 'catlistId');
+        foreach($images as $image)
         {
-          if(!in_array($ti, $images))
-          {
-            $images[] = $ti;
-            $this->ci->database->add('images', $article_where+array('image' => $ti, 'deleted' => 0), 'imageId');
-          }
+          $this->ci->database->add('images', array('image' => $image)+$clusters_update, 'imageId');
+        }
+        foreach($resources as $resource)
+        {
+          $this->ci->database->add('resources', array('resource' => $resource)+$clusters_update, 'resourceId');
+        }
+        
+        // Add Clusters to Article
+        foreach($clusters as $c)
+        {
+          $nInsert = array('clusterId' => $c, 'parentId' => $articleId, 'createdOn' => time());
+          $subscribers = $this->ci->database->get('subscriptions', array('clusterId' => $c, 'deleted' => 0));
+          foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+          $this->ci->database->edit('clusters', array('clusterId' => $c), $clusters_update);
         }
       }
-      if($type == 'cluster')
+      
+      if(sizeof($o_success['headline']))
       {
-        $t_score = 0;
-        $t_item = null;
-        foreach($o_success['article'] as $key => $n)
+        foreach($o_success['headline'] as $i)
         {
-          $n_headline = $this->ci->utility->blwords_strip($n['item']->headline, 'regEx_spaces', ' ');
-          $n_tags = $this->ci->utility->blwords_strip($n['item']->tags, 'regEx_commas', ' ');
-
-          $score = $o['ovn'] + $o['nvo'];
-          if($score > $t_score)
+          if(!$i['item']->parentId)
           {
-            if($score > $t_score)
-            {
-              $t_score = $score;
-              $t_item = $n;
-            }
+            // Add Headlines to Cluster
+            $nInsert = array('headlineId' => $i['id'], 'parentId' => $id, 'createdOn' => time());
+            $subscribers = $this->ci->database->get('subscriptions', array('headlineId' => $i['id'], 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('clusters', array('headlineId' => $i['id']), array('clusterId' => $id));
           }
         }
-        $nInsert = array('clusterId' => $id, 'parentId' => $t_item['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $id), array('articleId' => $t_item['id']));
       }
-      $o_success['cluster'] = array();
     }
-
-    if(sizeof($o_success['cluster']) == 1)
+    else
     {
-      if($type == 'cluster')
+      if(sizeof($o_success['cluster']) > 1)
       {
-        $new_temp = $o_success['cluster'];
-        $new_temp[] = array('item' => $original, 'ovn' => 0, 'nvo' => 0);
-        $articleId = $this->new_article($new_temp);
-        //
-        $nInsert = array('clusterId' => $id, 'parentId' => $articleId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $id), array('articleId' => $articleId));
-        //
-        $nInsert = array('clusterId' => $o_success['cluster'][0]['id'], 'parentId' => $articleId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $o_success['cluster'][0]['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $o_success['cluster'][0]['id']), array('articleId' => $articleId));
-      }
-
-      $cluster_where = array('clusterId' => $o_success['cluster'][0]['id']);
-      $resources = array();
-      $images = array();
-      // get
-      $clusterResources = $this->ci->database->get_array('resources', $cluster_where+array('deleted' => 0), 'resource');
-      foreach($clusterResources as $cr)
-      {
-        if(!in_array($cr, $resources)) { $resources[] = $cr; }
-      }
-      $clusterImages = $this->ci->database->get_array('images', $cluster_where+array('deleted' => 0), 'image');
-      foreach($clusterImages as $ci)
-      {
-        if(!in_array($ci, $images)) { $images[] = $ci; }
-      }
-
-      if($type == 'headline')
-      {
-        $nInsert = array('headlineId' => $id, 'parentId' => $o_success['cluster'][0]['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $id), $cluster_where);
-        // transfer
-        $headline_where = array('clusterId' => $id, 'deleted' => 0);
-        $thisResources = $this->ci->database->get_array('resources', $headline_where, 'resource');
-        foreach($thisResources as $tr)
-        {
-          if(!in_array($tr, $resources))
-          {
-            $resources[] = $tr;
-            $this->ci->database->add('resources', $cluster_where+array('resource' => $tr, 'deleted' => 0), 'resourceId');
-          }
-        }
-        $thisImages = $this->ci->database->get_array('images', $headline_where, 'image');
-        foreach($thisImages as $ti)
-        {
-          if(!in_array($ti, $images))
-          {
-            $images[] = $ti;
-            $this->ci->database->add('images', $cluster_where+array('image' => $ti, 'deleted' => 0), 'imageId');
-          }
-        }
-      }
-      foreach($o_success['headline'] as $o)
-      {
-        $nInsert = array('headlineId' => $id, 'parentId' => $o_success['cluster'][0]['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $o['id']), $cluster_where);
-        // transfer
-        $headline_where = array('clusterId' => $o['id'], 'deleted' => 0);
-        $thisResources = $this->ci->database->get_array('resources', $headline_where, 'resource');
-        foreach($thisResources as $tr)
-        {
-          if(!in_array($tr, $resources))
-          {
-            $resources[] = $tr;
-            $this->ci->database->add('resources', $cluster_where+array('resource' => $tr, 'deleted' => 0), 'resourceId');
-          }
-        }
-        $thisImages = $this->ci->database->get_array('images', $headline_where, 'image');
-        foreach($thisImages as $ti)
-        {
-          if(!in_array($ti, $images))
-          {
-            $images[] = $ti;
-            $this->ci->database->add('images', $cluster_where+array('image' => $ti, 'deleted' => 0), 'imageId');
-          }
-        }
-      }
-      $o_success['headline'] = array();
-    }
-    elseif($o_success['cluster'])
-    {
-      if($type == 'cluster')
-      {
-        $new_temp = $o_success['cluster'];
-        $new_temp[] = array('item' => $original, 'ovn' => 0, 'nvo' => 0);
-        $articleId = $this->new_article($new_temp);
-        //
-        $nInsert = array('clusterId' => $id, 'parentId' => $articleId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $id), array('articleId' => $articleId));
-      }
-      else { $articleId = $this->new_article($o_success['cluster']); }
-      foreach($o_success['cluster'] as $o)
-      {
-        $nInsert = array('clusterId' => $o['id'], 'parentId' => $articleId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $o['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $o['id']), array('articleId' => $articleId));
-      }
-
-      if($type == 'headline')
-      {
-        $t_score = 0;
-        $t_item = null;
-        foreach($o_success['cluster'] as $key => $o)
-        {
-          $score = $o['ovn'] + $o['nvo'];
-          if($score > $t_score)
-          {
-            $t_score = $score;
-            $t_item = $o;
-          }
-        }
-        $nInsert = array('headlineId' => $id, 'parentId' => $t_item['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $id), array('clusterId' => $t_item['id']));
-      }
-      foreach($o_success['headline'] as $o)
-      {
-        $t_score = 0;
-        $t_item = null;
+        // Find Best Matching Cluster for Headline
+        $temp_score = 0;
+        $temp_item = null;
         foreach($o_success['cluster'] as $key => $n)
         {
           $n_headline = $this->ci->utility->blwords_strip($n['item']->headline, 'regEx_spaces', ' ');
           $n_tags = $this->ci->utility->blwords_strip($n['item']->tags, 'regEx_commas', ' ');
-
-          if($score = $this->item_compare($o['item'], $n_headline, $n_tags))
+          
+          $score = $n['ovn'] + $n['nvo'];
+          if($score > $temp_score)
           {
-            if($score > $t_score)
-            {
-              $t_score = $score;
-              $t_item = $n;
-            }
+            $temp_score = $score;
+            $temp_item = $n;
           }
         }
-        $cluster_where = array('clusterId' => $t_item['id']);
+        
+        // Add Headline to Best Matching Cluster
+        $nInsert = array('headlineId' => $id, 'parentId' => $temp_item['id'], 'createdOn' => time());
+        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
+        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+        $this->ci->database->edit('clusters', array('headlineId' => $id), array('clusterId' => $temp_item['id']));
+      }
+      if(sizeof($o_success['cluster']) == 1)
+      {
+        // Add Headline to Cluster
+        $clusterId = $o_success['article'][key($o_success['cluster'])]['id'];
+        $nInsert = array('headlineId' => $id, 'parentId' => $clusterId, 'createdOn' => time());
+        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
+        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+        $this->ci->database->edit('clusters', array('headlineId' => $id), array('clusterId' => $clusterId));
+      }
+      elseif(sizeof($o_success['headline']))
+      {
+        // Find Available Headlines and Sort by Highest Rated Headline
+        $headlines = array($id);
+        $meta_scores = array(0);
+        foreach($o_success['headline'] as $i)
+        {
+          if(!$i['item']->parentId !$i['item']->adminOnly)
+          {
+            $headlines[] = $i['id'];
+            $meta = $this->ci->database->get_single('metadata', array('headlineId' => $i['id']), $select = 'score');
+            $meta_scores[] = $meta->score;
+          }
+        }
+        array_multisort($meta_scores, SORT_DESC, $headlines);
+        
+        // Get Data from Headlines
+        $top_item = null;
+        $tags = array();
         $resources = array();
         $images = array();
-        // get
-        $clusterResources = $this->ci->database->get_array('resources', $cluster_where+array('deleted' => 0), 'resource');
-        foreach($clusterResources as $cr)
+        foreach($headlines as $h)
         {
-          if(!in_array($cr, $resources)) { $resources[] = $cr; }
-        }
-        $clusterImages = $this->ci->database->get_array('images', $cluster_where+array('deleted' => 0), 'image');
-        foreach($clusterImages as $ci)
-        {
-          if(!in_array($ci, $images)) { $images[] = $ci; }
-        }
-        //
-        $nInsert = array('headlineId' => $o['id'], 'parentId' => $t_item['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $o['id']), array('clusterId' => $t_item['id']));
-        // transfer
-        $headline_where = array('clusterId' => $o['id'], 'deleted' => 0);
-        $thisResources = $this->ci->database->get_array('resources', $headline_where, 'resource');
-        foreach($thisResources as $tr)
-        {
-          if(!in_array($tr, $resources))
+          $temp_item = $this->ci->database->get_single('headlines', array('headlineId' => $h), 'headline, tags');
+          if(!$top_item) { $top_item = $temp_item; }
+          
+          foreach(explode(',', $temp_item->tags) as $t)
           {
-            $resources[] = $tr;
-            $this->ci->database->add('resources', $cluster_where+array('resource' => $tr, 'deleted' => 0), 'resourceId');
+            if(!preg_grep("/\b".$t."\b/i", $tags)) { $tags[] = $t; }
+          }
+          
+          $temp_resources = $this->ci->database->get_array('resources', array('headlineId' => $h, 'deleted' => 0), 'resource');
+          foreach($temp_resources as $r)
+          {
+            if(!preg_grep("/\b".$r."/\bi", $resources)) { $resources[] = $r; }
+          }
+          
+          $temp_images = $this->ci->database->get_array('images', array('headlineId' => $h, 'deleted' => 0), 'image');
+          foreach($temp_images as $i)
+          {
+            if(!preg_grep("/\b".$i."\b/i", $images)) { $images[] = $i; }
           }
         }
-        $thisImages = $this->ci->database->get_array('images', $headline_where, 'image');
-        foreach($thisImages as $ti)
+        
+        // Create Cluster
+        $insert = array('headline' => $top_item->headline, 'tags' => implode(',', $tags), 'createdOn' => time());
+        $clusterId = $this->ci->database->add('clusters', $insert, 'clusterId');
+        $this->database_model->add('subscriptions', array('userId' => 3, 'clusterId' => $clusterId, 'createdOn' => time()), 'subscriptionId');
+        
+        // Add Metadata
+        $metadata = array('clusterId' => $clusterId, 'quality' => 0, 'importance' => 0);
+        $metadata['credibility'] = $this->ci->utility->credibility('cluster', $clusterId);
+        $this->ci->database->add('metadata', $metadata, 'metadataId');
+        
+        // Add Images/Resources/etc.
+        $headlines_update = array('clusterId' => $clusterId);
+        $this->ci->database->add('catlist', array('categoryId' => 1)+$headlines_update, 'catlistId');
+        foreach($images as $image)
         {
-          if(!in_array($ti, $images))
-          {
-            $images[] = $ti;
-            $this->ci->database->add('images', $cluster_where+array('image' => $ti, 'deleted' => 0), 'imageId');
-          }
+          $this->ci->database->add('images', array('image' => $image)+$headlines_update, 'imageId');
         }
-      }
-      $o_success['headline'] = array();
-    }
-
-    if(sizeof($o_success['headline']) == 1)
-    {
-      if($type == 'headline')
-      {
-        $new_temp = $o_success['headline'];
-        $new_temp[] = array('item' => $original, 'ovn' => 0, 'nvo' => 0);
-        $clusterId = $this->new_cluster($new_temp);
-        //
-        $nInsert = array('headlineId' => $id, 'parentId' => $clusterId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $id), array('clusterId' => $clusterId));
-        //
-        $nInsert = array('headlineId' => $o_success['headline'][0]['id'], 'parentId' => $clusterId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o_success['headline'][0]['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $o_success['headline'][0]['id']), array('clusterId' => $clusterId));
-      }
-    }
-    elseif($o_success['headline'])
-    {
-      if($type == 'headline')
-      {
-        $new_temp = $o_success['headline'];
-        $new_temp[] = array('item' => $original, 'ovn' => 0, 'nvo' => 0);
-        $clusterId = $this->new_cluster($new_temp);
-        $nInsert = array('headlineId' => $id, 'parentId' => $clusterId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $id), array('clusterId' => $clusterId));
-      }
-      else { $clusterId = $this->new_cluster($o_success['headline']); }
-      foreach($o_success['headline'] as $o)
-      {
-        $nInsert = array('headlineId' => $o['id'], 'parentId' => $clusterId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $o['id']), array('clusterId' => $clusterId));
+        foreach($resources as $resource)
+        {
+          $this->ci->database->add('resources', array('resource' => $resource)+$headlines_update, 'resourceId');
+        }
+        
+        // Add Headlines to Cluster
+        foreach($headlines as $h)
+        {
+          $nInsert = array('headlineId' => $h, 'parentId' => $clusterId, 'createdOn' => time());
+          $subscribers = $this->ci->database->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+          foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+          $this->ci->database->edit('headlines', array('headlineId' => $h), $headlines_update);
+        }
       }
     }
   }
@@ -2097,50 +1923,58 @@ class Stream_model extends CI_Model
     return false;
   }
 
-  private function new_article($clusters = array(), $userId = 0)
+  private function new_article($data = array(), $userId = 0)
   {
-    $t_score = 0;
-    $temp_key = key($clusters);
-    $t_item = $clusters[$temp_key];
-    $t_item = null;
+    // Find Available Clusters and Sort by Highest Rated Cluster
+    $clusters = array();
+    $meta_scores = array(0);
+    foreach($data as $i)
+    {
+      $clusters[] = $i['id'];
+      $meta = $this->ci->database->get_single('metadata', array('clusterId' => $i['id']), $select = 'score');
+      $meta_scores[] = $meta->score;
+    }
+    array_multisort($meta_scores, SORT_DESC, $clusters);
+    
+    // Get Data from Clusters
+    $top_item = null;
     $tags = array();
     $resources = array();
     $images = array();
-    foreach($clusters as $key => $o)
+    foreach($clusters as $c)
     {
-      foreach(explode(',', $o['item']->tags) as $t)
+      $temp_item = $this->ci->database->get_single('clusters', array('clusterId' => $c), 'headline, tags');
+      if(!$top_item) { $top_item = $temp_item; }
+      
+      foreach(explode(',', $temp_item->tags) as $t)
       {
         if(!preg_grep("/\b".$t."\b/i", $tags)) { $tags[] = $t; }
       }
-      $thisResources = $this->ci->database->get_array('resources', array('clusterId' => $o['item']->clusterId, 'deleted' => 0), 'resource');
-      foreach($thisResources as $tr)
+      
+      $temp_resources = $this->ci->database->get_array('resources', array('clusterId' => $c, 'deleted' => 0), 'resource');
+      foreach($temp_resources as $r)
       {
-        if(!preg_grep("/\b".$tr."/\bi", $resources)) { $resources[] = $tr; }
+        if(!preg_grep("/\b".$r."/\bi", $resources)) { $resources[] = $r; }
       }
-      $thisImages = $this->ci->database->get_array('images', array('clusterId' => $o['item']->clusterId, 'deleted' => 0), 'image');
-      foreach($thisImages as $ti)
+      
+      $temp_images = $this->ci->database->get_array('images', array('clusterId' => $c, 'deleted' => 0), 'image');
+      foreach($temp_images as $i)
       {
-        if(!preg_grep("/\b".$ti."\b/i", $images)) { $images[] = $ti; }
-      }
-
-      $score = $o['ovn'] + $o['nvo'];
-      if($score > $t_score)
-      {
-        $t_score = $score;
-        $t_item = $o;
+        if(!preg_grep("/\b".$i."\b/i", $images)) { $images[] = $i; }
       }
     }
-
-    $insert = array('headline' => $t_item['item']->headline, 'tags' => implode(',', $tags), 'createdOn' => time());
+    // Create Article
+    $insert = array('headline' => $top_item->headline, 'tags' => implode(',', $tags), 'createdOn' => time(), 'createdBy' => $userId);
     if($userId) { $insert['editedBy'] = $userId; }
     $articleId = $this->ci->database->add('articles', $insert, 'articleId');
     $this->database_model->add('subscriptions', array('userId' => 3, 'articleId' => $articleId, 'createdOn' => time()), 'subscriptionId');
-
-    // Metadata
+    
+    // Add Metadata
     $metadata = array('articleId' => $articleId, 'quality' => 0, 'importance' => 0);
     $metadata['credibility'] = $this->ci->utility->credibility('article', $articleId);
     $this->ci->database->add('metadata', $metadata, 'metadataId');
-
+    
+    // Add Images/Resources/etc.
     $clusters_update = array('articleId' => $articleId);
     $this->ci->database->add('catlist', array('categoryId' => 1)+$clusters_update, 'catlistId');
     foreach($images as $image)
@@ -2151,66 +1985,89 @@ class Stream_model extends CI_Model
     {
       $this->ci->database->add('resources', array('resource' => $resource)+$clusters_update, 'resourceId');
     }
-
-    return $articleId;
+    
+    // Add Clusters to Article
+    foreach($clusters as $c)
+    {
+      $nInsert = array('clusterId' => $c, 'parentId' => $articleId, 'createdOn' => time());
+      $subscribers = $this->ci->database->get('subscriptions', array('clusterId' => $c, 'deleted' => 0));
+      foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+      $this->ci->database->edit('clusters', array('clusterId' => $c, 'editedBy' => $userId), $clusters_update);
+    }
   }
 
-  private function new_cluster($headlines = array(), $articleId = 0, $userId = 0)
+  private function new_cluster($data = array(), $userId = 0, $articleId = 0)
   {
-    $t_score = 0;
-    $temp_key = key($headlines);
-    $t_item = $headlines[$temp_key];
+    // Find Available Headlines and Sort by Highest Rated Headline
+    $headlines = array($id);
+    $meta_scores = array(0);
+    foreach($data as $i)
+    {
+      $headlines[] = $i['id'];
+      $meta = $this->ci->database->get_single('metadata', array('headlineId' => $i['id']), $select = 'score');
+      $meta_scores[] = $meta->score;
+    }
+    array_multisort($meta_scores, SORT_DESC, $headlines);
+    
+    // Get Data from Headlines
+    $top_item = null;
     $tags = array();
     $resources = array();
     $images = array();
-    foreach($headlines as $key => $o)
+    foreach($headlines as $h)
     {
-      foreach(explode(',', $o['item']->tags) as $t)
+      $temp_item = $this->ci->database->get_single('headlines', array('headlineId' => $h), 'headline, tags');
+      if(!$top_item) { $top_item = $temp_item; }
+      
+      foreach(explode(',', $temp_item->tags) as $t)
       {
         if(!preg_grep("/\b".$t."\b/i", $tags)) { $tags[] = $t; }
       }
-      $thisResources = $this->ci->database->get_array('resources', array('headlineId' => $o['item']->headlineId, 'deleted' => 0), 'resource');
-      foreach($thisResources as $tr)
+      
+      $temp_resources = $this->ci->database->get_array('resources', array('headlineId' => $h, 'deleted' => 0), 'resource');
+      foreach($temp_resources as $r)
       {
-        if(!preg_grep("/\b".$tr."\b/i", $resources)) { $resources[] = $tr; }
+        if(!preg_grep("/\b".$r."/\bi", $resources)) { $resources[] = $r; }
       }
-      $thisImages = $this->ci->database->get_array('images', array('headlineId' => $o['item']->headlineId, 'deleted' => 0), 'image');
-      foreach($thisImages as $ti)
+      
+      $temp_images = $this->ci->database->get_array('images', array('headlineId' => $h, 'deleted' => 0), 'image');
+      foreach($temp_images as $i)
       {
-        if(!preg_grep("/\b".$ti."\b/i", $images)) { $images[] = $ti; }
-      }
-
-      $score = $o['ovn'] + $o['nvo'];
-      if($score > $t_score)
-      {
-        $t_score = $score;
-        $t_item = $o;
+        if(!preg_grep("/\b".$i."\b/i", $images)) { $images[] = $i; }
       }
     }
-
-    $insert = array('headline' => $t_item['item']->headline, 'tags' => implode(',', $tags), 'createdOn' => time());
+    
+    // Create Cluster
+    $insert = array('headline' => $top_item->headline, 'tags' => implode(',', $tags), 'createdOn' => time(), 'createdBy' => $userId);
     if($articleId) { $insert['articleId'] = $articleId; }
-    if($userId) { $insert['editedBy'] = $userId; }
     $clusterId = $this->ci->database->add('clusters', $insert, 'clusterId');
     $this->database_model->add('subscriptions', array('userId' => 3, 'clusterId' => $clusterId, 'createdOn' => time()), 'subscriptionId');
-
-    // Metadata
+    
+    // Add Metadata
     $metadata = array('clusterId' => $clusterId, 'quality' => 0, 'importance' => 0);
     $metadata['credibility'] = $this->ci->utility->credibility('cluster', $clusterId);
     $this->ci->database->add('metadata', $metadata, 'metadataId');
-
-    $headline_update = array('clusterId' => $clusterId);
-    $this->ci->database->add('catlist', array('categoryId' => 1)+$headline_update, 'catlistId');
+    
+    // Add Images/Resources/etc.
+    $headlines_update = array('clusterId' => $clusterId);
+    $this->ci->database->add('catlist', array('categoryId' => 1)+$headlines_update, 'catlistId');
     foreach($images as $image)
     {
-      $this->ci->database->add('images', array('image' => $image)+$headline_update, 'imageId');
+      $this->ci->database->add('images', array('image' => $image)+$headlines_update, 'imageId');
     }
     foreach($resources as $resource)
     {
-      $this->ci->database->add('resources', array('resource' => $resource)+$headline_update, 'resourceId');
+      $this->ci->database->add('resources', array('resource' => $resource)+$headlines_update, 'resourceId');
     }
-
-    return $clusterId;
+    
+    // Add Headlines to Cluster
+    foreach($headlines as $h)
+    {
+      $nInsert = array('headlineId' => $h, 'parentId' => $clusterId, 'createdOn' => time());
+      $subscribers = $this->ci->database->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+      foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+      $this->ci->database->edit('headlines', array('headlineId' => $h, 'editedBy' => $userId), $headlines_update);
+    }
   }
 }
 

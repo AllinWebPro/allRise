@@ -1,5 +1,12 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.9.6.3</h2>
+
+<h4>Fixes:</h4>
+* Auto Cluster rework due to anomaly
+* Manual Cluster rework due to anomaly
+* Image Size in Item
+
 <h2>Version 0.9.6.2</h2>
 
 <h4>Fixes:</h4>

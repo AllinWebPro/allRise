@@ -1790,7 +1790,7 @@ class Stream_model extends CI_Model
         $meta_scores = array(0);
         foreach($o_success['headline'] as $i)
         {
-          if(!$i['item']->parentId !$i['item']->adminOnly)
+          if(!$i['item']->parentId && !$i['item']->adminOnly)
           {
             $headlines[] = $i['id'];
             $meta = $this->ci->database->get_single('metadata', array('headlineId' => $i['id']), $select = 'score');

@@ -38,7 +38,7 @@ class Password extends CI_Controller
     }
     // Load View
     $this->data['title'] = "Forgot Password";
-    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'])
+    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
     {
       $this->load->view('includes/functions');
       $this->load->view('main/password', $this->data);

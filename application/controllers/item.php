@@ -23,7 +23,7 @@ class Item extends CI_Controller
    * @param int
    * @return void
    */
-  public function index($type = '', $id = 0)
+  public function index($type = '', $id = 0, $sort = "score", $results = "all", $comments = true, $limit = 20, $current = 1, $userId = 0, $subscription = 0)
   {
     // Grab Data by Type
     $this->data['type'] = $type;
@@ -32,6 +32,7 @@ class Item extends CI_Controller
     // Get Data
     if(isset($this->data['item']) && $this->data['item'])
     {
+      // $this->data['related'] = $this->stream_model->search($this->data['item']->tags, '(id != '.$id.' AND type != "'.$type.'")', 'score', $type.'s', true, 3);
       // Views
       if($this->session->userdata('isLoggedIn'))
       {
@@ -66,17 +67,32 @@ class Item extends CI_Controller
       $this->data['images'] = $this->database_model->get('images', $assets_where+array('active' => 1, 'deleted' => 0));
       $this->data['resources'] = $this->database_model->get('resources', $assets_where+array('active' => 1, 'deleted' => 0));
       $select = 'c.commentId, u.user, c.createdOn, c.editedOn, c.createdBy, c.comment, u.photo';
-      $this->data['comments'] = $this->database_model->get_join('comments c', 'users u', 'c.createdBy = u.userId', $assets_where+array('c.deleted' => 0, 'u.deleted' => 0), $select, false, 'commentId', 'DESC');
+      $comment_where = array($type.'Id' => $id);
+      if(isset($_GET['hId']))
+      {
+        $history_time = $this->data['item']->editedOn;
+        $comment_where['c.createdOn <'] = $history_time;
+        $comment_where['IF(c.deleted = 1, IF(c.editedOn > '.$history_time.', 1, 0), 1) ='] = 1;
+      }
+      $this->data['comments'] = $this->database_model->get_join('comments c', 'users u', 'c.createdBy = u.userId', $comment_where+array('c.deleted' => 0, 'u.deleted' => 0), $select, false, 'commentId', 'DESC');
       // Get Sub Content
       $this->data['contributors'] = $this->stream_model->get_contributors($type, $id);
       $this->data['ranking'] = $this->database_model->get_single('rankings', array($type.'Id' => $id, 'createdBy' => $this->session->userdata('userId')));
       $this->utility_model->metadata($type, $id);
       // Actions
-      if(isset($_GET['comments'])) { $this->comments($_GET['comments'], isset($_GET['commentId'])?$_GET['commentId']:0); }
+      if(isset($_GET['comments']))
+      {
+        $this->comments($_GET['comments'], isset($_GET['commentId'])?$_GET['commentId']:0);
+        $this->data['comments'] = $this->database_model->get_join('comments c', 'users u', 'c.createdBy = u.userId', $comment_where+array('c.deleted' => 0, 'u.deleted' => 0), $select, false, 'commentId', 'DESC');
+      }
       if(isset($_GET['importance'])) { $this->importance($_GET['importance']); }
       if(isset($_GET['quality'])) { $this->quality($_GET['quality']); }
       if(isset($_GET['favorite'])) { $this->favorite($_GET['favorite']); }
-      if(isset($_GET['importance']) || isset($_GET['quality']) || isset($_GET['favorite'])) { redirect($type.'/'.$id); }
+      if(isset($_GET['importance']) || isset($_GET['quality']) || isset($_GET['favorite']))
+      {
+        $this->utility_model->metadata($type, $id);
+        redirect($type.'/'.$id);
+      }
       //
       if($type !== 'headline')
       {
@@ -137,7 +153,7 @@ class Item extends CI_Controller
       $this->data['keywords'] = $this->data['item']->tags;
       // Load View
       $this->data['title'] = stripslashes($this->data['item']->headline);
-      if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'])
+      if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
       {
         $this->load->view('includes/functions');
         $this->load->view('main/item', $this->data);
@@ -159,7 +175,7 @@ class Item extends CI_Controller
    * @param string
    * @return void
    */
-  public function hashed($type = '', $hashId = '')
+  public function hashed($type = '', $hashId = '', $sort = "score", $results = "all", $comments = true, $limit = 20)
   {
     // Grab Data by Type
     $this->data['type'] = $type;
@@ -177,6 +193,7 @@ class Item extends CI_Controller
     {
       $idType = $type.'Id';
       $this->data['id'] = $id = $this->data['item']->$idType;
+      // $this->data['related'] = $this->stream_model->search($this->data['item']->tags, '(id != '.$id.' AND type != "'.$type.'")', 'score', $type.'s', true, 3);
       // Views
       if($this->session->userdata('isLoggedIn') && !isset($_GET['hId']))
       {
@@ -230,11 +247,19 @@ class Item extends CI_Controller
       $this->data['ranking'] = $this->database_model->get_single('rankings', array($type.'Id' => $id, 'createdBy' => $this->session->userdata('userId')));
       $this->utility_model->metadata($type, $id);
       // Actions
-      if(isset($_GET['comments'])) { $this->comments($_GET['comments'], isset($_GET['commentId'])?$_GET['commentId']:0); }
+      if(isset($_GET['comments']))
+      {
+        $this->comments($_GET['comments'], isset($_GET['commentId'])?$_GET['commentId']:0);
+        $this->data['comments'] = $this->database_model->get_join('comments c', 'users u', 'c.createdBy = u.userId', $comment_where+array('c.deleted' => 0, 'u.deleted' => 0), $select, false, 'commentId', 'DESC');
+      }
       if(isset($_GET['importance'])) { $this->importance($_GET['importance']); }
       if(isset($_GET['quality'])) { $this->quality($_GET['quality']); }
       if(isset($_GET['favorite'])) { $this->favorite($_GET['favorite']); }
-      if(isset($_GET['importance']) || isset($_GET['quality']) || isset($_GET['favorite'])) { redirect($type.'/'.$id); }
+      if(isset($_GET['importance']) || isset($_GET['quality']) || isset($_GET['favorite']))
+      {
+        $this->utility_model->metadata($type, $id);
+        redirect($type.'/'.$id);
+      }
       //
       if($type !== 'headline')
       {
@@ -282,6 +307,7 @@ class Item extends CI_Controller
       if($type == 'headline')
       {
         $this->data['parent'] = $this->database_model->get_single('clusters', array('clusterId' => $this->data['item']->clusterId, 'deleted' => 0), "*, OLD_PASSWORD(clusterId) AS hashId, 'cluster' AS type");
+        if($this->data['parent']) { $this->data['parent_parent'] = $this->database_model->get_single('articles', array('articleId' => $this->data['parent']->articleId, 'deleted' => 0), "*, OLD_PASSWORD(articleId) AS hashId, 'article' AS type"); }
       }
       elseif($type == 'cluster')
       {
@@ -296,7 +322,7 @@ class Item extends CI_Controller
       // Load View
       $this->data['title'] = stripslashes($this->data['item']->headline);
       $this->data['page'] = "item";
-      if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'])
+      if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
       {
         $this->load->view('includes/functions');
         $this->load->view('main/item', $this->data);
@@ -363,6 +389,7 @@ class Item extends CI_Controller
           }
         }
       }
+      elseif($_POST) { $this->data['comment_errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     }
     elseif($action == 'modify' && $commentId)
     {
@@ -380,6 +407,7 @@ class Item extends CI_Controller
           $this->database_model->edit('comments', array('commentId' => $post['commentId']), $update);
           unset($this->data['comment']);
         }
+        elseif($_POST) { $this->data['comment_errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
       }
       else { unset($this->data['comment']); }
     }
@@ -498,14 +526,14 @@ class Item extends CI_Controller
       $score = $this->stream_model->get_score_by_user($user->userId);
       $update = array('score' => (($score->q_score_sum + $score->i_score_sum) / $score->total_items));
       $this->database_model->edit('users', array('userId' => $user->userId), $update);
-      foreach($this->data['cats'] as $c)
+      /*foreach($this->data['cats'] as $c)
       {
         $cat_score = $this->stream_model->get_score_by_user($user->userId, $c);
         $data = array('score' => (($cat_score->q_score_sum + $cat_score->i_score_sum) / $cat_score->total_items));
         $where = array('userId' => $user->userId, 'categoryId' => $c);
         if($item = $this->database_model->get_single('scores', $where)) { $this->database_model->edit('scores', array('scoreId' => $item->scoreId), $data); }
         else { $this->database_model->add('scores', $where+$data, 'scoreId'); }
-      }
+      }*/
     }
   }
 }

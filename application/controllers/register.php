@@ -21,7 +21,7 @@ class Register extends CI_Controller
   {
     $this->form_validation->set_rules('user', 'Username', 'trim|required|min_length[3]|max_length[24]|alpha_dash|xss_clean|is_unique[users.user]');
     $this->form_validation->set_rules('email', 'Email', 'trim|required|min_length[6]|max_length[255]|valid_email|xss_clean|is_unique[users.email]');
-    $this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[8]|max_length[50]|xss_clean'); //password_check
+    $this->form_validation->set_rules('rgpassword', 'Password', 'trim|required|min_length[8]|max_length[50]|xss_clean'); //password_check
     $this->form_validation->set_rules('redirect', 'Redirect', 'trim|xss_clean');
     if($this->form_validation->run() && $_POST)
     {
@@ -29,11 +29,11 @@ class Register extends CI_Controller
       $post = $this->input->post();
       $insert = array('user' => $this->db->escape_str($post['user']), 'email' => $this->db->escape_str($post['email']));
       $insert['createdOn'] = time();
-      $insert['password'] = $this->utility_model->password_encrypt($post['user'], $post['password']);
+      $insert['password'] = $this->utility_model->password_encrypt($post['user'], $post['rgpassword']);
       $userId = $this->database_model->add('users', $insert, 'userId');
       if($user = $this->database_model->get_single('users', array('userId' => $userId)))
       {
-        @mail("owen@allinwebpro.com", "New User", "Username: ".$user->user);
+        $this->utility_model->email_owen("New User", "Username: ".$user->user);
         //
         $this->database_model->edit('users', array('userId' => $user->userId), array('lastLogin' => time()));
         $this->utility_model->emails_signup($user);
@@ -51,11 +51,12 @@ class Register extends CI_Controller
         $this->session->set_userdata($s);
         redirect($post['redirect']);
       }
-      else { $this->data['error'] = '<p>An error happened creating your account.</p>'; }
+      else { $this->data['register_error'] = 'An error happened creating your account.'; }
     }
+    elseif($_POST) { $this->data['register_errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     // Load View
-    $this->data['title'] = "Login / Register";
-    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'])
+    $this->data['title'] = "";
+    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
     {
       $this->load->view('includes/functions');
       $this->load->view('main/login-register', $this->data);

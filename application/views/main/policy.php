@@ -1,5 +1,7 @@
-<h3 class="horizontal-padding-xsmall">Privacy Policy</h3>
-<div class="vertical-padding-xsmall horizontal-padding-xsmall">
+<div class="vertical-padding-small horizontal-padding-small">
+  <div class="pure-u-1 bottom-padding-xsmall">
+    <strong><a name="privacy"><i class="fa fa-file-text-o"></i></a> Privacy Policy</strong>
+  </div>
   <p>allRise (the "Company") is committed to maintaining robust privacy protections for its users.  Our Privacy Policy ("Privacy Policy") is designed to help you understand how we collect, use and safeguard the information you provide to us and to assist you in making informed decisions when using our Service.</p>
   <p>For purposes of this Agreement, "Service" refers to the Company's service which can be accessed via our website at <a href="<?php echo site_url(); ?>" title="allRise">http:<?php echo site_url(); ?></a> [or through our mobile application].  The terms "we," "us," and "our" refer to the Company. "You" refers to you, as a user of Service. By accepting our Privacy Policy you consent to our collection, storage, use and disclosure of your personal information as described in this Privacy Policy.</p>
 

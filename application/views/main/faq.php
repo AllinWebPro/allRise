@@ -1,5 +1,7 @@
-<h3 class="horizontal-padding-xsmall">F.A.Q.</h3>
-<div class="vertical-padding-xsmall horizontal-padding-xsmall">
+<div class="vertical-padding-small horizontal-padding-small">
+  <div class="pure-u-1 bottom-padding-xsmall">
+    <strong><a name="faq"><i class="fa fa-life-ring"></i></a> F.A.Q.</strong>
+  </div>
   <h4 class="vertical-margin-xsmall">Known Issues</h4>
   <ul>
     <li>If Javascript is not enabled, some pages will not work and only exist dynamically.</li>

@@ -6,7 +6,24 @@
 <!--[if gt IE 8]><!--><html class="no-js" lang="en"><!--<![endif]-->
   <?php $this->load->view('includes/head'); ?>
   <body>
-    <!--[if lt IE 7]><script>for (x in open);</script><![endif]-->
+    <div id="fb-root"></div>
+    <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '524735507676626',
+        xfbml      : true,
+        version    : 'v2.4'
+      });
+    };
+    (function(d, s, id){
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <!--load page-->
     <?php $this->load->view('includes/main-header'); ?>
     <div id="content" class="pure-g-r" data-page="<?php echo $page; ?>">
       <?php $this->load->view('main/'.$page); ?>

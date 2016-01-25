@@ -4,6 +4,7 @@ class Ajax extends CI_Controller
 {
   function __construct()
   {
+    $_POST = $_POST + $_GET;
     parent::__construct();
     $this->load->model('utility_model');
     if(!$this->session->userdata('isLoggedIn'))
@@ -42,10 +43,17 @@ class Ajax extends CI_Controller
    * @param int
    * @return void
    */
-  public function article($clusterId = 0)
+  public function article($childId = 0, $childType = '')
   {
     $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url|max_length[255]');
-    $this->form_validation->set_rules('article', 'Article', 'trim|xss_clean');
+    $this->form_validation->set_rules('article', 'Article', 'trim|strip_html_tags');
+    
+    if($this->session->userdata('level') == 'a')
+    {
+      $this->form_validation->set_rules('adminOnly', 'Admin Only', 'trim|xss_clean');
+      $this->form_validation->set_rules('hidden', 'Hidden', 'trim|xss_clean');
+    }
+    
     $this->form_validation->set_rules('place', 'Location', 'trim|xss_clean');
     $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
     $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
@@ -56,14 +64,24 @@ class Ajax extends CI_Controller
     {
       $post = $this->input->post();
       $userId = $this->session->userdata('userId');
+      $time = time();
+      $decay = $time - 1385884800;
       $insert = array(
         'headline' => $this->db->escape_str(preg_replace('/\s+/', ' ', $post['headline'])),
         'article' => $this->db->escape_str(str_replace('\r', '', str_replace('\n', '', $post['article']))),
         'tags' => $this->db->escape_str($this->utility_model->clean_tag_list($post['tags'])),
         'createdBy' => $userId,
-        'createdOn' => time(),
-        'editedBy' => $userId
+        'createdOn' => $time,
+        'editedBy' => $userId,
+        'decay' => (log10($decay + $decay) / 4) / 10
       );
+        
+      if($this->session->userdata('level') == 'a')
+      {
+        $insert['adminOnly'] = $post['adminOnly'];
+        $insert['hidden'] = $post['hidden'];
+      }
+      
       if($post['placeId']) { $insert['placeId'] = $post['placeId']; }
       elseif($post['place'])
       {
@@ -72,10 +90,27 @@ class Ajax extends CI_Controller
       }
       $insert['active'] = 1;
       $id = $this->database_model->add("articles", $insert, "articleId");
+      if($childId && $childType)
+      {
+        $items = array(
+          'headline' => ($childType == 'headline')?array($childId):array(),
+          'cluster' => ($childType == 'cluster')?array($childId):array(),
+          'article' => array($id)
+        );
+        $this->stream_model->manual_join($items);
+      }
       $sInsert = array('articleId' => $id, 'userId' => $userId);
       $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
       $this->database_model->add('subscriptions', array('userId' => 3, 'articleId' => $id, 'createdOn' => time()), 'subscriptionId');
-      $this->database_model->edit('clusters', array('clusterId' => $clusterId), array('articleId' => $id));
+      if($childId)
+      {
+        $items = array(
+          'headline' => ($childType == 'headline')?array($childId):array(),
+          'cluster' => ($childType == 'cluster')?array($childId):array(),
+          'article' => array($id)
+        );
+        $this->stream_model->manual_join($items);
+      }
       foreach($post['categoryId'] as $c)
       {
         $this->database_model->add("catlist", array('articleId' => $id, 'categoryId' => $c, 'editedBy' => $userId), 'catlistId');
@@ -96,15 +131,20 @@ class Ajax extends CI_Controller
         }
       }
       // Metadata
-      $metadata = array('articleId' => $id, 'quality' => 0, 'importance' => 0);
-      $metadata['credibility'] = $this->utility_model->credibility('article', $id);
+      $metadata = array(
+        'articleId' => $id,
+        'quality' => 0,
+        'importance' => 0,
+        'credibility' => $this->utility_model->credibility('article', $id)
+      );
+      $metadata['score'] = $metadata['credibility'];
       $this->database_model->add('metadata', $metadata, 'metadataId');
       $this->stream_model->autocompare('article', $id);
       $response['success'] = 1;
       $item_temp = $this->database_model->get_single('articles', array('articleId' => $id, 'deleted' => 0), '*, OLD_PASSWORD(articleId) AS hashId');
       $response['redirect'] = site_url('a/'.$item_temp->hashId);
     }
-    else { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
+    elseif($_POST) { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     $this->_output_json($response);
   }
 
@@ -272,10 +312,17 @@ class Ajax extends CI_Controller
    * @param int
    * @return void
    */
-  public function headline()
+  public function headline($parentId = 0, $parentType = '')
   {
     $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url|max_length[255]');
     $this->form_validation->set_rules('notes', 'Author Notes', 'trim|xss_clean|strip_tags');
+    
+    if($this->session->userdata('level') == 'a')
+    {
+      $this->form_validation->set_rules('adminOnly', 'Admin Only', 'trim|xss_clean');
+      $this->form_validation->set_rules('hidden', 'Hidden', 'trim|xss_clean');
+    }
+    
     $this->form_validation->set_rules('place', 'Location', 'trim|xss_clean');
     $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
     $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
@@ -286,14 +333,24 @@ class Ajax extends CI_Controller
     {
       $post = $this->input->post();
       $userId = $this->session->userdata('userId');
+      $time = time();
+      $decay = $time - 1385884800;
       $insert = array(
         'headline' => $this->db->escape_str(preg_replace('/\s+/', ' ', $post['headline'])),
         'notes' => $this->db->escape_str($post['notes']),
         'tags' => $this->db->escape_str($this->utility_model->clean_tag_list($post['tags'])),
         'createdBy' => $userId,
-        'createdOn' => time(),
-        'editedBy' => $userId
+        'createdOn' => $time,
+        'editedBy' => $userId,
+        'decay' => (log10($decay + $decay) / 4) / 10
       );
+        
+      if($this->session->userdata('level') == 'a')
+      {
+        $update['adminOnly'] = $post['adminOnly'];
+        $update['hidden'] = $post['hidden'];
+      }
+        
       if($post['placeId']) { $insert['placeId'] = $post['placeId']; }
       elseif($post['place'])
       {
@@ -302,8 +359,17 @@ class Ajax extends CI_Controller
       }
       $insert['active'] = 1;
       $id = $this->database_model->add("headlines", $insert, "headlineId");
+      if($parentId && $parentType)
+      {
+        $items = array(
+          'headline' => array($id),
+          'cluster' => ($parentType == 'cluster')?array($parentId):array(),
+          'article' => ($parentType == 'article')?array($parentId):array()
+        );
+        $this->stream_model->manual_join($items);
+      }
       $item = $this->database_model->get_select('headlines', array('headlineId' => $id), 'OLD_PASSWORD(headlineId) AS hashId');
-      @mail("owen@allinwebpro.com", "New Headline", "Link: ".site_url('h/'.$item->hashId));
+      $this->utility_model->email_owen("New Headline", "Link: http:".site_url('h/'.$item[0]->hashId));
       $sInsert = array('headlineId' => $id, 'userId' => $userId);
       $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
       $this->database_model->add('subscriptions', array('userId' => 3, 'headlineId' => $id, 'createdOn' => time()), 'subscriptionId');
@@ -327,16 +393,126 @@ class Ajax extends CI_Controller
         }
       }
       // Metadata
-      $metadata = array('headlineId' => $id, 'quality' => 0, 'importance' => 0);
-      $metadata['credibility'] = $this->utility_model->credibility('headline', $id);
+      $metadata = array(
+        'headlineId' => $id,
+        'quality' => 0,
+        'importance' => 0,
+        'credibility' => $this->utility_model->credibility('headline', $id)
+      );
+      $metadata['score'] = $metadata['credibility'];
       $this->database_model->add('metadata', $metadata, 'metadataId');
       $this->stream_model->autocompare('headline', $id);
       //
       $response['success'] = 1;
       $h = $this->database_model->get_single('headlines', array('headlineId' => $id, 'deleted' => 0), '*, OLD_PASSWORD(headlineId) AS hashId');
-      $response['redirect'] = site_url('h/'.$h->hashId);
+      $response['redirect'] = site_url('h/'.$h->hashId."?n=1");
     }
-    else { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
+    elseif($_POST) { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
+    $this->_output_json($response);
+  }
+  
+  
+
+  /**
+   * Create Cluster
+   *
+   * @access public
+   * @param int
+   * @return void
+   */
+  public function cluster($otherId = 0, $otherType = '')
+  {
+    $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url|max_length[255]');
+    
+    if($this->session->userdata('level') == 'a')
+    {
+      $this->form_validation->set_rules('adminOnly', 'Admin Only', 'trim|xss_clean');
+      $this->form_validation->set_rules('hidden', 'Hidden', 'trim|xss_clean');
+    }
+    
+    $this->form_validation->set_rules('place', 'Location', 'trim|xss_clean');
+    $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
+    $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
+    $this->form_validation->set_rules('image[]', 'Links', 'trim|prep_url|xss_clean');
+    $this->form_validation->set_rules('resource[]', 'Links', 'trim|prep_url|xss_clean');
+    $this->form_validation->set_rules('categoryId[]', 'Category', 'trim|required|xss_clean');
+    if($this->form_validation->run())
+    {
+      $post = $this->input->post();
+      $userId = $this->session->userdata('userId');
+      $time = time();
+      $decay = $time - 1385884800;
+      $insert = array(
+        'headline' => $this->db->escape_str(preg_replace('/\s+/', ' ', $post['headline'])),
+        'tags' => $this->db->escape_str($this->utility_model->clean_tag_list($post['tags'])),
+        'createdBy' => $userId,
+        'createdOn' => $time,
+        'editedBy' => $userId,
+        'decay' => (log10($decay + $decay) / 4) / 10
+      );
+        
+      if($this->session->userdata('level') == 'a')
+      {
+        $update['adminOnly'] = $post['adminOnly'];
+        $update['hidden'] = $post['hidden'];
+      }
+        
+      if($post['placeId']) { $insert['placeId'] = $post['placeId']; }
+      elseif($post['place'])
+      {
+        if($place = $this->database_model->get_single('places', array('place' => $this->db->escape_str($post['place']), 'deleted' => 0))) { $insert['placeId'] = $place->placeId; }
+        else { $insert['placeId'] = $this->database_model->add('places', array('place' => $this->db->escape_str($post['place']), 'editedBy' => $userId), 'placeId'); }
+      }
+      $insert['active'] = 1;
+      $id = $this->database_model->add("clusters", $insert, "clusterId");
+      if($otherId && $otherType)
+      {
+        $items = array(
+          'headline' => ($otherType == 'headline')?array($otherId):array(),
+          'cluster' => array($id),
+          'article' => ($otherType == 'article')?array($otherId):array()
+        );
+        $this->stream_model->manual_join($items);
+      }
+      $item = $this->database_model->get_select('clusters', array('clusterId' => $id), 'OLD_PASSWORD(clusterId) AS hashId');
+      $sInsert = array('clusterId' => $id, 'userId' => $userId);
+      $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
+      $this->database_model->add('subscriptions', array('userId' => 3, 'clusterId' => $id, 'createdOn' => time()), 'subscriptionId');
+      foreach($post['categoryId'] as $c)
+      {
+        $this->database_model->add("catlist", array('clusterId' => $id, 'categoryId' => $c, 'editedBy' => $userId), 'catlistId');
+      }
+      $this->utility_model->add_keywords('cluster', $id, $post['headline'], $post['tags']);
+      if(isset($post['image']) && $post['image'])
+      {
+        foreach($post['image'] as $i)
+        {
+          if($i !== '') { $this->database_model->add("images", array('clusterId' => $id, 'image' => $this->db->escape_str($i), 'editedBy' => $userId), 'imageId'); }
+        }
+      }
+      if(isset($post['resource']) && $post['resource'])
+      {
+        foreach($post['resource'] as $r)
+        {
+          if($r !== '') { $this->database_model->add("resources", array('clusterId' => $id, 'resource' => $this->db->escape_str($r), 'editedBy' => $userId), 'resourceId'); }
+        }
+      }
+      // Metadata
+      $metadata = array(
+        'clusterId' => $id,
+        'quality' => 0,
+        'importance' => 0,
+        'credibility' => $this->utility_model->credibility('cluster', $id)
+      );
+      $metadata['score'] = $metadata['credibility'];
+      $this->database_model->add('metadata', $metadata, 'metadataId');
+      $this->stream_model->autocompare('cluster', $id);
+      //
+      $response['success'] = 1;
+      $c = $this->database_model->get_single('clusters', array('clusterId' => $id, 'deleted' => 0), '*, OLD_PASSWORD(clusterId) AS hashId');
+      $response['redirect'] = site_url('c/'.$c->hashId."?n=1");
+    }
+    elseif($_POST) { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     $this->_output_json($response);
   }
 
@@ -453,8 +629,8 @@ class Ajax extends CI_Controller
     $limit = 20;
     if($subscription) { $userId = $this->session->userdata('userId'); }
     $this->data['items'] = $this->stream_model->search($search, $where, $sort, $results, $comments, $limit, $current, $userId, $subscription);
-    $count = $this->stream_model->search_count($search, $where, $sort, $results, $userId, $subscription);
-    $this->data['pages'] = ceil(($count->items) / $limit);
+    $count = $this->stream_model->search_count($search, $where, $sort, $results, $comments, $limit, $current, $userId, $subscription);
+    $this->data['pages'] = ceil($count / $limit);
     $this->load->view('includes/functions');
     $this->load->view("main/lists", $this->data);
   }
@@ -562,7 +738,7 @@ class Ajax extends CI_Controller
       $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url');
       if($type == 'article')
       {
-        $this->form_validation->set_rules('article', 'Article', 'trim|xss_clean');
+        $this->form_validation->set_rules('article', 'Article', 'trim');
       }
       $this->form_validation->set_rules('place', 'Location', 'trim|xss_clean');
       $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
@@ -771,7 +947,7 @@ class Ajax extends CI_Controller
         $response['errors'] = "Account has been updated!";
       }
     }
-    else { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
+    elseif($_POST) { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     $this->_output_json($response);
   }
 
@@ -786,7 +962,7 @@ class Ajax extends CI_Controller
     $response = array('success' => 0);
     $this->form_validation->set_rules('user', 'Username', 'trim|required|min_length[3]|max_length[24]|alpha_dash|xss_clean|is_unique[users.user]');
     $this->form_validation->set_rules('email', 'Email', 'trim|required|min_length[6]|max_length[255]|valid_email|xss_clean|is_unique[users.email]');
-    $this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[8]|max_length[50]|xss_clean'); //password_check
+    $this->form_validation->set_rules('rgpassword', 'Password', 'trim|required|min_length[8]|max_length[50]|xss_clean'); //password_check
     $this->form_validation->set_rules('redirect', 'Redirect', 'trim|xss_clean');
     if($this->form_validation->run())
     {
@@ -794,11 +970,11 @@ class Ajax extends CI_Controller
       $post = $this->input->post();
       $insert = array('user' => $this->db->escape_str($post['user']), 'email' => $this->db->escape_str($post['email']));
       $insert['createdOn'] = time();
-      $insert['password'] = $this->utility_model->password_encrypt($post['user'], $post['password']);
+      $insert['password'] = $this->utility_model->password_encrypt($post['user'], $post['rgpassword']);
       $userId = $this->database_model->add('users', $insert, 'userId');
       if($user = $this->database_model->get_single('users', array('userId' => $userId)))
       {
-        @mail("owen@allinwebpro.com", "New User", "Username: ".$user->user);
+        $this->utility_model->email_owen("New User", "Username: ".$user->user);
         //
         $this->database_model->edit('users', array('userId' => $user->userId), array('lastLogin' => time()));
         $this->utility_model->emails_signup($user);
@@ -847,13 +1023,20 @@ class Ajax extends CI_Controller
     }
     if($type == 'article')
     {
-      $this->form_validation->set_rules('article', 'Article', 'trim|xss_clean');
+      $this->form_validation->set_rules('article', 'Article', 'trim|strip_html_tags');
+    }
+    if($this->session->userdata('level') == 'a')
+    {
+      $this->form_validation->set_rules('adminOnly', 'Admin Only', 'trim|xss_clean');
+      $this->form_validation->set_rules('hidden', 'Hidden', 'trim|xss_clean');
     }
     $this->form_validation->set_rules('place', 'Location', 'trim|xss_clean');
     $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
     $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
     $this->form_validation->set_rules('image[]', 'Links', 'trim  |prep_url|xss_clean');
+    $this->form_validation->set_rules('remove-image[]', 'Links', 'trim  |prep_url|xss_clean');
     $this->form_validation->set_rules('resource[]', 'Links', 'trim  |prep_url|xss_clean');
+    $this->form_validation->set_rules('remove-resource[]', 'Links', 'trim  |prep_url|xss_clean');
     $this->form_validation->set_rules('categoryId[]', 'Category', 'trim|required|xss_clean');
     if($this->form_validation->run())
     {
@@ -862,7 +1045,13 @@ class Ajax extends CI_Controller
       $item['headline'] = $this->db->escape_str(preg_replace('/\s+/', ' ', $post['headline']));
       $item['tags'] = $this->db->escape_str($this->utility_model->clean_tag_list($post['tags']));
       $item['editedBy'] = $userId;
+      $item['decay'] = (log10(($item['createdOn'] - 1385884800) + (time() - 1385884800)) / 4) / 10;
       $item['active'] = 1;
+      if($this->session->userdata('level') == 'a')
+      {
+        $item['adminOnly'] = $post['adminOnly'];
+        $item['hidden'] = $post['hidden'];
+      }
       if($type == 'headline') { $item['notes'] = $this->db->escape_str($post['notes']); }
       if($type == 'article') { $item['article'] = $this->db->escape_str(str_replace("\r", '', str_replace("\n", '', $post['article']))); }
       if($place && $post['placeId'] == $place['placeId'])
@@ -923,57 +1112,55 @@ class Ajax extends CI_Controller
         }
       }
       // Edit Images
-      if($images)
-      {
-        foreach($images as $image)
-        {
-          if(!in_array($image, $post['image']) || $image == '')
-          {
-            $where = array($type.'Id' => $id, 'image' => $image);
-            $image_s = $this->database_model->get_single('images', $where);
-            $this->database_model->edit('images', array('imageId' => $image_s->imageId), $delete);
-          }
-        }
-      }
       if(isset($post['image']) && $post['image'])
       {
-        foreach($post['image'] as $image)
+        foreach($post['image'] as $imageId => $image)
         {
-          if(!in_array($image, $images) && $image !== '')
-          {
-            $where = array($type.'Id' => $id, 'image' => $image);
-            $image_s = $this->database_model->get_single('images', $where);
-            if($image_s) { $this->database_model->edit('images', array('imageId' => $image_s->imageId), $undelete); }
-            else { $this->database_model->add('images', $where+array('editedBy' => $userId, 'active' => 1), 'imageId'); }
-          }
+          $this->database_model->edit('images', array('imageId' => $imageId), array('image' => $this->db->escape_str($image), 'editedBy' => $userId));
+        }
+      }
+      if(isset($post['add-image']) && $post['add-image'])
+      {
+        foreach($post['add-image'] as $image)
+        {
+          $this->database_model->add('images', array($type.'Id' => $id, 'image' => $this->db->escape_str($image), 'editedBy' => $userId, 'active' => 1), 'imageId');
+        }
+      }
+      if(isset($post['remove-image']) && $post['remove-image'])
+      {
+        foreach($post['remove-image'] as $imageId => $image)
+        {
+          $this->database_model->edit('images', array('imageId' => $imageId), $delete);
         }
       }
       // Edit Resources
-      if($resources)
-      {
-        foreach($resources as $resource)
-        {
-          if(!in_array($resource, $post['resource']) || $resource == '')
-          {
-            $where = array($type.'Id' => $id, 'resource' => $resource);
-            $resource_s = $this->database_model->get_single('resources', $where);
-            $this->database_model->edit('resources', array('resourceId' => $resource_s->resourceId), $delete);
-          }
-        }
-      }
       if(isset($post['resource']) && $post['resource'])
       {
-        foreach($post['resource'] as $resource)
+        foreach($post['resource'] as $resourceId => $resource)
         {
-          if(!in_array($resource, $resources) && $resource !== '')
-          {
-            $where = array($type.'Id' => $id, 'resource' => $resource);
-            $resource_s = $this->database_model->get_single('resources', $where);
-            if($resource_s) { $this->database_model->edit('resources', array('resourceId' => $resource_s->resourceId), $undelete); }
-            else { $this->database_model->add('resources', $where+array('editedBy' => $userId, 'active' => 1), 'resourceId'); }
-          }
+          $this->database_model->edit('resources', array('resourceId' => $resourceId), array('resource' => $this->db->escape_str($resource), 'editedBy' => $userId));
         }
       }
+      if(isset($post['add-resource']) && $post['add-resource'])
+      {
+        foreach($post['add-resource'] as $resource)
+        {
+          $this->database_model->add('resources', array($type.'Id' => $id, 'resource' => $this->db->escape_str($resource), 'editedBy' => $userId, 'active' => 1), 'resourceId');
+        }
+      }
+      if(isset($post['remove-resource']) && $post['remove-resource'])
+      {
+        foreach($post['remove-resource'] as $resourceId => $resource)
+        {
+          $this->database_model->edit('resources', array('resourceId' => $resourceId), $delete);
+        }
+      }
+      //
+      $this->utility_model->metadata($type, $id);
+    }
+    elseif($_POST)
+    {
+      $this->data['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.';
     }
     $item_temp = $this->database_model->get_select($type.'s', array($type.'Id' => $id), 'OLD_PASSWORD('.$type.'Id) AS hashId');
     $response['redirect'] = site_url(substr($type, 0, 1).'/'.$item_temp[0]->hashId);
@@ -1057,9 +1244,10 @@ class Ajax extends CI_Controller
     $this->data['id'] = $id;
     $this->data['type'] = $type;
     $this->data['ranking'] = $this->database_model->get_single('rankings', array($type.'Id' => $id, 'createdBy' => $userId));
-    $this->data['cats'] = $this->database_model->get_array('catlist', array($type.'Id' => $id, 'deleted' => 0), 'categoryId');
+    //$this->data['cats'] = $this->database_model->get_array('catlist', array($type.'Id' => $id, 'deleted' => 0), 'categoryId');
     $this->data['contributors'] = $this->stream_model->get_contributors($type, $id);
     $this->$target($dir);
+    $this->utility_model->metadata($type, $id);
   }
 
   /**
@@ -1151,14 +1339,14 @@ class Ajax extends CI_Controller
       $score = $this->stream_model->get_score_by_user($user->userId);
       $update = array('score' => (($score->q_score_sum + $score->i_score_sum) / $score->total_items));
       $this->database_model->edit('users', array('userId' => $user->userId), $update);
-      foreach($this->data['cats'] as $c)
+      /*foreach($this->data['cats'] as $c)
       {
         $cat_score = $this->stream_model->get_score_by_user($user->userId, $c);
         $data = array('score' => (($cat_score->q_score_sum + $cat_score->i_score_sum) / $cat_score->total_items));
         $where = array('userId' => $user->userId, 'categoryId' => $c);
         if($item = $this->database_model->get_single('scores', $where)) { $this->database_model->edit('scores', array('scoreId' => $item->scoreId), $data); }
         else { $this->database_model->add('scores', $where+$data, 'scoreId'); }
-      }
+      }*/
     }
   }
 

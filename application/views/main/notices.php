@@ -16,7 +16,7 @@
           <?php elseif(sizeof($people) == 1): ?>
             <strong><?php echo $people[0]; ?></strong>
           <?php endif; ?>
-          commented on <i class="fa fa-<?php echo ($n->type == 'headline')?'dot-circle-o':(($n->type == 'cluster')?'code-fork':'caret-square-o-up'); ?>"></i>
+          commented on <div class="icon-box"><?php echo file_get_contents('media/svg/'.$n->type.'.svg'); ?></div>
           <em>&ldquo;<?php echo stripslashes($n->headline); ?>&rdquo;</em>
         <?php elseif($n->action == 'edits'): ?>
           <?php $people = explode(' ', $n->users); ?>
@@ -29,10 +29,10 @@
           <?php elseif(sizeof($people) == 1): ?>
             <strong><?php echo $people[0]; ?></strong>
           <?php endif; ?>
-          edited <i class="fa fa-<?php echo ($n->type == 'headline')?'dot-circle-o':(($n->type == 'cluster')?'code-fork':'caret-square-o-up'); ?>"></i>
+          edited <div class="icon-box"><?php echo file_get_contents('media/svg/'.$n->type.'.svg'); ?></div>
           <em>&ldquo;<?php echo stripslashes($n->headline); ?>&rdquo;</em>
         <?php elseif($n->action == 'joins'): ?>
-          <i class="fa fa-<?php echo ($n->type == 'headline')?'dot-circle-o':(($n->type == 'cluster')?'code-fork':'caret-square-o-up'); ?>"></i>
+          <div class="icon-box"><?php echo file_get_contents('media/svg/'.$n->type.'.svg'); ?></div>
           <em>&ldquo;<?php echo stripslashes($n->headline); ?>&rdquo;</em> has been upgraded to <?php echo ($n->type == 'headline')?'a Cluster':'an Article'; ?>
         <?php endif; ?>
       </a><br>

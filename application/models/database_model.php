@@ -2,6 +2,11 @@
 
 class Database_model extends CI_Model
 {
+  public function __construct()
+  {
+    parent::__construct();
+  }
+  
   /**
    * Add Item
    *
@@ -65,7 +70,9 @@ class Database_model extends CI_Model
   {
     if($limit) { $this->db->limit($limit, ($limit*$n)); }
     $q = $this->db->get_where($table, $where);
-    return $q->result();
+    $results =  $q->result();
+    
+    return $results;
   }
 
   /**
@@ -84,7 +91,9 @@ class Database_model extends CI_Model
     $this->db->where($where);
     $this->db->or_where($or_where);
     $q = $this->db->get($table);
-    return $q->result();
+    $results =  $q->result();
+    
+    return $results;
   }
 
   /**
@@ -131,7 +140,9 @@ class Database_model extends CI_Model
   {
     $this->db->where($where);
     if($group_by) { $this->db->group_by($group_by); }
-    return $this->db->count_all_results($table);
+    $count = $this->db->count_all_results($table);
+    
+    return $count;
   }
 
   /**
@@ -149,7 +160,9 @@ class Database_model extends CI_Model
     if($order) { $this->db->order_by($order, $dir); }
     $q = $this->db->get_where($table, $where);
     if($row) { return $q->row(); }
-    return $q->result();
+    $results =  $q->result();
+    
+    return $results;
   }
 
   /**
@@ -168,7 +181,9 @@ class Database_model extends CI_Model
     if($group_by) { $this->db->group_by($group_by); }
     if($order) { $this->db->order_by($order, $dir); }
     $q = $this->db->get_where($table, $where);
-    return $q->row();
+    $results =  $q->row();
+    
+    return $results;
   }
 
   public function get_select($table = '', $where = array(), $select = '*', $order = '', $dir = '')
@@ -176,7 +191,9 @@ class Database_model extends CI_Model
     $this->db->select($select, false);
     if($order) { $this->db->order_by($order, $dir); }
     $q = $this->db->get_where($table, $where);
-    return $q->result();
+    $results =  $q->result();
+    
+    return $results;
   }
 }
 

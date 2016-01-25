@@ -21,34 +21,59 @@ class Form extends CI_Controller
    * @param int
    * @return void
    */
-  public function index($action = '', $type = '', $id = 0)
+  public function index($action = '', $type = '', $id = 0, $otherType = '', $otherDeclaration = '')
   {
     $this->data['action'] = $action;
-    if(in_array($type, array('article', 'cluster', 'headline')))
+    if(in_array($type, array('article', 'cluster', 'headline')) &&
+       (($type == 'cluster' && $action == 'add' && $this->session->userdata('level') == 'a') 
+       || ($type !== 'cluster')))
     {
       $this->data['type'] = $type;
+      $this->data['otherType'] = $otherType;
+      $this->data['otherDeclaration'] = $otherDeclaration;
       $this->$action($id, false);
       // Load View
       // redirect(substr($type, 0, 1).'/'.$id);
       $this->data['title'] = ($action=='add'?'Create':'Modify')." ".ucfirst($this->data['type']);
-      $this->data['page'] = "form";
-      $this->load->view($this->template, $this->data);
+      if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
+      {
+        $this->load->view('includes/functions');
+        $this->load->view('main/form', $this->data);
+      }
+      else
+      {
+        $this->data['page'] = "form";
+        $this->load->view($this->template, $this->data);
+      }
     }
     else { redirect('p/404'); }
   }
 
-  public function hashed($action = '', $type = '', $id = 0)
+  public function hashed($action = '', $type = '', $id = 0, $otherType = '', $otherDeclaration = '')
   {
     $this->data['action'] = $action;
-    if(in_array($type, array('article', 'cluster', 'headline')))
+    
+    if(in_array($type, array('article', 'cluster', 'headline')) &&
+       (($type == 'cluster' && $action == 'add' && $this->session->userdata('level') == 'a') 
+       || ($type !== 'cluster')))
     {
       $this->data['type'] = $type;
+      $this->data['otherType'] = $otherType;
+      $this->data['otherDeclaration'] = $otherDeclaration;
       $this->$action($id, true);
       // Load View
       // redirect(substr($type, 0, 1).'/'.$id);
       $this->data['title'] = ($action=='add'?'Create':'Modify')." ".ucfirst($this->data['type']);
-      $this->data['page'] = "form";
-      $this->load->view($this->template, $this->data);
+      if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
+      {
+        $this->load->view('includes/functions');
+        $this->load->view('main/form', $this->data);
+      }
+      else
+      {
+        $this->data['page'] = "form";
+        $this->load->view($this->template, $this->data);
+      }
     }
     else { redirect('p/404'); }
   }
@@ -62,23 +87,25 @@ class Form extends CI_Controller
    * @param int
    * @return void
    */
-  private function add($clusterId = 0, $hashed = false)
+  private function add($otherId = 0, $hashed = false)
   {
     // Vars
-    if($clusterId)
+    if($otherId && $this->data['otherDeclaration'] == 'parent')
     {
-      $this->data['id'] = $clusterId;
+      $this->data['id'] = $otherId;
       if($hashed)
       {
-        $this->data['hashId'] = $clusterId;
-        $this->data['item'] = $this->database_model->get_single('clusters', array('OLD_PASSWORD(clusterId)' => $clusterId, 'deleted' => 0));
+        $this->data['hashId'] = $otherId;
+        
+        $this->data['item'] = $this->database_model->get_single($this->data['otherType'].'s', array('OLD_PASSWORD('.$this->data['otherType'].'Id)' => $otherId, 'deleted' => 0));
         $this->data['id'] = $this->data['item']->clusterId;
       }
       else
       {
-        $this->data['item'] = $this->database_model->get_single('clusters', array('clusterId' => $clusterId, 'deleted' => 0));
+        $this->data['item'] = $this->database_model->get_single($this->data['otherType'].'s', array($this->data['otherType'].'Id' => $otherId, 'deleted' => 0));
       }
-      $assets_where = array('clusterId' => $this->data['id']);
+      $assets_where = array($this->data['otherType'].'Id' => $this->data['id']);
+      
       $this->data['images_output'] = $this->database_model->get('images', $assets_where+array('active' => 1, 'deleted' => 0));
       $this->data['resources_output'] = $this->database_model->get('resources', $assets_where+array('active' => 1, 'deleted' => 0));
     }
@@ -86,12 +113,15 @@ class Form extends CI_Controller
     if($post = $this->validate())
     {
       $userId = $this->session->userdata('userId');
+      $time = time();
+      $decay = $time - 1385884800;
       $insert = array(
         'headline' => $this->db->escape_str(preg_replace('/\s+/', ' ', $post['headline'])),
         'tags' => $this->db->escape_str($this->utility_model->clean_tag_list($post['tags'])),
         'createdBy' => $userId,
-        'createdOn' => time(),
-        'editedBy' => $userId
+        'createdOn' => $time,
+        'editedBy' => $userId,
+        'decay' => (log10($decay + $decay) / 4) / 10
       );
       if($post['placeId']) { $insert['placeId'] = $post['placeId']; }
       elseif($post['place'])
@@ -102,20 +132,35 @@ class Form extends CI_Controller
       if($this->data['type'] == 'headline') { $insert['notes'] = $this->db->escape_str($post['notes']); }
       if($this->data['type'] == 'article') { $insert['article'] = $this->db->escape_str(str_replace('\r', '', str_replace('\n', '', $post['article']))); }
       $insert['active'] = 1;
+      
+      if($this->session->userdata('level') == 'a')
+      {
+        $insert['adminOnly'] = $post['adminOnly'];
+        $insert['hidden'] = $post['hidden'];
+      }
+        
       $id = $this->database_model->add($this->data['type']."s", $insert, $this->data['type']."Id");
-      $sInsert = array($$this->data['type'].'Id' => $id, 'userId' => $userId);
+      $sInsert = array($this->data['type'].'Id' => $id, 'userId' => $userId);
       $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
       if($this->data['type'] == 'headline')
       {
         $item = $this->database_model->get_select('headlines', array('headlineId' => $id), 'OLD_PASSWORD(headlineId) AS hashId');
-        @mail("owen@allinwebpro.com", "New Headline", "Link: ".site_url('h/'.$item->hashId));
+        $this->utility_model->email_owen("New Headline", "Link: http:".site_url('h/'.$item[0]->hashId));
         $sInsert = array('headlineId' => $id, 'userId' => $userId);
       }
       foreach($post['categoryId'] as $c)
       {
         $this->database_model->add("catlist", array($this->data['type'].'Id' => $id, 'categoryId' => $c, 'editedBy' => $userId), 'catlistId');
       }
-      if($clusterId) { $this->database_model->edit('clusters', array('clusterId' => $clusterId, 'editedBy' => $userId), array($this->data['type'].'Id' => $id)); }
+      if($otherId)
+      {
+        $items = array(
+          'headline' => ($this->data['type'] == 'headline')?array($id):($this->data['otherType'] == 'headline')?array($otherId):array(),
+          'cluster' => ($this->data['type'] == 'cluster')?array($id):($this->data['otherType'] == 'cluster')?array($otherId):array(),
+          'article' => ($this->data['type'] == 'article')?array($id):($this->data['otherType'] == 'article')?array($otherId):array()
+        );
+        $this->stream_model->manual_join($items);
+      }
       $this->utility_model->add_keywords($this->data['type'], $id, $post['headline'], $post['tags']);
       if(isset($post['image']) && $post['image'])
       {
@@ -137,11 +182,11 @@ class Form extends CI_Controller
       $this->database_model->add('metadata', $metadata, 'metadataId');
       $this->stream_model->autocompare($this->data['type'], $id);
       // Load View
-      redirect($this->data['type'].'/'.$id);
+      redirect($this->data['type'].'/'.$id."?n=1");
     }
     else
     {
-      if($clusterId)
+      if($this->data['otherDeclaration'] == 'parent')
       {
         $this->data['headlines'] = array();
         $this->data['h_resources'] = array();
@@ -200,7 +245,7 @@ class Form extends CI_Controller
     $this->data['images_output'] = $this->database_model->get('images', $assets_where+array('active' => 1, 'deleted' => 0));
     $this->data['resources_output'] = $this->database_model->get('resources', $assets_where+array('active' => 1, 'deleted' => 0));
     // Verify Data Exists
-    if(isset($this->data['item']) && $this->data['item'])
+    if(isset($this->data['item']) && $this->data['item'] && (!$this->data['item']->adminOnly || ($this->data['item']->adminOnly && $this->session->userdata('level') == 'a')))
     {
       // Set Variables for Display
       $this->data['place'] = $this->database_model->get_single('places', array('placeId' => $this->data['item']->placeId, 'deleted' => 0));
@@ -217,6 +262,7 @@ class Form extends CI_Controller
           'tags' => $this->db->escape_str($this->utility_model->clean_tag_list($post['tags'])),
           'editedBy' => $userId
         );
+        $update['decay'] = (log10(($this->data['item']->createdOn - 1385884800) + (time() - 1385884800)) / 4) / 10;
         if($this->data['place'] && $post['placeId'] == $this->data['place']->placeId)
         {
           if(empty($post['place'])) { $update['placeId'] = null; }
@@ -240,7 +286,7 @@ class Form extends CI_Controller
         if($this->data['type'] == 'article') { $update['article'] = $this->db->escape_str(str_replace('\r', '', str_replace('\n', '', $post['article']))); }
         $update['active'] = 1;
 
-        $sInsert = array($$this->data['type'].'Id' => $this->data['id'], 'userId' => $userId);
+        $sInsert = array($this->data['type'].'Id' => $this->data['id'], 'userId' => $userId);
         if(!$this->database_model->get_single('subscriptions', $sInsert))
         {
           $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
@@ -253,6 +299,12 @@ class Form extends CI_Controller
           {
             $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId');
           }
+        }
+        
+        if($this->session->userdata('level') == 'a')
+        {
+          $update['adminOnly'] = $post['adminOnly'];
+          $update['hidden'] = $post['hidden'];
         }
 
         $this->database_model->edit($this->data['type'].'s', array($this->data['type'].'Id' => $this->data['id']), $update);
@@ -282,57 +334,50 @@ class Form extends CI_Controller
           }
         }
         // Edit Images
-        if($this->data['images'])
-        {
-          foreach($this->data['images'] as $image)
-          {
-            if(!in_array($image, $post['image']) || $image == '')
-            {
-              $where = array($this->data['type'].'Id' => $this->data['id'], 'image' => $image);
-              $image_s = $this->database_model->get_single('images', $where);
-              $this->database_model->edit('images', array('imageId' => $image_s->imageId), $delete);
-            }
-          }
-        }
         if(isset($post['image']) && $post['image'])
         {
-          foreach($post['image'] as $image)
+          foreach($post['image'] as $imageId => $image)
           {
-            if(!in_array($image, $this->data['images']) && $image !== '')
-            {
-              $where = array($this->data['type'].'Id' => $this->data['id'], 'image' => $image);
-              $image_s = $this->database_model->get_single('images', $where);
-              if($image_s) { $this->database_model->edit('images', array('imageId' => $image_s->imageId), $undelete); }
-              else { $this->database_model->add('images', $where+array('editedBy' => $userId, 'active' => 1), 'imageId'); }
-            }
+            $this->database_model->edit('images', array('imageId' => $imageId), array('image' => $this->db->escape_str($image), 'editedBy' => $userId));
+          }
+        }
+        if(isset($post['add-image']) && $post['add-image'])
+        {
+          foreach($post['add-image'] as $image)
+          {
+            $this->database_model->add('images', array($this->data['type'].'Id' => $this->data['id'], 'image' => $this->db->escape_str($image), 'editedBy' => $userId, 'active' => 1), 'imageId');
+          }
+        }
+        if(isset($post['remove-image']) && $post['remove-image'])
+        {
+          foreach($post['remove-image'] as $imageId => $image)
+          {
+            $this->database_model->edit('images', array('imageId' => $imageId), $delete);
           }
         }
         // Edit Resources
-        if($this->data['resources'])
-        {
-          foreach($this->data['resources'] as $resource)
-          {
-            if(!in_array($resource, $post['resource']) || $resource == '')
-            {
-              $where = array($this->data['type'].'Id' => $this->data['id'], 'resource' => $this->db->escape_str($resource));
-              $resources = $this->database_model->get_single('resources', $where);
-              $this->database_model->edit('resources', array('resourceId' => $resources->resourceId), $delete);
-            }
-          }
-        }
         if(isset($post['resource']) && $post['resource'])
         {
-          foreach($post['resource'] as $resource)
+          foreach($post['resource'] as $resourceId => $resource)
           {
-            if(!in_array($resource, $this->data['resources']) && $resource !== '')
-            {
-              $where = array($this->data['type'].'Id' => $this->data['id'], 'resource' => $this->db->escape_str($resource));
-              $resources = $this->database_model->get_single('resources', $where);
-              if($resources) { $this->database_model->edit('resources', array('resourceId' => $resources->resourceId), $undelete); }
-              else { $this->database_model->add('resources', $where+array('editedBy' => $userId), 'resourceId'); }
-            }
+            $this->database_model->edit('resources', array('resourceId' => $resourceId), array('resource' => $this->db->escape_str($resource), 'editedBy' => $userId));
           }
         }
+        if(isset($post['add-resource']) && $post['add-resource'])
+        {
+          foreach($post['add-resource'] as $resource)
+          {
+            $this->database_model->add('resources', array($this->data['type'].'Id' => $this->data['id'], 'resource' => $this->db->escape_str($resource), 'editedBy' => $userId, 'active' => 1), 'resourceId');
+          }
+        }
+        if(isset($post['remove-resource']) && $post['remove-resource'])
+        {
+          foreach($post['remove-resource'] as $resourceId => $resource)
+          {
+            $this->database_model->edit('resources', array('resourceId' => $resourceId), $delete);
+          }
+        }
+        //
         $this->utility_model->metadata($this->data['type'], $this->data['id']);
         redirect($this->data['type'].'/'.$id);
       }
@@ -445,16 +490,29 @@ class Form extends CI_Controller
     }
     if($this->data['type'] == 'article')
     {
-      $this->form_validation->set_rules('article', 'Article', 'trim|xss_clean');
+      $this->form_validation->set_rules('article', 'Article', 'trim|strip_html_tags');
+    }
+    if($this->session->userdata('level') == 'a')
+    {
+      $this->form_validation->set_rules('adminOnly', 'Admin Only', 'trim|xss_clean');
+      $this->form_validation->set_rules('hidden', 'Hidden', 'trim|xss_clean');
     }
     $this->form_validation->set_rules('place', 'Location', 'trim|xss_clean');
     $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
     $this->form_validation->set_rules('categoryId[]', 'Category', 'trim|required|xss_clean');
     $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
     $this->form_validation->set_rules('image[]', 'Links', 'trim|prep_url|xss_clean');
+    $this->form_validation->set_rules('add-image[]', 'Links', 'trim|prep_url|xss_clean');
+    $this->form_validation->set_rules('remove-image[]', 'Links', 'trim|prep_url|xss_clean');
     $this->form_validation->set_rules('resource[]', 'Links', 'trim|prep_url|xss_clean');
+    $this->form_validation->set_rules('add-resource[]', 'Links', 'trim|prep_url|xss_clean');
+    $this->form_validation->set_rules('remove-resource[]', 'Links', 'trim|prep_url|xss_clean');
     if($this->form_validation->run()) { return $this->input->post(); }
-    return false;
+    elseif($_POST)
+    {
+      $this->data['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.';
+      return false;
+    }
   }
 }
 

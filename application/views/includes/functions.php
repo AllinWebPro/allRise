@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-define('SITE_TITLE', "allRise - Collaborative News for Everyone");
+define('SITE_TITLE', "allRise: Collaborative News for Everyone");
 
 function indexpage($segments = array())
 {
@@ -20,11 +20,11 @@ function metadata($name, $data)
     break;
     case 'description':
       if(isset($data) && !empty($data)) { $output = $data; }
-      else { $output = "allRise Description"; }
+      else { $output = "allRise helps communities large and small connect in new ways to share real-time important information and easily build it into high-quality information, news, and articles."; }
     break;
     case 'keywords':
       if(isset($data) && !empty($data)) { $output = $data; }
-      else { $output = "allRise,Keywords"; }
+      else { $output = "allRise,communities,connect,share,information,quality,news,articles"; }
     break;
     default:
       $output = "No Data Available.";
@@ -42,5 +42,16 @@ function get_url_string($string = '', $max_length = 122)
     $string = substr($string, 0, strpos($string, "\n"));
   }
   return str_replace(' ', '-', str_replace('  ', '-', $string));
+}
+
+function get_100_char($string = '')
+{
+  if(strlen($string) > 100)
+  {
+    $string = wordwrap($string, 100);
+    $string = substr($string, 0, strpos($string, "\n"));
+    $string .= "...";
+  }
+  return $string;
 }
 ?>

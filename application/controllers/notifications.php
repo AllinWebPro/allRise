@@ -31,7 +31,7 @@ class Notifications extends CI_Controller
     $count = $this->stream_model->notifications_count($this->data['user']->userId, 0, $display);
     $this->data['pages'] = ceil(($count) / $limit);
     $this->data['title'] = "Notifications";
-    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'])
+    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
     {
       $this->load->view('includes/functions');
       $this->load->view('main/notifications', $this->data);

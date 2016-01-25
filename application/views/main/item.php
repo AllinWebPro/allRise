@@ -1,21 +1,24 @@
 <nav id="sort" class="pure-menu pure-menu-open pure-menu-horizontal pure-u-1">
   <ul class="pure-g-r pure-u-1 center-text left-align">
     <li class="pure-u-1-6 left-align pure-menu-selected"><a><?php echo ucfirst($type); ?></a></li>
-    <?php if($this->session->userdata('isLoggedIn') && !isset($history)): ?>
-      <?php if($subscription): ?>
-        <li class="pure-u-1-6 right-align pure-menu-selected">
-          <a id="subscribe" href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline)); ?>?subscribe=0" class="ajax" data-type="item">Unsubscribe</a></li>
-      <?php else: ?>
-        <li class="pure-u-1-6 right-align pure-menu-selected">
-          <a id="subscribe" href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline)); ?>?subscribe=1" class="ajax" data-type="item">Subscribe</a></li>
-      <?php endif; ?>
-    <?php endif; ?>
   </ul>
 </nav>
+<?php if(isset($_REQUEST['n']) && $_REQUEST['n'] && isset($parent) && $parent): ?>
+  <div id="alert" class="pure-u-1 top-padding">
+    <div class="horizontal-margin-small">
+      <div class="horizontal-padding-small vertical-padding-small">
+        <a href="<?php echo site_url(substr($parent->type, 0, 1).'/'.$parent->hashId.'/'.get_url_string($parent->headline)); ?>">
+          This Headline was Auto-Joined with a Cluster based on the title and tags submitted.
+          Click here, to join the conversation and see what other people are saying about the topic.
+        </a>
+      </div>
+    </div>
+  </div>
+<?php endif; ?>
 <div id="item" class="pure-u-1 vertical-padding-small">
   <section class="large">
     <div class="horizontal-margin-small vertical-margin-small">
-      <div class="horizontal-padding-small vertical-padding-small">
+      <div class="horizontal-padding-small vertical-padding-xsmall">
         <h2><?php echo stripslashes($item->headline); ?></h2>
         <div class="horizontal-padding-tiny vertical-padding-tiny top-padding-xsmall grey">
           <span class="right-padding-tiny"><i class="fa fa-3-4 fa-edit horizontal-padding-tiny"></i>
@@ -48,61 +51,77 @@
           <?php endif; ?>
           <?php if($type == 'headline'): ?>
             <span><i class="fa fa-3-4 fa-user horizontal-padding-tiny"></i>
-              <a href="<?php echo site_url('user/'.$contributors[0]->user); ?>"><?php echo $contributors[0]->user; ?></a></span>
+              <a href="<?php echo site_url('u/'.$contributors[0]->user); ?>"><?php echo $contributors[0]->user; ?></a></span>
           <?php endif; ?>
           <?php if(isset($parent) && $parent): ?>
-            <span><i class="fa fa-<?php echo ($parent->type == 'cluster')?'code-fork':'caret-square-o-up'; ?> horizontal-padding-tiny"></i>
-              <a href="<?php echo site_url(substr($parent->type, 0, 1).'/'.$parent->hashId.'/'.get_url_string($parent->headline)); ?>">View <?php echo ucfirst($parent->type); ?></a></span>
+            <span>
+              <div class="icon-box horizontal-padding-tiny"><?php echo file_get_contents('media/svg/'.$parent->type.'.svg'); ?></div>
+              <a href="<?php echo site_url(substr($parent->type, 0, 1).'/'.$parent->hashId.'/'.get_url_string($parent->headline)); ?>">View Parent <?php echo ucfirst($parent->type); ?></a></span>
+            <?php if($parent->type == 'cluster' && isset($parent_parent) && $parent_parent): ?>
+              <span>
+                <div class="icon-box horizontal-padding-tiny"><?php echo file_get_contents('media/svg/article.svg'); ?></div>
+                <a href="<?php echo site_url('a/'.$parent_parent->hashId.'/'.get_url_string($parent_parent->headline)); ?>">View Parent Article</a></span>
+            <?php endif; ?>
           <?php endif; ?>
         </div>
       </div>
       <?php if($type == 'article'): ?>
-        <div class="horizontal-padding-small vertical-padding-small">
+        <div class="horizontal-padding-small bottom-padding-xsmall">
           <?php if($type == 'article' && $item->article): ?>
             <article class="content">
-              <?php echo stripslashes(str_replace('\r', '', str_replace('\n', '', $item->article))); ?>
+              <?php echo stripcslashes(str_replace('\r', '', str_replace('\n', '', $item->article))); ?>
             </article>
-            <a href="<?php echo site_url('article/modify/'.$id); ?>" class="right-align">Edit this Article</a>
+            <div class="clear"></div>
+            <?php if($this->session->userdata('isLoggedIn') && !isset($history) && (!$item->adminOnly || ($item->adminOnly && $this->session->userdata('level') == 'a')) && ($type !== 'headline' || ($item->createdBy == $this->session->userdata('userId') || in_array($this->session->userdata('level'), array('m', 'a'))))): ?>
+              <a href="<?php echo site_url('a/modify/'.$item->hashId); ?>" class="right-align">Edit this Article</a>
+            <?php endif; ?>
             <div class="clear"></div>
           <?php elseif($this->session->userdata('isLoggedIn')): ?>
-            <a class="pure-button pure-button-small" href="<?php echo site_url('article/modify/'.$id); ?>" >
+            <a class="pure-button pure-button-small" href="<?php echo site_url('a/modify/'.$item->hashId); ?>" >
               Start Writing an Article</a>
           <?php endif; ?>
         </div>
       <?php elseif($type == 'cluster' && is_null($item->articleId) && $this->session->userdata('isLoggedIn')): ?>
           <div class="horizontal-padding-small vertical-padding-xsmall">
-            <a title="Create Article" class="pure-button pure-button-small" href="<?php echo site_url('article/create/'.$id); ?>">
+            <a title="Create Article" class="pure-button pure-button-small" href="<?php echo site_url('a/create/'.$item->hashId.'/cluster/parent'); ?>">
               Start Writing an Article</a>
           </div>
       <?php elseif($type == 'headline' && $item->notes): ?>
-        <div class="horizontal-padding-small vertical-padding-xsmall">
+        <div class="horizontal-padding-small bottom-padding-xsmall">
           <article class="content">
-            <p class="em"><?php echo stripslashes(str_replace('\r', '<br>', str_replace('\n', '', $item->notes))); ?></p>
+            <p class="em"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $item->notes))); ?></p>
           </article>
         </div>
       <?php endif; ?>
       <hr>
-      <div class="horizontal-padding-small vertical-padding-small pure-g-r">
-        <div class="pure-u-1"><strong><a name="resources"><i class="fa fa-camera"></i></a> Images</strong></div>
+      <div class="horizontal-padding-small vertical-padding-xsmall pure-g-r" id="item-images">
+        <div class="pure-u-1 bottom-padding-small">
+          <strong><a name="images"><i class="fa fa-camera"></i></a> Images</strong>
+        </div>
         <?php if($images): ?>
           <div class="clear"></div>
           <?php foreach($images as $i): ?>
-            <div class="pure-u-1-4">
-              <div class="horizontal-padding-small vertical-padding-small">
-                <a href="<?php echo stripslashes($i->image); ?>" target="_blank" rel="nofollow">
-                  <img src="<?php echo stripslashes($i->image); ?>" class="border"></a>
+            <?php if(@getimagesize($i->image)): ?>
+              <div class="pure-u-1-4">
+                <div class="horizontal-padding-small vertical-padding-small">
+                  <a href="<?php echo stripslashes($i->image); ?>" rel="prettyPhoto[galleries]">
+                    <img src="<?php echo stripslashes($i->image); ?>" class="border"></a>
+                </div>
               </div>
-            </div>
+            <?php endif; ?>
           <?php endforeach; ?>
         <?php else: ?>
           <div class="pure-u-1 truncate">
             <em>No images at this time.</em>
           </div>
         <?php endif; ?>
+        <script>if(window.jQuery) { $("a[rel^='prettyPhoto']").prettyPhoto(); }</script>
       </div>
       <hr>
-      <div class="horizontal-padding-small vertical-padding-small">
-        <strong><a name="resources"><i class="fa fa-link"></i></a> Resources</strong>
+      <div class="horizontal-padding-small vertical-padding-small top-padding-xsmall">
+        <div class="pure-u-1 bottom-padding-small">
+          <strong><a name="resources"><i class="fa fa-link"></i></a> Resources</strong>
+        </div>
         <?php if($resources): ?>
           <?php foreach($resources as $r): ?>
             <div class="pure-u-1 truncate">
@@ -139,13 +158,22 @@
   <?php if($type !== 'headline'): ?>
     <section id="components" class="large">
       <div class="horizontal-margin-small vertical-margin-small">
-        <div class="horizontal-padding-small vertical-padding-xsmall pure-g">
+        <div class="horizontal-padding-small vertical-padding-small pure-g">
           <?php if(isset($clusters)): ?>
-            <div class="pure-u-1 strong">Article Components</div>
+            <div class="pure-u-1 bottom-padding-small">
+              <strong><a name="components"><div class="icon-box"><?php echo file_get_contents('media/svg/article.svg'); ?></div></a> Components</strong>
+              <?php if($this->session->userdata('isLoggedIn')): ?>
+                <?php if($this->session->userdata('level') == 'a'): ?>
+                  <a href="<?php site_url('c/create/'.$item->hashId.'/article/child'); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg left-margin-xsmall">Create Cluster</a>
+                <?php endif; ?>
+                <a href="<?php site_url('h/create/'.$item->hashId.'/article/child'); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg">Create Headline</a>
+              <?php endif; ?>
+            </div>
             <?php foreach($clusters as $c): ?>
               <div class="pure-u-1 vertical-padding-tiny">
-                <a title="<?php echo stripslashes($c->headline); ?>" href="<?php echo site_url('c/'.$c->hashId.'/'.get_url_string($c->headline)); ?>" class="item ajax" data-type="item">
-                  <i class="fa fa-code-fork"></i> <?php echo stripslashes($c->headline); ?></a>
+                <a title="<?php echo stripslashes($c->headline); ?>" href="<?php echo site_url('c/'.$c->hashId.'/'.get_url_string($c->headline)); ?>" class="item">
+                  <div class="icon-box"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div>
+                  <?php echo stripslashes($c->headline); ?></a>
                 <span class="grey">
                   <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
                     <time>
@@ -165,19 +193,24 @@
                   <?php endif; ?>
                   <?php if($c_comments[$c->clusterId]): ?>
                     <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
-                      <a title="<?php echo stripslashes($c->headline); ?>" href="<?php echo site_url('h/'.$c->hashId.'/'.get_url_string($c->headline)); ?>#comments" data-type="item" class="ajax">
+                      <a title="<?php echo stripslashes($c->headline); ?>" href="<?php echo site_url('h/'.$c->hashId.'/'.get_url_string($c->headline)); ?>#comments">
                         <?php echo $c_comments[$c->clusterId]; ?></a>
                     </span>
                   <?php endif; ?>
                   <?php if(sizeof($c_contributors[$c->clusterId])): ?>
                     <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-users"></i> <?php echo sizeof($c_contributors[$c->clusterId]); ?></span>
                   <?php endif; ?>
+                  <?php if(in_array($this->session->userdata('level'), array('m', 'a'))): ?>
+                    <span class="horizontal-padding-tiny">
+                      <a href="<?php echo site_url('c/unlink/'.$c->hashId); ?>"><i class="fa fa-chain-broken fa-3-4"></i> Unlink</a></span>
+                  <?php endif; ?>
                 </span>
               </div>
               <?php foreach($headlines[$c->clusterId] as $h): ?>
                 <div class="pure-u-1 vertical-padding-tiny">
-                  <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>" class="left-padding display-ib item ajax" data-type="item">
-                    <i class="fa fa-dot-circle-o"></i> <?php echo stripslashes($h->headline); ?></a>
+                  <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>" class="left-padding display-ib item">
+                    <div class="icon-box"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
+                    <?php echo stripslashes($h->headline); ?></a>
                   <span class="grey left-padding display-ib">
                     <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
                       <time>
@@ -197,24 +230,34 @@
                     <?php endif; ?>
                     <?php if($h_comments[$h->headlineId]): ?>
                       <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
-                        <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>#comments" data-type="item" class="ajax">
+                        <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>#comments">
                           <?php echo $h_comments[$h->headlineId]; ?></a>
                       </span>
                     <?php endif; ?>
                     <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-user"></i>
-                      <a href="<?php echo site_url('user/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
-                    <?php if($h->notes): ?><span class="horizontal-padding-tiny note"><i class="fa fa-3-4 fa-file-text-o"></i> View Note</span><?php endif; ?>
+                      <a href="<?php echo site_url('u/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
+                    <?php if(in_array($this->session->userdata('level'), array('m', 'a'))): ?>
+                      <span class="horizontal-padding-tiny">
+                        <a href="<?php echo site_url('h/unlink/'.$h->hashId); ?>"><i class="fa fa-chain-broken fa-3-4"></i> Unlink</a></span>
+                    <?php endif; ?>
+                    <?php if($h->notes): ?><span class="horizontal-padding-tiny note-toggle pointer"><i class="fa fa-3-4 fa-file-text-o"></i> View Note</span><?php endif; ?>
                   </span>
-                  <?php if($h->notes): ?><div class="note-text hidden"><?php echo $h->notes; ?></div><?php endif; ?>
+                  <?php if($h->notes): ?><div class="note-text show-none em top-margin-xsmall left-margin horizontal-padding-small vertical-padding-xsmall"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $h->notes))); ?></div><?php endif; ?>
                 </div>
               <?php endforeach; ?>
             <?php endforeach; ?>
           <?php elseif(isset($headlines)): ?>
-            <div class="pure-u-1 strong">Cluster Components</div>
+            <div class="pure-u-1 bottom-padding-small">
+              <strong><a name="components"><div class="icon-box"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div> Components</strong>
+              <?php if($this->session->userdata('isLoggedIn')): ?>
+                <a href="<?php site_url('h/create/'.$item->hashId.'/cluster/child'); ?>" class="pure-button pure-button-tiny right-align vertical-margin-tiny grey-light-bg">Create Headline</a>
+              <?php endif; ?>
+            </div>
             <?php foreach($headlines as $h): ?>
               <div class="pure-u-1 vertical-padding-tiny">
-                <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>" class="item ajax" data-type="item">
-                  <i class="fa fa-dot-circle-o"></i> <?php echo stripslashes($h->headline); ?></a>
+                <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>" class="item">
+                  <div class="icon-box"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
+                  <?php echo stripslashes($h->headline); ?></a>
                 <span class="grey">
                   <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
                     <time>
@@ -234,15 +277,19 @@
                   <?php endif; ?>
                   <?php if($h_comments[$h->headlineId]): ?>
                     <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
-                      <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>#comments" class="ajax" data-type="item">
+                      <a title="<?php echo stripslashes($h->headline); ?>" href="<?php echo site_url('h/'.$h->hashId.'/'.get_url_string($h->headline)); ?>#comments">
                         <?php echo $h_comments[$h->headlineId]; ?></a>
                     </span>
                   <?php endif; ?>
                   <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-user"></i>
-                    <a href="<?php echo site_url('user/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
+                    <a href="<?php echo site_url('u/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
+                  <?php if(in_array($this->session->userdata('level'), array('m', 'a'))): ?>
+                    <span class="horizontal-padding-tiny">
+                      <a href="<?php echo site_url('h/unlink/'.$h->hashId); ?>"><i class="fa fa-chain-broken fa-3-4"></i> Unlink</a></span>
+                  <?php endif; ?>
                   <?php if($h->notes): ?><span class="horizontal-padding-tiny note-toggle pointer"><i class="fa fa-3-4 fa-file-text-o"></i> View Note</span><?php endif; ?>
                 </span>
-                <?php if($h->notes): ?><div class="note-text show-none em"><?php echo $h->notes; ?></div><?php endif; ?>
+                <?php if($h->notes): ?><div class="note-text show-none em top-margin-xsmall horizontal-padding-small vertical-padding-xsmall"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $h->notes))); ?></div><?php endif; ?>
               </div>
             <?php endforeach; ?>
           <?php endif; ?>
@@ -250,7 +297,7 @@
       </div>
     </section>
   <?php endif; ?>
-  <?php if($this->session->userdata('isLoggedIn') && ($type !== 'headline' || ($item->createdBy == $this->session->userdata('userId') || in_array($this->session->userdata('level'), array('m', 'a')))) && !isset($history)): ?>
+  <?php if($this->session->userdata('isLoggedIn') && !isset($history) && (!$item->adminOnly || ($item->adminOnly && $this->session->userdata('level') == 'a'))): ?>
     <section class="small">
       <div class="horizontal-margin-small vertical-margin-small">
         <div class="horizontal-padding-small vertical-padding-small pure-g">
@@ -259,19 +306,19 @@
             <div class="pure-u-1-2 left-align">
               <?php if($ranking && $ranking->iPositive): ?>
                 <span href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?importance=up'); ?>" class="pure-button pure-button-xsmall pure-button-active ajax" data-history="false" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/importance/up/'.$type.'/'.$id); ?>" id="importance-up">
-                  <i class="fa fa-plus fa-7-5 fa-lh-110"></i></span>
+                  <i class="fa fa-plus fa-7-5 top-padding-xsmall"></i></span>
               <?php else: ?>
                 <a href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?importance=up'); ?>" class="pure-button pure-button-xsmall ajax" data-history="false" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/importance/up/'.$type.'/'.$id); ?>" id="importance-up">
-                  <i class="fa fa-plus fa-7-5 fa-lh-110"></i></a>
+                  <i class="fa fa-plus fa-7-5 top-padding-xsmall"></i></a>
               <?php endif; ?>
             </div>
             <div class="pure-u-1-2 left-align">
               <?php if($ranking && $ranking->iNegative): ?>
                 <span href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?importance=down'); ?>" class="pure-button pure-button-xsmall pure-button-active ajax" data-history="false" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/importance/down/'.$type.'/'.$id); ?>" id="importance-down">
-                  <i class="fa fa-minus fa-7-5 fa-lh-110"></i></span>
+                  <i class="fa fa-minus fa-7-5 top-padding-xsmall"></i></span>
               <?php else: ?>
                 <a href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?importance=down'); ?>" class="pure-button pure-button-xsmall ajax" data-history="false" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/importance/down/'.$type.'/'.$id); ?>" id="importance-down">
-                  <i class="fa fa-minus fa-7-5 fa-lh-110"></i></a>
+                  <i class="fa fa-minus fa-7-5 top-padding-xsmall"></i></a>
               <?php endif; ?>
             </div>
           </div>
@@ -280,26 +327,40 @@
             <div class="pure-u-1-2 left-align">
               <?php if($ranking && $ranking->qPositive): ?>
                 <span href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?quality=up'); ?>" class="pure-button pure-button-xsmall pure-button-active ajax" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/quality/up/'.$type.'/'.$id); ?>" id="quality-up">
-                  <i class="fa fa-plus fa-7-5"></i></span>
+                  <i class="fa fa-plus fa-7-5 top-padding-xsmall"></i></span>
               <?php else: ?>
                 <a href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?quality=up'); ?>" class="pure-button pure-button-xsmall ajax" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/quality/up/'.$type.'/'.$id); ?>" id="quality-up">
-                  <i class="fa fa-plus fa-7-5"></i></a>
+                  <i class="fa fa-plus fa-7-5 top-padding-xsmall"></i></a>
               <?php endif; ?>
             </div>
             <div class="pure-u-1-2 left-align">
               <?php if($ranking && $ranking->qNegative): ?>
                 <span href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?quality=down'); ?>" class="pure-button pure-button-xsmall pure-button-active ajax" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/quality/down/'.$type.'/'.$id); ?>" id="quality-down">
-                  <i class="fa fa-minus fa-7-5"></i></span>
+                  <i class="fa fa-minus fa-7-5 top-padding-xsmall"></i></span>
               <?php else: ?>
                 <a href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'?quality=down'); ?>" class="pure-button pure-button-xsmall ajax" data-type="vote" data-ajax="<?php echo site_url('ajax/vote/quality/down/'.$type.'/'.$id); ?>" id="quality-down">
-                  <i class="fa fa-minus fa-7-5"></i></a>
+                  <i class="fa fa-minus fa-7-5 top-padding-xsmall"></i></a>
               <?php endif; ?>
             </div>
           </div>
-          <div class="pure-u-1 center-text vertical-margin-small">
-            <a class="pure-button pure-u-1 no-lr-padding" href="<?php echo site_url(substr($type, 0, 1).'/modify/'.$item->hashId); ?>">
-              <i class="fa fa-pencil-square-o fa-9-10"></i> Modify <?php echo ucfirst($type); ?></a>
-          </div>
+          <?php if(!isset($history)): ?>
+            <div class="pure-u-1 center-text top-margin-small">
+              <?php if($subscription): ?>
+                <a id="subscribe" href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline)); ?>?subscribe=0" class="ajax pure-button pure-u-1 no-lr-padding" data-type="item">Unsubscribe</a>
+              <?php else: ?>
+                <a id="subscribe" href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline)); ?>?subscribe=1" class="ajax pure-button pure-u-1 no-lr-padding" data-type="item">Subscribe</a>
+              <?php endif; ?>
+            </div>
+          <?php endif; ?>
+        </div>
+        <hr>
+        <div class="horizontal-margin-small bottom-margin-small">
+          <?php if($type !== 'headline' || ($item->createdBy == $this->session->userdata('userId') || in_array($this->session->userdata('level'), array('m', 'a')))): ?>
+            <div class="pure-u-1 center-text top-margin-xsmall bottom-margin-small">
+              <a class="pure-button pure-u-1 no-lr-padding" href="<?php echo site_url(substr($type, 0, 1).'/modify/'.$item->hashId); ?>">
+                <i class="fa fa-pencil-square-o fa-9-10"></i> Modify <?php echo ucfirst($type); ?></a>
+            </div>
+          <?php endif; ?>
           <?php if((($type == 'cluster' && $item->articleId) || ($type == 'headline' && $item->clusterId)) && in_array($this->session->userdata('level'), array('m', 'a'))): ?>
             <div class="pure-u-1-2 center-text">
               <a href="<?php echo site_url(substr($type, 0, 1).'/unlink/'.$item->hashId); ?>"><i class="fa fa-chain-broken fa-9-10"></i> Unlink <?php echo ucfirst($type); ?></a>
@@ -363,7 +424,7 @@
           foreach($contributors as $c)
           {
             if($output) { $output .= ", "; }
-            $output .= '<a href="'.site_url('user/'.strtolower($c->user)).'">'.$c->user.'</a>';
+            $output .= '<a href="'.site_url('u/'.strtolower($c->user)).'">'.$c->user.'</a>';
           }
           echo $output;
           ?>
@@ -374,22 +435,48 @@
   <section class="small">
     <div class="horizontal-margin-small vertical-margin-small">
       <div class="horizontal-padding-small vertical-padding-small">
-        <strong><a name="social"><i class="fa fa-share"></i></a> Social</strong>
-        <form class="pure-u-1 pure-form">
+        <div class="pure-u-1  bottom-padding-small">
+          <strong><a name="social"><i class="fa fa-share"></i></a> Social</strong>
+        </div>
+        <form class="pure-u-1 pure-form pure-g-r">
+          <?php $tinyurl = @file_get_contents('http://tinyurl.com/api-create.php?url=http:'.site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline))); ?>
           <fieldset class="pure-group pure-u-1">
-            <input type="text" id="copy" value="http:<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline)); ?>" class="pure-input-1" readonly>
+            <input type="text" id="copy" value="<?php echo $tinyurl; ?>" class="pure-input-1" readonly>
           </fieldset>
+          <div class="pure-u-1-2 center-text">
+            <a href="https://twitter.com/share" class="twitter-share-button" data-url="<?php echo $tinyurl; ?>" data-text="<?php echo get_100_char($item->headline); ?>">Tweet</a>
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+          </div>
+          <div class="pure-u-1-2 center-text">
+            <!--<div class="fb-share-button" data-href="<?php echo $tinyurl; ?>" data-layout="button_count"></div>-->
+            <fb:share-button type="button_count"></fb:share-button>
+          </div>
         </form>
       </div>
     </div>
   </section>
   <section class="large">
     <div class="horizontal-margin-small vertical-margin-small">
-      <h3 class="horizontal-padding-xsmall"><i class="fa fa-3-4 fa-comment"></i> Comments (<?php echo sizeof($comments); ?>)</h3>
+      <div class="horizontal-padding-small top-padding-small">
+        <strong><a name="comments"><i class="fa fa-comment"></i></a> Comments (<?php echo sizeof($comments); ?>)</strong>
+      </div>
       <?php if($this->session->userdata('isLoggedIn') && !isset($history)): ?>
         <div class="horizontal-padding-small vertical-padding-small">
           <form method="post" action="?comments=create" class="pure-form pure-u-1 vertical-padding-xsmall ajax" novalidate>
-            <div class="errors"></div>
+            <div class="errors">
+              <?php if(isset($comment_error)): ?>
+                <p><?php echo $comment_error; ?></p>
+              <?php endif; ?>
+              <?php if(isset($comment_errors)): ?>
+                <?php if(is_string($comment_errors)): ?>
+                  <p><?php echo $comment_errors; ?></p>
+                <?php else: ?>
+                  <?php foreach($comment_errors as $key => $val): ?>
+                    <p><?php echo $val; ?></p>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              <?php endif; ?>
+            </div>
             <input type="text" name="comment" id="add-comment" class="pure-input-1" placeholder="Share Your Thoughts" value="<?php echo set_value('comment'); ?>" required>
             <div class="pure-controls right-text top-padding">
               <input type="hidden" name="type" value="<?php echo $type; ?>">
@@ -416,7 +503,7 @@
                   <img src="<?php echo site_url('media/img/no-image.gif'); ?>" alt="<?php echo $c->user; ?>" width="40" class="left-align right-padding-xsmall">
                 <?php endif; ?>
                 <header>
-                  <a href="<?php echo site_url('user/'.$c->user); ?>" class="grey"><?php echo $c->user; ?></a> |
+                  <a href="<?php echo site_url('u/'.$c->user); ?>" class="grey"><?php echo $c->user; ?></a> |
                   <time class="grey">
                     <?php if($c->editedOn > strtotime(date("m/d/Y"))): ?>
                       Today at <?php echo date("h:ia", $c->editedOn); ?>
@@ -456,13 +543,85 @@
             <?php endforeach; ?>
           <?php else: ?>
             <article id="blank-comment">
-              <span class="text"><em>Be the first to add a comment.</em></span>
+              <span class="text"><em>
+                Be the first to add a comment.
+                <?php if(!$this->session->userdata('isLoggedIn')): ?>
+                  <a href="<?php echo site_url('?r='.$this->uri->uri_string()); ?>" title="Login / Register"><i>Login / Register</i></a>
+                <?php endif; ?>
+              </em></span>
             </article>
           <?php endif; ?>
         </div>
       </div>
     </div>
   </section>
+  <?php if(isset($related)): ?>
+    <section class="small">
+      <div class="horizontal-margin-small vertical-margin-small">
+        <div class="horizontal-padding-small vertical-padding-small">
+          <strong><a name="related"><i class="fa fa-search"></i></a> Related</strong>
+          <?php if($related): ?>
+            <?php foreach($related as $i): ?>
+              <div class="vertical-padding-small horizontal-padding-xsmall">
+                <?php if($i->image && 1 == 0): ?>
+                  <img src="<?php echo $i->image; ?>" height="42" width="42" class="left-align right-padding-xsmall">
+                <?php endif; ?>
+                <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
+                  <span class="item">
+                    <div class="icon-box"><?php echo file_get_contents('media/svg/'.$i->type.'.svg'); ?></div>
+                    <span><?php echo stripslashes($i->headline); ?></span>
+                  </span>
+                </a><br>
+                <span class="grey">
+                  <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
+                    <time>
+                      <?php if($i->editedOn > strtotime(date("m/d/Y"))): ?>
+                        Today at <?php echo date("h:ia", $i->editedOn); ?>
+                      <?php elseif($i->editedOn > strtotime(date("m/d/Y", strtotime("-1 day")))): ?>
+                        Yesterday at <?php echo date("h:ia", $i->editedOn); ?>
+                      <?php elseif(date("Y", $i->editedOn) == date("Y")): ?>
+                        <?php echo date("M d", $i->editedOn); ?> @ <?php echo date("h:ia", $i->editedOn); ?>
+                      <?php else: ?>
+                        <?php echo date("M d Y", $i->editedOn); ?>
+                      <?php endif; ?>
+                    </time>
+                  </span>
+                  <?php if($i->c_count): ?>
+                    <span class="horizontal-padding-tiny">
+                      <div class="icon-box small"><?php echo file_get_contents('media/svg/cluster.svg'); ?></div>
+                      <?php echo $i->c_count; ?></span>
+                  <?php endif; ?>
+                  <?php if($i->h_count): ?>
+                    <span class="horizontal-padding-tiny">
+                      <div class="icon-box small"><?php echo file_get_contents('media/svg/headline.svg'); ?></div>
+                      <?php echo $i->h_count; ?></span>
+                  <?php endif; ?>
+                  <?php if($i->comments): ?>
+                    <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-comment"></i>
+                      <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>#comments" class="ajax" data-type="item">
+                        <?php echo $i->comments; ?></a></span>
+                  <?php endif; ?>
+                  <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('a'))): ?>
+                    <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-eye"></i> <?php echo round($i->x_score * 10, 2); ?></span>
+                    <span class="horizontal-padding-tiny">
+                      K: <?php echo round($i->search_score * 10, 2); ?>
+                      C: <?php echo round($i->cred_score * 10, 2); ?>
+                      S: <?php echo round($i->sub_score * 10, 2); ?>
+                      Q: <?php echo round($i->decay_score * 10, 2); ?>
+                    </span>
+                  <?php endif; ?>
+                </span>
+              </div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="vertical-padding-xsmall horizontal-padding-xsmall">
+              <span class="item">No results found.</span>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+    </section>
+  <?php endif; ?>
 </div>
 <?php if($this->session->userdata('isLoggedIn')): ?>
   <div class="modal-content" id="comment-edit" title="Modify Comment">

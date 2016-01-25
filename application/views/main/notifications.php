@@ -7,12 +7,14 @@
 <div id="notices" class="pure-u-1 vertical-padding-small">
   <section id="notice-settings" class="small">
     <div class="horizontal-margin-small vertical-margin-small">
-      <h3 class="horizontal-padding-xsmall">Settings</h3>
-      <div class="vertical-padding-xsmall horizontal-padding-xsmall">
+      <div class="vertical-padding-xsmall horizontal-padding-small">
+        <div class="bottom-padding-xsmall">
+          <strong><a name="settings"><i class="fa fa-cog"></i></a> Settings</strong>
+        </div>
         <form class="pure-u-1 pure-form ajax-notice" method="post" action="<?php echo site_url('notifications/settings'); ?>">
           <div class="errors"></div>
           <div class="pure-g-r-x">
-            <label class="pure-u-1-2 strong">Item Updates</label>
+            <label class="pure-u-1-2 em">Item Updates</label>
             <label for="edits-show" class="pure-u-1-4">
               <input type="radio" name="edits" id="edits-show" value="1" <?php echo ($user->edits)?'checked':''; ?>> Show
             </label>
@@ -21,7 +23,7 @@
             </label>
           </div>
           <div class="pure-g-r-x">
-            <label class="pure-u-1-2 strong">Item Joins</label>
+            <label class="pure-u-1-2 em">Item Joins</label>
             <label for="parents-show" class="pure-u-1-4">
               <input type="radio" name="parents" id="parents-show" value="1" <?php echo ($user->parents)?'checked':''; ?>> Show
             </label>
@@ -30,7 +32,7 @@
             </label>
           </div>
           <div class="pure-g-r-x">
-            <label class="pure-u-1-2 strong">Item Comments</label>
+            <label class="pure-u-1-2 em">Item Comments</label>
             <label for="comments-show" class="pure-u-1-4">
               <input type="radio" name="comments" id="comments-show" value="1" <?php echo ($user->comments)?'checked':''; ?>> Show
             </label>
@@ -48,12 +50,14 @@
   </section>
   <section id="notice-list" class="large">
     <div class="horizontal-margin-small vertical-margin-small">
-      <h3 class="horizontal-padding-xsmall">Notices</h3>
-      <div>
+      <div class="vertical-padding-xsmall horizontal-padding-xsmall">
+        <div class="bottom-padding-xsmall horizontal-padding-xsmall">
+          <strong><a name="notices"><i class="fa fa-book"></i></a> Notices</strong>
+        </div>
         <?php $this->load->view('main/notices'); ?>
         <?php if($pages > 1): ?>
-          <?php $url = "search?s=".$sort."&".ltrim($uri."&pg=", '&'); ?>
-          <div class="vertical-padding-small horizontal-padding-xsmall">
+          <?php $url = "search?pg="; ?>
+          <div class="vertical-padding-small horizontal-padding-small">
             <ul class="pure-paginator">
               <?php if($current > 1): ?>
                 <li><a class="pure-button ajax prev" href="<?php echo site_url($url.($current-1)); ?>" data-type="list"><i class="fa fa-11-10 fa-arrow-circle-left"></i></a></li>

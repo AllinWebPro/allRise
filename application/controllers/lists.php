@@ -7,6 +7,7 @@ class Lists extends CI_Controller
 
   function __construct()
   {
+    $_POST = $_POST + $_GET;
     parent::__construct();
     $this->load->model('stream_model');
     $this->load->model('utility_model');
@@ -33,7 +34,8 @@ class Lists extends CI_Controller
       if(isset($post['r']) && $post['r']) { $results = $post['r']; $this->data['uri'] .= "&r=".$results; }
       if(isset($post['k']) && $post['k']) { $search = $post['k']; $this->data['uri'] .= "&k=".$search; }
       if(isset($post['u']) && $post['u']) { $userId = $post['u']; $this->data['uri'] .= "&u=".$userId; }
-      if(isset($post['b']) && $post['b']) { $subscription = $post['b']; $this->data['uri'] .= "&b=".$subscription; }
+      if(isset($post['b']) && $post['b'] && $this->session->userdata('isLoggedIn')) { $subscription = $post['b']; $this->data['uri'] .= "&b=".$subscription; }
+      elseif(isset($post['b']) && $post['b']) { $sort = 'score'; }
     }
     $this->data['results'] = $results;
     $this->data['sort'] = $sort;
@@ -44,12 +46,12 @@ class Lists extends CI_Controller
     $this->data['sort'] = $sort;
     if($subscription) { $userId = $this->session->userdata('userId'); }
     $this->data['items'] = $this->stream_model->search($search, $where, $sort, $results, $comments, $limit, $current, $userId, $subscription);
-    $count = $this->stream_model->search_count($search, $where, $sort, $results, $userId, $subscription);
-    $this->data['pages'] = ceil(($count->items) / $limit);
-    $this->data['title'] = "Search";
+    $count = $this->stream_model->search_count($search, $where, $sort, $results, $comments, $limit, $current, $userId, $subscription);
+    $this->data['pages'] = ceil($count / $limit);
+    $this->data['title'] = "News Stream";
     if($search) { $this->data['title'] .= " [".$search."]"; }
     //print_r($this->data); die();
-    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'])
+    if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
     {
       $this->load->view('includes/functions');
       $this->load->view('main/lists', $this->data);

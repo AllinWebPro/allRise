@@ -96,7 +96,7 @@
             <div class="item vertical-padding-small horizontal-padding-xsmall">
               <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
                 <span class="item">
-                  <i class="fa fa-<?php echo ($i->type == 'headline')?'dot-circle-o':(($i->type == 'cluster')?'code-fork':'caret-square-o-up'); ?>"></i>
+                  <div class="icon-box"><?php echo file_get_contents('media/svg/'.$i->type.'.svg'); ?></div>
                   <span><?php echo stripslashes($i->headline); ?></span>
                 </span>
               </a>

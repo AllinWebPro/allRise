@@ -10,12 +10,12 @@
 |
 */
 
-$hook['pre_system'][] = array(
+/*$hook['pre_system'][] = array(
   'class'    => 'Fixes',
   'function' => 'post_get',
   'filename' => 'fixes.php',
   'filepath' => 'hooks'
-);
+);*/
 $hook['post_controller_constructor'][] = array(
   'class'    => 'Checks',
   'function' => 'is_logged_in',

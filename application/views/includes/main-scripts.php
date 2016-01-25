@@ -3,13 +3,12 @@ var site_title = ".::. <?php echo SITE_TITLE; ?>";
 var site_url = "<?php echo site_url(); ?>";
 var current_page = window.location.href;
 </script>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="<?php echo site_url('media/js/vendor/jquery-1.10.2.min.js'); ?>"><\/script>')</script>
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-<script src="<?php echo site_url('ckeditor/ckeditor.js'); ?>"></script>
-<script src="<?php echo site_url('ckeditor/config.js'); ?>"></script>
-<script src="<?php echo site_url('ckeditor/adapters/jquery.js'); ?>"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src="<?php echo site_url('media/ckeditor/ckeditor.js'); ?>"></script>
+<script src="<?php echo site_url('media/ckeditor/adapters/jquery.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/vendor/masonry.pkgd.min.js'); ?>"></script>
+<script src="<?php echo site_url('media/js/vendor/jquery.prettyPhoto.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/fix.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/main-scripts.js'); ?>"></script>
 <?php if($this->session->userdata('isLoggedIn') && $this->session->flashdata('tutorial')): ?>

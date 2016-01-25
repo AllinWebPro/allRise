@@ -1,5 +1,7 @@
-<h3 class="horizontal-padding-xsmall">Terms of Use</h3>
-<div class="vertical-padding-xsmall horizontal-padding-xsmall">
+<div class="vertical-padding-small horizontal-padding-small">
+  <div class="pure-u-1 bottom-padding-xsmall">
+    <strong><a name="terms"><i class="fa fa-file-text-o"></i></a> Terms of Use</strong>
+  </div>
   <p>Welcome to the allRise service (the "Service"). The following Terms of Use apply when you view or use the Service [via our website located at <a href="<?php echo site_url(); ?>" title="allRise">http:<?php echo site_url(); ?></a>] [or by accessing the Service through clicking on the application (the "App") on your mobile device.] Please review the following terms carefully. By accessing or using the Service, you signify your agreement to these Terms of Use. If you do not agree to these Terms of Use, you may not access or use the Service.</p>
 
   <h4 class="vertical-margin-xsmall">REGISTRATION; RULES FOR USER CONDUCT AND USE OF THE SERVICE</h4>

@@ -83,6 +83,7 @@ $route['c/(:any)']                   = "item/hashed/cluster/$1";
 $route['a/(:any)']                   = "item/hashed/article/$1";
 
 $route['search']                     = "lists/index";
+$route['stream']                     = "lists/index";
 
 $route['user/(:any)']                = "user/index/$1";
 

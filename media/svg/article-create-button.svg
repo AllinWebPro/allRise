@@ -1,0 +1,20 @@
+<svg class="ar-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 500 460" xml:space="preserve">
+	<defs>
+		<filter id="dropshadow" height="150%" width="150%" x="-10%">
+			<feGaussianBlur in="SourceAlpha" stdDeviation="10"/> 
+			<feOffset dx="25" dy="20" result="offsetblur"/> 
+			<feMerge> 
+				<feMergeNode/>
+				<feMergeNode in="SourceGraphic"/> 
+			</feMerge>
+		</filter>
+	</defs>
+	<path class="ar-dropshadow" d="M489.19,345.25L308.572,36.206C282.52-8.351,218.093-8.333,192.066,36.278L11.795,345.286
+		c-26.24,44.967,6.192,101.462,58.27,101.462h360.882C483.016,446.748,515.458,390.217,489.19,345.25" fill="#000" filter="url(#dropshadow)" />
+	<path class="ar-icon create-article" d="M489.19,345.25L308.572,36.206C282.52-8.351,218.093-8.333,192.066,36.278L11.795,345.286
+		c-26.24,44.967,6.192,101.462,58.27,101.462h360.882C483.016,446.748,515.458,390.217,489.19,345.25" />
+	<path class="ar-icon plus-icon" d="M259.4,341.126v-65.724h61.628
+		c2.833,0,4.403-1.261,4.403-4.069v-9.76c0-2.834-1.57-4.095-4.403-4.095H259.4v-65.724c0-2.807-0.953-4.094-3.786-4.094h-10.377
+		c-2.821,0-4.405,1.288-4.405,4.094v65.724h-61.628c-2.499,0-3.773,1.261-3.773,4.095v9.76c0,2.809,1.274,4.069,3.773,4.069h61.975
+		v65.724c0,2.831,1.559,4.094,4.378,4.094h10.056C258.447,345.22,259.4,343.957,259.4,341.126z" />
+</svg>

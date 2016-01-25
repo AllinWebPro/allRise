@@ -8,7 +8,7 @@ class Fixes
    * @access public
    * @return null
    */
-  public function post_get() { $_POST = $_POST+$_GET; }
+  public function post_get() { $_POST = $_POST + $_GET; }
 }
 
 /* End of file fixes.php */

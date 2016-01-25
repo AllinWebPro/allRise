@@ -5,9 +5,12 @@ class Stream_model extends CI_Model
   private $ci;
   private $generic_select = "s.headline, s.tags, s.createdBy, s.createdOn, s.editedBy, s.editedOn, p.place, s.placeId, s.flagId, s.deleted ";
   private $places_join = "LEFT JOIN places p ON p.placeId = s.placeId ";
-  private $decay_score = "LOG10(((s.createdOn - 1385884800) + (s.editedOn - 1385884800)) / 4)";
+  private $decay_score = "s.decay ";
 
-  public function __construct() { parent::__construct(); }
+  public function __construct()
+  {
+    parent::__construct();
+  }
 
   // -- here --
 
@@ -112,7 +115,9 @@ class Stream_model extends CI_Model
     $sql .= "LIMIT ".$limit." ";
 
     $q = $this->db->query($sql);
-    return $q->result();
+    $results = $q->result();
+    
+    return $results;
   }
 
   /**
@@ -157,10 +162,11 @@ class Stream_model extends CI_Model
       }
       $sql .= "GROUP BY u.userid ";
     $sql .= ") contributors ";
-    $sql .= "WHERE deleted = 0 ";
 
     $q = $this->db->query($sql);
-    return $q->result();
+    $results = $q->result();
+    
+    return $results;
   }
 
   /**
@@ -229,7 +235,9 @@ class Stream_model extends CI_Model
     $sql .= "WHERE deleted = 0 ";
 
     $q = $this->db->query($sql);
-    return $q->result();
+    $results = $q->result();
+    
+    return $results;
   }
 
   /**
@@ -276,7 +284,9 @@ class Stream_model extends CI_Model
     $sql .= "ORDER BY editedOn DESC ";
 
     $q = $this->db->query($sql);
-    return $q->result();
+    $results = $q->result();
+    
+    return $results;
   }
 
   public function get_notices($userId = 0, $comments = 1, $edits = 1, $parents = 1, $limit = 0, $page = 1)
@@ -325,7 +335,9 @@ class Stream_model extends CI_Model
     $sql .= "LIMIT ".(($page-1) * $limit).", ".$limit;
 
     $q = $this->db->query($sql);
-    return $q->result();
+    $results = $q->result();
+    
+    return $results;
   }
 
   /**
@@ -407,7 +419,9 @@ class Stream_model extends CI_Model
     $sql .= "WHERE items = 1 ";
 
     $q = $this->db->query($sql);
-    return $q->row();
+    $results = $q->row();
+    
+    return $results;
   }
 
   function notifications($userId, $time, $display = array('edits', 'joins', 'comments'), $limit = 10, $page = 1)
@@ -722,44 +736,76 @@ class Stream_model extends CI_Model
       // Process
     if(sizeof($selected['article']) == 1)
     {
-      // Update Cluster Matches
-      $clusters_update = array('articleId' => $selected['article'][0], 'editedBy' => $userId);
-      foreach($selected['cluster'] as $c)
+      $article = $this->database_model->get_single('articles', array('articleId' => $selected['article'][0]), 'adminOnly');
+      if(!$article->adminOnly || $this->session->userdata('level') == 'a')
       {
-        $nInsert = array('clusterId' => $c, 'parentId' => $selected['article'][0], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $c, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $c), $clusters_update);
-      }
-      // Update Headline Matches
-      $newCluster = array();
-      $i = 0;
-      foreach($selected['headline'] as $h)
-      {
-        $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
-        if(!$this->check_for_cluster($hl, $h, $where_score, $selected['article'][0], $userId)) { $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => $i, 'nvo' => $i); $i++; }
-      }
-      if($newCluster)
-      {
-        $clusterId = $this->new_cluster($newCluster, $selected['article'][0], $userId);
-        foreach($newCluster as $o)
+        // Update Cluster Matches
+        $clusters_update = array('articleId' => $selected['article'][0], 'editedBy' => $userId);
+        foreach($selected['cluster'] as $c)
         {
-          $nInsert = array('headlineId' => $o['id'], 'parentId' => $clusterId, 'createdOn' => time());
-          $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o['id'], 'deleted' => 0));
-          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-          $this->ci->database->edit('headlines', array('headlineId' => $o['id']), array('clusterId' => $clusterId));
+          $cluster = $this->database_model->get_single('clusters', array('clusterId' => $c), 'adminOnly');
+          if(!$cluster->adminOnly || $this->session->userdata('level') == 'a')
+          {
+            $nInsert = array('clusterId' => $c, 'parentId' => $selected['article'][0], 'createdOn' => time());
+            $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $c, 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('clusters', array('clusterId' => $c), $clusters_update);
+          }
         }
+        // Update Headline Matches
+        $newCluster = array();
+        foreach($selected['headline'] as $h)
+        {
+          $headline = $this->database_model->get_single('headlines', array('headlineId' => $h), 'adminOnly');
+          if(!$headline->adminOnly || $this->session->userdata('level') == 'a')
+          {
+            $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
+            $compared = array();
+            foreach($selected['cluster'] as $c)
+            {
+              $cluster = $this->database_model->get_single('clusters', array('clusterId' => $c), 'adminOnly');
+              if(!$cluster->adminOnly || $this->session->userdata('level') == 'a')
+              {
+                $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
+                if($score = $this->item_compare($h1, $c->headline, $c->tags)) { $compared[$c] = $score; }
+              }
+            }
+            if($compared)
+            {
+              asort($compared);
+              $clusterId = key($compared);
+              //
+              $nInsert = array('headlineId' => $c, 'parentId' => $clusterId, 'createdOn' => time());
+              $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+              foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+              $this->ci->database->edit('headlines', array('headlineId' => $h), array('clusterId' => $clusterId, 'editedBy' => $userId));
+            }
+            else
+            {
+              $newCluster[] = array('id' => $h);
+            }
+          }
+        }
+        if($newCluster) { $this->new_cluster($newCluster, $userId, $selected['article'][0]); }
       }
     }
     elseif(sizeof($selected['cluster']) == 1)
     {
-      $headlines_update = array('clusterId' => $selected['cluster'][0], 'editedBy' => $userId);
-      foreach($selected['headline'] as $h)
+      $cluster = $this->database_model->get_single('clusters', array('clusterId' => $selected['cluster'][0]), 'adminOnly');
+      if(!$cluster->adminOnly || $this->session->userdata('level') == 'a')
       {
-        $nInsert = array('headlineId' => $h, 'parentId' => $selected['cluster'][0], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $h), $headlines_update);
+        $headlines_update = array('clusterId' => $selected['cluster'][0], 'editedBy' => $userId);
+        foreach($selected['headline'] as $h)
+        {
+          $headline = $this->database_model->get_single('headlines', array('headlineId' => $h), 'adminOnly');
+          if(!$headline->adminOnly || $this->session->userdata('level') == 'a')
+          {
+            $nInsert = array('headlineId' => $h, 'parentId' => $selected['cluster'][0], 'createdOn' => time());
+            $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('headlines', array('headlineId' => $h), $headlines_update);
+          }
+        }
       }
     }
     elseif($selected['cluster'])
@@ -767,42 +813,46 @@ class Stream_model extends CI_Model
       // Update Cluster Matches
       $articleId = 0;
       $newArticle = array();
-      $i = 0;
       foreach($selected['cluster'] as $c)
       {
-        $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
-        if(!$this->check_for_cluster($cl, $c, $where_score, $articleId, $userId)) { $newArticle[] = array('id' => $c, 'item' => $cl, 'ovn' => $i, 'nvo' => $i); $i++; }
-      }
-      if($newArticle)
-      {
-        $articleId = $this->new_article($newArticle, $userId);
-        foreach($newArticle as $o)
+        $cluster = $this->database_model->get_single('clusters', array('clusterId' => $c));
+        if(!$cluster->adminOnly || $this->session->userdata('level') == 'a')
         {
-          $nInsert = array('clusterId' => $o['id'], 'parentId' => $articleId, 'createdOn' => time());
-          $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $o['id'], 'deleted' => 0));
-          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-          $this->ci->database->edit('clusters', array('clusterId' => $o['id']), array('articleId' => $articleId));
+          $newArticle[] = array('id' => $c);
         }
       }
+      if($newArticle) { $this->new_article($newArticle, $userId); }
       // Update Headline Matches
       $newCluster = array();
-      $i = 0;
       foreach($selected['headline'] as $h)
       {
-        $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
-        if(!$this->check_for_cluster($hl, $h, $where_score, $articleId, $userId)) { $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => $i, 'nvo' => $i); $i++; }
-      }
-      if($newCluster)
-      {
-        $clusterId = $this->new_cluster($newCluster, $articleId, $userId);
-        foreach($newCluster as $o)
+        $headline = $this->database_model->get_single('headlines', array('headlineId' => $h), 'adminOnly');
+        if(!$headline->adminOnly || $this->session->userdata('level') == 'a')
         {
-          $nInsert = array('headlineId' => $o['id'], 'parentId' => $clusterId, 'createdOn' => time());
-          $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o['id'], 'deleted' => 0));
-          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-          $this->ci->database->edit('headlines', array('headlineId' => $o['id']), array('clusterId' => $clusterId));
+          $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
+          $compared = array();
+          foreach($selected['cluster'] as $c)
+          {
+            $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
+            if($score = $this->item_compare($h1, $c->headline, $c->tags)) { $compared[$c] = $score; }
+          }
+          if($compared)
+          {
+            asort($compared);
+            $clusterId = key($compared);
+            //
+            $nInsert = array('headlineId' => $c, 'parentId' => $clusterId, 'createdOn' => time());
+            $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('headlines', array('headlineId' => $h), array('clusterId' => $clusterId, 'editedBy' => $userId));
+          }
+          else
+          {
+            $newCluster[] = array('id' => $h);
+          }
         }
       }
+      if($newCluster) { $this->new_cluster($newCluster, $userId, $articleId); }
     }
     elseif(sizeof($selected['headline']) > 1)
     {
@@ -811,1051 +861,645 @@ class Stream_model extends CI_Model
       $i = 0;
       foreach($selected['headline'] as $h)
       {
-        $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
-        $newCluster[] = array('id' => $h, 'item' => $hl, 'ovn' => $i, 'nvo' => $i); $i++;
-      }
-      if($newCluster)
-      {
-        $clusterId = $this->new_cluster($newCluster, 0, $userId);
-        foreach($newCluster as $o)
+        $headline = $this->database_model->get_single('headlines', array('headlineId' => $h), 'adminOnly');
+        if(!$headline->adminOnly || $this->session->userdata('level') == 'a')
         {
-          $nInsert = array('headlineId' => $o['id'], 'parentId' => $clusterId, 'createdOn' => time());
-          $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o['id'], 'deleted' => 0));
-          foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-          $this->ci->database->edit('headlines', array('headlineId' => $o['id']), array('clusterId' => $clusterId));
+          $hl = $this->ci->database->get_single('headlines', array('headlineId' => $h, 'deleted' => 0));
+          $compared = array();
+          foreach($selected['cluster'] as $c)
+          {
+            $cl = $this->ci->database->get_single('clusters', array('clusterId' => $c, 'deleted' => 0));
+            if($score = $this->item_compare($h1, $c->headline, $c->tags)) { $compared[$c] = $score; }
+          }
+          if($compared)
+          {
+            asort($compared);
+            $clusterId = key($compared);
+            //
+            $nInsert = array('headlineId' => $c, 'parentId' => $clusterId, 'createdOn' => time());
+            $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('headlines', array('headlineId' => $h), array('clusterId' => $clusterId, 'editedBy' => $userId));
+          }
+          else
+          {
+            $newCluster[] = array('id' => $h);
+          }
         }
       }
+      if($newCluster) { $this->new_cluster($newCluster, $userId); }
     }
   }
 
   function search($terms = "", $where = "", $order = "score", $results = "all", $comments = false, $limit = 0, $page = 1, $userId = null, $subscriptions = false, $exclusive = true)
   {
+    $filters = json_encode(array(
+      'terms' => $terms,
+      'where' => $where,
+      'order' => $order,
+      'results' => $results,
+      'comments' => $comments,
+      'limit' => ($order !== "score")?$limit:0,
+      'page' => ($order !== "score")?$page:0,
+      'userId' => $userId,
+      'subscriptions' => $subscriptions,
+      'exclusive' => $exclusive
+    ));
+    
     $this->ci =& get_instance();
     $this->ci->load->model('database_model', 'database', true);
     $this->ci->load->model('utility_model', 'utility', true);
-
-    $w = 0;
-    $match = "";
-    $article_match = "";
-    $terms = preg_replace('/[^A-Za-z0-9 ]/', '', $terms);
-    $terms = $this->ci->utility->blwords_strip($terms, 'regEx_spaces', ' ');
-    if($terms)
+    
+    $query = $this->ci->database->get_single('search', array('filters' => $filters));
+    
+    if($query && $query->editedOn > time()-(60*60))
     {
-      $search = explode(' ', $terms);
-      foreach($search as $s)
-      {
-        if($w < 10)
-        {
-          if($w) { $match .= " + "; }
-          $match .= "IF((s.headline REGEXP '[[:<:]]".$s."[[:>:]]'), 1, IF((s.headline REGEXP '".$s."'), .75, 0)) ";
-          $match .= "+ IF((s.tags REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.tags REGEXP '".$s."'), .25, 0)) ";
-          $article_match .= "+ IF((s.article REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.article REGEXP '".$s."'), .25, 0)) ";
-        }
-        $w++;
-      }
-
-      $search_pair = array();
-      $search_temp = $search;
-      for($j = 0; $j < sizeof($search); $j++)
-      {
-        $imp = implode(' ', array_splice($search_temp, $j, 2));
-        if(strpos($imp, ' ')) { $search_pair[] = $imp; }
-        $search_temp = $search;
-      }
-
-      foreach($search_pair as $s)
-      {
-        if($w < 5)
-        {
-          if($w) { $match .= " + "; }
-          $match .= "IF((s.headline REGEXP '[[:<:]]".$s."[[:>:]]'), 1, IF((s.headline REGEXP '".$s."'), .75, 0)) ";
-          $match .= "+ IF((s.tags REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.tags REGEXP '".$s."'), .25, 0)) ";
-          $article_match .= "+ IF((s.article REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((s.article REGEXP '".$s."'), .25, 0)) ";
-        }
-        $w++;
-      }
+      $results = json_decode($query->data);
+      
+      if($order == 'score') { $results = array_slice($results, ($page-1) * $limit, $limit); }
     }
-
-    $article_scores = $scores = "(quality + importance + credibility) AS cred_score, ";
-    $article_scores = $scores .= "(LOG10(((s.createdOn - 1385884800) + (s.editedOn - 1385884800)) / 4) / 10) AS decay_score, ";
-    if($terms)
+    else
     {
-      $scores .= "((".$match.") / ".$w.") AS search_score ";
-      $article_scores .= "((".$match.$article_match.") / ".$w.") AS search_score ";
-    }
-    else { $article_scores = $scores .= "0 AS search_score "; }
-
-    if($comments)
-    {
-      $comments_include = "COUNT(commentId) as comments ";
-      $comments_include .= "FROM comments ";
-      $comments_include .= "WHERE deleted = 0 ";
-    }
-
-    $view_include = "COUNT(viewId) AS views ";
-    $view_include .= "FROM views ";
-
-    $viewed_include = "IF(viewId IS NULL, 0, 1) AS viewed ";
-    $viewed_include .= "FROM views ";
-    $viewed_include .= "WHERE userId = ".$this->session->userdata('userId')." ";
-
-    $image_include = "imageId FROM images ";
-    $image_include .= "WHERE deleted = 0 AND active = 1 ";
-    $image_include .= "LIMIT 1 ";
-
-    $sub_score = "SUM(quality + importance + credibility) AS cred_score, ";
-    $sub_score .= "SUM(LOG10(((s.createdOn - 1385884800) + (s.editedOn - 1385884800)) / 4) / 10) AS decay_score, ";
-    if($terms) { $sub_score .= "SUM((".$match.") / ".$w.") AS search_score "; }
-    else { $sub_score .= "0 AS search_score "; }
-
-    if($results !== 'headline')
-    {
-      $headline_include = "LEFT JOIN ( ";
-        $headline_include .= "SELECT s.clusterId, COUNT(s.headlineId) AS h_count, ";
-        $headline_include .= $sub_score;
-        $headline_include .= "FROM headlines s ";
-        $headline_include .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
-        $headline_include .= "WHERE s.clusterId IS NOT NULL ";
-        $headline_include .= "AND s.deleted = 0 ";
-        $headline_include .= "GROUP BY clusterId ";
-      $headline_include .= ") h ON h.clusterId = s.clusterId ";
-    }
-
-    $global_select = "s.headline, i2.image, s.createdOn, s.editedOn, ";
-    if($userId && !$subscriptions) { $global_select .= "s.createdBy, s.editedBy, "; }
-
-    $sql = "SELECT ";
-      $sql .= "*, OLD_PASSWORD(id) AS hashId, ((search_score + (cred_score / 2) + (sub_score / 2)) / decay_score) AS score, ((cred_score / 2) / decay_score) AS x_score ";
-    $sql .= "FROM ( ";
-      if(!in_array($results, array('clusters', 'articles')))
+      if($terms)
       {
-        $sql .= "SELECT ";
-          $sql .= "'headline' AS type, s.headlineId AS id, IF(views IS NULL, 0, views) AS views, 0 AS h_count, 0 AS c_count, 0 AS sub_score, ";
-          $sql .= $global_select;
-          if($comments) { $sql .= "comments, "; }
-          if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-          $sql .= $scores;
-        $sql .= "FROM headlines s ";
-        $sql .= "LEFT JOIN headlines_history h ON h.headlineId = s.headlineId ";
-        $sql .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT headlineId, ";
-          $sql .= $view_include;
-          $sql .= "GROUP BY headlineId ";
-        $sql .= ") v ON v.headlineId = s.headlineId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT headlineId, ";
-          $sql .= $image_include;
-        $sql .= ") i1 ON i1.headlineId = s.headlineId ";
-        $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.headlineId = s.headlineId) ";
-        if($comments)
+        $terms = str_replace(",", " ", $terms);
+        $terms = preg_replace('/[^A-Za-z0-9 ]/', '', $terms);
+        $terms = $this->ci->utility->blwords_strip($terms, 'regEx_spaces', ' ');
+        
+        $w = 0;
+        $h_search = "(";
+        $c_search = "(";
+        $a_search = "(";
+        $terms_array = explode(' ', $terms);
+        $arrayKeys = array_keys($terms_array);
+        $lastArrayKey = array_pop($arrayKeys);
+        $ext_terms_array = array();
+        foreach($terms_array as $k => $t)
         {
-          $sql .= "LEFT JOIN ( ";
-            $sql .= "SELECT headlineId, ";
-            $sql .= $comments_include;
-            $sql .= "GROUP BY headlineId ";
-          $sql .= ") x ON x.headlineId = s.headlineId ";
-        }
-        if($subscriptions) { $sql .= "JOIN subscriptions b ON b.headlineId = s.headlineId "; }
-        if(in_array($results, array('visited', 'unvisited')))
-        {
-          $sql .= "LEFT JOIN (";
-            $sql .= "SELECT headlineId, ";
-            $sql .= $viewed_include;
-            $sql .= "GROUP BY headlineId ";
-          $sql .= ") d ON d.headlineId = s.headlineId ";
-        }
-        $sql .= "WHERE s.deleted = 0 ";
-          $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
-          if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
-          if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR h.editedBy = ".$userId.") "; }
-          if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
-        $sql .= "GROUP BY s.headlineId ";
-      }
-
-      if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
-
-      if(!in_array($results, array('headlines', 'articles')))
-      {
-        $sql .= "SELECT ";
-          $sql .= "'cluster' AS type, s.clusterId AS id, IF(views IS NULL, 0, views) AS views, h_count, 0 AS c_count, ";
-          $sql .= "(((h.search_score + (h.cred_score / 2)) / h.decay_score) / h_count) AS sub_score, ";
-          $sql .= $global_select;
-          if($comments) { $sql .= "comments, "; }
-          if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-          $sql .= $scores;
-        $sql .= "FROM clusters s ";
-        $sql .= "LEFT JOIN clusters_history c ON c.clusterId = s.clusterId ";
-        $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT clusterId, ";
-          $sql .= $view_include;
-          $sql .= "GROUP BY clusterId ";
-        $sql .= ") v ON v.clusterId = s.clusterId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT clusterId, ";
-          $sql .= $image_include;
-        $sql .= ") i1 ON i1.clusterId = s.clusterId ";
-        $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.clusterId = s.clusterId) ";
-        $sql .= $headline_include;
-        if($comments)
-        {
-          $sql .= "LEFT JOIN ( ";
-            $sql .= "SELECT clusterId, ";
-            $sql .= $comments_include;
-            $sql .= "GROUP BY clusterId ";
-          $sql .= ") x ON x.clusterId = s.clusterId ";
-        }
-        if($subscriptions) { $sql .= "JOIN subscriptions b ON b.clusterId = s.clusterId "; }
-        if(in_array($results, array('visited', 'unvisited')))
-        {
-          $sql .= "LEFT JOIN (";
-            $sql .= "SELECT clusterId, ";
-            $sql .= $viewed_include;
-          $sql .= ") d ON d.clusterId = s.clusterId ";
-        }
-        $sql .= "WHERE s.deleted = 0 ";
-          $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
-          if($exclusive && !$subscriptions) { $sql .= "AND s.articleId IS null "; }
-          if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR c.editedBy = ".$userId.") "; }
-          if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
-        $sql .= "GROUP BY s.clusterId ";
-      }
-
-      if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
-
-      if(!in_array($results, array('headlines', 'clusters')))
-      {
-        $sql .= "SELECT ";
-          $sql .= "'article' AS type, s.articleId AS id, IF(views IS NULL, 0, views) AS views, h_count, c_count, ";
-          $sql .= "(((c.search_score + (c.cred_score / 2) + c.sub_score) / c.decay_score) / c_count) AS sub_score, ";
-          $sql .= $global_select;
-          if($comments) { $sql .= "comments, "; }
-          if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-          $sql .= $article_scores;
-        $sql .= "FROM articles s ";
-        $sql .= "LEFT JOIN articles_history a ON a.articleId = s.articleId ";
-        $sql .= "LEFT JOIN metadata m ON m.articleId = s.articleId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT articleId, ";
-          $sql .= $view_include;
-          $sql .= "GROUP BY articleId ";
-        $sql .= ") v ON v.articleId = s.articleId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT articleId, ";
-          $sql .= $image_include;
-        $sql .= ") i1 ON i1.articleId = s.articleId ";
-        $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.articleId = s.articleId) ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, SUM(h.h_count) AS h_count, ";
-          $sql .= "(((h.search_score + (h.cred_score / 2)) / h.decay_score) / h_count) AS sub_score, ";
-          $sql .= $sub_score;
-          $sql .= "FROM clusters s ";
-          $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
-          $sql .= $headline_include;
-          $sql .= "WHERE s.articleId IS NOT NULL ";
-          $sql .= "AND s.deleted = 0 ";
-          $sql .= "GROUP BY articleId ";
-        $sql .= ") c ON c.articleId = s.articleId ";
-        if($comments)
-        {
-          $sql .= "LEFT JOIN ( ";
-            $sql .= "SELECT articleId, ";
-            $sql .= $comments_include;
-            $sql .= "GROUP BY articleId ";
-          $sql .= ") x ON x.articleId = s.articleId ";
-        }
-        if($subscriptions) { $sql .= "JOIN subscriptions b ON b.articleId = s.articleId "; }
-        if(in_array($results, array('visited', 'unvisited')))
-        {
-          $sql .= "LEFT JOIN (";
-            $sql .= "SELECT articleId, ";
-            $sql .= $viewed_include;
-          $sql .= ") d ON d.articleId = s.articleId ";
-        }
-        $sql .= "WHERE s.deleted = 0 ";
-          $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
-          if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR a.editedBy = ".$userId.") "; }
-          if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
-        $sql .= "GROUP BY s.articleId ";
-      }
-    $sql .= ") items ";
-    $sql .= "WHERE decay_score > 0 ";
-    if($terms) { $sql .= "AND (search_score > 0 OR sub_score > 0) "; }
-    if($where) { $sql .= "AND ".$where." "; }
-    if($results == 'visited') { $sql .= "AND visited = 1 "; }
-    if($results == 'unvisited') { $sql .= "AND visited = 0 "; }
-    $sql .= "ORDER BY ".$order." DESC, ";
-    $sql .= "search_score DESC, cred_score DESC, decay_score DESC ";
-    if($limit) { $sql .= "LIMIT ".(($page-1) * $limit).", ".$limit; }
-
-    //die($sql);
-
-    $q = $this->db->query($sql);
-    return $q->result();
-  }
-
-  function search_count($terms = "", $where = "", $order = "score", $results = "all", $userId = null, $subscriptions = false, $exclusive = true)
-  {
-    $this->ci =& get_instance();
-    $this->ci->load->model('database_model', 'database', true);
-    $this->ci->load->model('utility_model', 'utility', true);
-
-    $w = 0;
-    $match = "";
-    $article_match = "";
-    $terms = preg_replace('/[^A-Za-z0-9\' ]/', '', $terms);
-    $terms = $this->ci->utility->blwords_strip($terms, 'regEx_spaces', ' ');
-    if($terms)
-    {
-      $search = explode(' ', $terms);
-      foreach($search as $s)
-      {
-        if($w < 10)
-        {
-          if($w) { $match .= " + "; }
-          $match .= "IF((headline REGEXP '[[:<:]]".$s."[[:>:]]'), 1, IF((headline REGEXP '".$s."'), .75, 0)) ";
-          $match .= "+ IF((tags REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((tags REGEXP '".$s."'), .25, 0)) ";
-          $article_match .= "+ IF((article REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((article REGEXP '".$s."'), .25, 0)) ";
-        }
-        $w++;
-      }
-
-      $search_pair = array();
-      $search_temp = $search;
-      for($j = 0; $j < sizeof($search); $j++)
-      {
-        $imp = implode(' ', array_splice($search_temp, $j, 2));
-        if(strpos($imp, ' ')) { $search_pair[] = $imp; }
-        $search_temp = $search;
-      }
-
-      foreach($search_pair as $s)
-      {
-        if($w < 5)
-        {
-          if($w) { $match .= " + "; }
-          $match .= "IF((headline REGEXP '[[:<:]]".$s."[[:>:]]'), 1, IF((headline REGEXP '".$s."'), .75, 0)) ";
-          $match .= "+ IF((tags REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((tags REGEXP '".$s."'), .25, 0)) ";
-          $article_match .= "+ IF((article REGEXP '[[:<:]]".$s."[[:>:]]'), .5, IF((article REGEXP '".$s."'), .25, 0)) ";
-        }
-        $w++;
-      }
-    }
-
-    $article_scores = $scores = "(quality + importance + credibility) AS cred_score, ";
-    $article_scores = $scores .= "(LOG10(((s.createdOn - 1385884800) + (s.editedOn - 1385884800)) / 4) / 10) AS decay_score, ";
-    if($terms)
-    {
-      $scores .= "((".$match.") / ".$w.") AS search_score ";
-      $article_scores .= "((".$match.$article_match.") / ".$w.") AS search_score ";
-    }
-    else { $article_scores = $scores .= "0 AS search_score "; }
-
-    $view_include = "COUNT(viewId) AS views ";
-    $view_include .= "FROM views ";
-
-    $viewed_include = "IF(viewId IS NULL, 0, 1) AS viewed ";
-    $viewed_include .= "FROM views ";
-    $viewed_include .= "WHERE userId = ".$this->session->userdata('userId')." ";
-
-    $sub_score = "SUM(quality + importance + credibility) AS cred_score, ";
-    $sub_score .= "SUM(LOG10(((s.createdOn - 1385884800) + (s.editedOn - 1385884800)) / 4) / 10) AS decay_score, ";
-    if($terms) { $sub_score .= "SUM((".$match.") / ".$w.") AS search_score "; }
-    else { $sub_score .= "0 AS search_score "; }
-
-    if($results !== 'headline')
-    {
-      $headline_include = "LEFT JOIN ( ";
-        $headline_include .= "SELECT s.clusterId, COUNT(s.headlineId) AS h_count, ";
-        $headline_include .= $sub_score;
-        $headline_include .= "FROM headlines s ";
-        $headline_include .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
-        $headline_include .= "WHERE s.clusterId IS NOT NULL ";
-        $headline_include .= "AND s.deleted = 0 ";
-        $headline_include .= "GROUP BY clusterId ";
-      $headline_include .= ") h ON h.clusterId = s.clusterId ";
-    }
-
-    $sql = "SELECT ";
-      $sql .= "COUNT(id) AS items ";
-    $sql .= "FROM ( ";
-      if(!in_array($results, array('clusters', 'articles')))
-      {
-        $sql .= "SELECT ";
-          $sql .= "'headline' AS type, s.headlineId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, 0 AS h_count, 0 AS c_count, 0 AS sub_score, ";
-          if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-          $sql .= $scores;
-        $sql .= "FROM headlines s ";
-        $sql .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT headlineId, ";
-          $sql .= $view_include;
-          $sql .= "GROUP BY headlineId ";
-        $sql .= ") v ON v.headlineId = s.headlineId ";
-        if($subscriptions) { $sql .= "JOIN subscriptions b ON b.headlineId = s.headlineId "; }
-        if(in_array($results, array('visited', 'unvisited')))
-        {
-          $sql .= "LEFT JOIN (";
-            $sql .= "SELECT headlineId, ";
-            $sql .= $viewed_include;
-            $sql .= "GROUP BY headlineId ";
-          $sql .= ") d ON d.headlineId = s.headlineId ";
-        }
-        $sql .= "WHERE s.deleted = 0 ";
-          if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
-          if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
-          if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
-      }
-
-      if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
-
-      if(!in_array($results, array('headlines', 'articles')))
-      {
-        $sql .= "SELECT ";
-          $sql .= "'cluster' AS type, s.clusterId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, h_count, 0 AS c_count, ";
-          $sql .= "(((h.search_score + (h.cred_score / 2)) / h.decay_score) / h_count) AS sub_score, ";
-          if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-          $sql .= $scores;
-        $sql .= "FROM clusters s ";
-        $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT clusterId, ";
-          $sql .= $view_include;
-          $sql .= "GROUP BY clusterId ";
-        $sql .= ") v ON v.clusterId = s.clusterId ";
-        $sql .= $headline_include;
-        if($exclusive && $subscriptions) { $sql .= "JOIN subscriptions b ON b.clusterId = s.clusterId "; }
-        if(in_array($results, array('visited', 'unvisited')))
-        {
-          $sql .= "LEFT JOIN (";
-            $sql .= "SELECT clusterId, ";
-            $sql .= $viewed_include;
-          $sql .= ") d ON d.clusterId = s.clusterId ";
-        }
-        $sql .= "WHERE s.deleted = 0 ";
-          if(!$subscriptions) { $sql .= "AND s.articleId IS null "; }
-          if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
-          if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
-      }
-
-      if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
-
-      if(!in_array($results, array('headlines', 'clusters')))
-      {
-        $sql .= "SELECT ";
-          $sql .= "'article' AS type, s.articleId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, h_count, c_count, ";
-          $sql .= "(((c.search_score + (c.cred_score / 2) + c.sub_score) / c.decay_score) / c_count) AS sub_score, ";
-          if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-          $sql .= $article_scores;
-        $sql .= "FROM articles s ";
-        $sql .= "LEFT JOIN metadata m ON m.articleId = s.articleId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT articleId, ";
-          $sql .= $view_include;
-          $sql .= "GROUP BY articleId ";
-        $sql .= ") v ON v.articleId = s.articleId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, SUM(h.h_count) AS h_count, ";
-          $sql .= "(((h.search_score + (h.cred_score / 2)) / h.decay_score) / h_count) AS sub_score, ";
-          $sql .= $sub_score;
-          $sql .= "FROM clusters s ";
-          $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
-          $sql .= $headline_include;
-          $sql .= "WHERE s.articleId IS NOT NULL ";
-          $sql .= "AND s.deleted = 0 ";
-          $sql .= "GROUP BY articleId ";
-        $sql .= ") c ON c.articleId = s.articleId ";
-        if($subscriptions) { $sql .= "JOIN subscriptions b ON b.articleId = s.articleId "; }
-        if(in_array($results, array('visited', 'unvisited')))
-        {
-          $sql .= "LEFT JOIN (";
-            $sql .= "SELECT articleId, ";
-            $sql .= $viewed_include;
-          $sql .= ") d ON d.articleId = s.articleId ";
-        }
-        $sql .= "WHERE s.deleted = 0 ";
-          if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
-          if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
-      }
-    $sql .= ") items ";
-    $sql .= "WHERE decay_score > 0 ";
-    if($terms) { $sql .= "AND (search_score > 0 OR sub_score > 0) "; }
-    if($where) { $sql .= "AND ".$where." "; }
-    if($results == 'visited') { $sql .= "AND visited = 1 "; }
-    if($results == 'unvisited') { $sql .= "AND visited = 0 "; }
-
-    $q = $this->db->query($sql);
-    return $q->row();
-  }
-
-  /**
-   * Search Stream
-   *
-   * @access public
-   * @param string
-   * @param string
-   * @param array
-   * @param string
-   * @param int
-   * @param string
-   * @param bool
-   *
-   * @return object
-   */
-  public function _search($keywords = '', $place = '', $categories_list = array(), $type = '', $id = 0, $where = '', $meta = true, $limit = 0, $order = 'score', $comments = false, $page = 1, $results = 'all', $userId = 0)
-  {
-    $key_array = preg_split($this->config->item('regEx_spaces'), $this->db->escape_str($keywords));
-    $key_array = array_filter($key_array, "strlen");
-    $keyword_score = $keywords?"(k_matches / ".sizeof($key_array).")":"0";
-
-    $place = $this->db->escape_str($place);
-    $place_if = "IF(p.place = '".$place."', 1, ";
-    $place_if .= "IF(p.place LIKE '%".$place."%', .667, ";
-    if(strlen($place) >= 3)
-    {
-      $length = round(strlen($place)/3);
-      $place_if .= "IF(p.place LIKE '%".substr($place, $length, -$length)."%', .333, 0) ";
-    }
-    else { $place_if .= "0"; }
-    $place_if .= "))";
-    $place_score = $place?$place_if:"0";
-
-    $category_score = $categories_list?"(cat_count / ".sizeof($categories_list).")":"0";
-
-    $c_keyword_score = "((h_keyword_score / h_count) + ".$keyword_score.")";
-    $c_place_score = "((h_place_score / h_count) + ".$place_score.")";
-    $c_category_score = "((h_category_score / h_count) + ".$category_score.")";
-    if($meta)
-    {
-      $c_quality_score = "((h_quality_score / h_count) + quality)";
-      $c_importance_score = "((h_importance_score / h_count) + importance)";
-      $c_credibility_score = "((h_credibility_score / h_count) + credibility)";
-    }
-
-    $case = "CASE ";
-      $case .= "WHEN keyword IN ('".implode("', '", $key_array)."') ";
-        $case .= "THEN IF(isTag = 0, 1, .1) ";
-      $case .= "WHEN keyword RLIKE '".implode("|", $key_array)."' ";
-        $case .= "THEN IF(isTag = 0, .667, .067) ";
-      $shortk = array();
-      foreach($key_array as $k)
-      {
-        if(strlen($k) >= 3)
-        {
-          $length = round(strlen($k)/3);
-          $begin = substr($k, 0, $length);
-          $shortk[] = "^".$begin;
-          $end = substr($k, (strlen($k)-$length), $length);
-          $shortk[] = $end."$";
-        }
-        else
-        {
-          $shortk[] = "^".$k;
-          $shortk[] = $k."$";
-        }
-      }
-      $case .= "WHEN keyword RLIKE '".implode("|", $shortk)."' ";
-        $case .= "THEN IF(isTag = 0, .333, .033) ";
-      $case .= "ELSE 0 ";
-    $case .= "END ";
-
-    $view_include = "COUNT(viewId) AS views ";
-    $view_include .= "FROM views ";
-
-    $viewed_include = "IF(viewId IS NULL, 0, 1) AS viewed ";
-    $viewed_include .= "FROM views ";
-    $viewed_include .= "WHERE userId = ".$this->session->userdata('userId')." ";
-
-    $keyword_include = "SUM(".$case.") AS k_matches ";
-    $keyword_include .= "FROM keywords ";
-    $keyword_include .= "WHERE deleted = 0 ";
-
-    $catlist_include = "COUNT(catlistId) AS cat_count ";
-    $catlist_include .= "FROM catlist ";
-    $catlist_include .= "WHERE categoryId IN (".implode(',', $categories_list).") ";
-    $catlist_include .= "AND deleted = 0 ";
-
-    if($comments)
-    {
-      $comments_include = "COUNT(commentId) as comments ";
-      $comments_include .= "FROM comments ";
-      $comments_include .= "WHERE deleted = 0 ";
-    }
-
-    $headline_include = "FROM headlines s ";
-    $headline_include .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
-    $headline_include .= "LEFT JOIN ( ";
-      $headline_include .= "SELECT headlineId, ";
-      $headline_include .= $view_include;
-      $headline_include .= "GROUP BY headlineId ";
-    $headline_include .= ") v ON v.headlineId = s.headlineId ";
-    $headline_include .= $this->places_join;
-    if($keywords)
-    {
-      $headline_include .= "LEFT JOIN ( ";
-        $headline_include .= "SELECT headlineId, ";
-        $headline_include .= $keyword_include;
-        $headline_include .= "GROUP BY headlineId ";
-      $headline_include .= ") k ON k.headlineId = s.headlineId ";
-    }
-    if($categories_list)
-    {
-      $headline_include .= "LEFT JOIN ( ";
-        $headline_include .= "SELECT headlineId, ";
-        $headline_include .= $catlist_include;
-        $headline_include .= "GROUP BY headlineId ";
-      $headline_include .= ") l ON l.headlineId = s.headlineId ";
-    }
-    if(in_array($results, array('visited', 'unvisited')))
-    {
-      $headline_include .= "LEFT JOIN (";
-        $headline_include .= "SELECT headlineId, ";
-        $headline_include .= $viewed_include;
-      $headline_include .= ") d ON d.headlineId = s.headlineId ";
-    }
-
-    if($results !== 'headlines')
-    {
-      $cluster_include = "FROM clusters s ";
-      $cluster_include .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
-      $cluster_include .= "LEFT JOIN ( ";
-        $cluster_include .= "SELECT clusterId, ";
-        $cluster_include .= $view_include;
-        $cluster_include .= "GROUP BY clusterId ";
-      $cluster_include .= ") v ON v.clusterId = s.clusterId ";
-      $cluster_include .= $this->places_join;
-      if($keywords)
-      {
-        $cluster_include .= "LEFT JOIN ( ";
-          $cluster_include .= "SELECT clusterId, ";
-          $cluster_include .= $keyword_include;
-          $cluster_include .= "GROUP BY clusterId ";
-        $cluster_include .= ") k ON k.clusterId = s.clusterId ";
-      }
-      if($categories_list)
-      {
-        $cluster_include .= "LEFT JOIN ( ";
-          $cluster_include .= "SELECT clusterId, ";
-          $cluster_include .= $catlist_include;
-          $cluster_include .= "GROUP BY clusterId ";
-        $cluster_include .= ") l ON l.clusterId = s.clusterId ";
-      }
-      if(in_array($results, array('visited', 'unvisited')))
-      {
-        $cluster_include .= "LEFT JOIN (";
-          $cluster_include .= "SELECT clusterId, ";
-          $cluster_include .= $viewed_include;
-        $cluster_include .= ") d ON d.clusterId = s.clusterId ";
-      }
-      $cluster_include .= "LEFT JOIN ( ";
-        $cluster_include .= "SELECT s.clusterId, COUNT(s.headlineId) AS h_count, ";
-        $cluster_include .= "IF(views IS NULL, 0, views) AS h_views, ";
-        if($meta)
-        {
-          $cluster_include .= "quality AS h_quality_score, ";
-          $cluster_include .= "importance AS h_importance_score, ";
-          $cluster_include .= "credibility AS h_credibility_score, ";
-        }
-        $cluster_include .= $keyword_score." AS h_keyword_score, ";
-        $cluster_include .= $place_score." AS h_place_score, ";
-        $cluster_include .= $category_score." AS h_category_score ";
-        $cluster_include .= $headline_include;
-        $cluster_include .= "WHERE s.clusterId IS NOT NULL ";
-        $cluster_include .= "AND s.deleted = 0 ";
-        $cluster_include .= "GROUP BY s.clusterId ";
-      $cluster_include .= ") h ON h.clusterId = s.clusterId ";
-    }
-
-    $sql = "SELECT *, OLD_PASSWORD(id) AS hashId, (keyword_score + category_score + place_score ";
-    if($meta) { $sql .= "+ quality_score + importance_score + credibility_score"; }
-    $sql .= " + 1) / decay_score AS score, (0 ";
-    if($meta) { $sql .= "+ quality_score + importance_score + credibility_score"; }
-    $sql .= " + 1) / decay_score AS x_score ";
-    $sql .= "FROM ( ";
-      if(!in_array($results, array('clusters', 'articles')))
-      {
-        $sql .= "SELECT s.headlineId AS id, 'headline' AS type, ".$this->generic_select.", ";
-        $sql .= "0 AS h_count, 0 AS c_count, ";
-        $sql .= "IF(views IS NULL, 0, views) AS views, ";
-        if($comments) { $sql .= "comments, "; }
-        if($meta)
-        {
-          $sql .= "quality AS quality_score, ";
-          $sql .= "importance AS importance_score, ";
-          $sql .= "credibility AS credibility_score, ";
-        }
-        if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-        $sql .= $keyword_score." AS keyword_score, ";
-        $sql .= $place_score." AS place_score, ";
-        $sql .= $category_score." AS category_score, ";
-        $sql .= $this->decay_score." AS decay_score ";
-        $sql .= $headline_include;
-        if($comments)
-        {
-          $sql .= "LEFT JOIN ( ";
-            $sql .= "SELECT headlineId, ";
-            $sql .= $comments_include;
-            $sql .= "GROUP BY headlineId ";
-          $sql .= ") x ON x.headlineId = s.headlineId ";
-        }
-        $sql .= "WHERE s.clusterId IS NULL ";
-        $sql .= "AND s.deleted = 0 ";
-      }
-      if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
-      if(!in_array($results, array('headlines', 'articles')))
-      {
-        $sql .= "SELECT s.clusterId AS id, 'cluster' AS type, ".$this->generic_select.", ";
-        $sql .= "h_count, 0 AS c_count, ";
-        $sql .= "(h_views + IF(views IS NULL, 0, views)) AS views, ";
-        if($comments) { $sql .= "comments, "; }
-        if($meta)
-        {
-          $sql .= $c_quality_score." AS quality_score, ";
-          $sql .= $c_importance_score." AS importance_score, ";
-          $sql .= $c_credibility_score." AS credibility_score, ";
-        }
-        if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-        $sql .= $c_keyword_score." AS keyword_score, ";
-        $sql .= $c_place_score." AS place_score, ";
-        $sql .= $c_category_score." AS category_score, ";
-        $sql .= $this->decay_score." AS decay_score ";
-        $sql .= $cluster_include;
-        if($comments)
-        {
-          $sql .= "LEFT JOIN ( ";
-            $sql .= "SELECT clusterId, ";
-            $sql .= $comments_include;
-            $sql .= "GROUP BY clusterId ";
-          $sql .= ") x ON x.clusterId = s.clusterId ";
-        }
-        $sql .= "WHERE s.articleId IS NULL ";
-        $sql .= "AND s.deleted = 0 ";
-      }
-      if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
-      if(!in_array($results, array('headlines', 'clusters')))
-      {
-        $sql .= "SELECT s.articleId AS id, 'article' AS type, ".$this->generic_select.", ";
-        $sql .= "h_count, c_count, ";
-        $sql .= "(c_views + IF(views IS NULL, 0, views)) AS views, ";
-        if($comments) { $sql .= "comments, "; }
-        if($meta)
-        {
-          $sql .= "((c_quality_score / c_count) + quality) AS quality_score, ";
-          $sql .= "((c_importance_score / c_count) + importance) AS importance_score, ";
-          $sql .= "((c_credibility_score / c_count) + credibility) AS credibility_score, ";
-        }
-        if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-        $sql .= "((c_keyword_score / c_count) + ".$keyword_score.") AS keyword_score, ";
-        $sql .= "((c_place_score / c_count) + ".$place_score.") AS place_score, ";
-        $sql .= "((c_category_score / c_count) + ".$category_score.") AS category_score, ";
-        $sql .= $this->decay_score." AS decay_score ";
-        $sql .= "FROM articles s ";
-        $sql .= "LEFT JOIN metadata m ON m.articleId = s.articleId ";
-        $sql .= "LEFT JOIN ( ";
-          $sql .= "SELECT articleId, ";
-          $sql .= $view_include;
-          $sql .= "GROUP BY articleId ";
-        $sql .= ") v ON v.articleId = s.articleId ";
-        $sql .= $this->places_join;
-        if($keywords)
-        {
-          $sql .= "LEFT JOIN ( ";
-            $sql .= "SELECT articleId, ";
-            $sql .= $keyword_include;
-            $sql .= "GROUP BY articleId ";
-          $sql .= ") k ON k.articleId = s.articleId ";
-        }
-        if($categories_list)
-        {
-          $sql .= "LEFT JOIN ( ";
-            $sql .= "SELECT articleId, ";
-            $sql .= $catlist_include;
-            $sql .= "GROUP BY articleId ";
-          $sql .= ") l ON l.articleId = s.articleId ";
-        }
-        if($comments)
-        {
-          $sql .= "LEFT JOIN ( ";
-            $sql .= "SELECT articleId, ";
-            $sql .= $comments_include;
-            $sql .= "GROUP BY articleId ";
-          $sql .= ") x ON x.articleId = s.articleId ";
-        }
-        if(in_array($results, array('visited', 'unvisited')))
-        {
-          $sql .= "LEFT JOIN (";
-            $sql .= "SELECT articleId, ";
-            $sql .= $viewed_include;
-          $sql .= ") d ON d.articleId = s.articleId ";
-        }
-        $sql .= "LEFT JOIN (";
-          $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, ";
-          $sql .= "h_count, ";
-          $sql .= "(h_views + IF(views IS NULL, 0, views)) AS c_views, ";
-          if($meta)
+          $t = $this->db->escape_str($t, true);
+          
+          $h_temp = "s.headline LIKE '%".$t."%' ";
+          $h_temp .= "OR s.tags LIKE '%".$t."%' ";
+          $c_temp = "h_headline LIKE '%".$t."%' ";
+          $c_temp .= "OR h_tags LIKE '%".$t."%' ";
+          $a_temp = "s.article LIKE '%".$t."%' ";
+          $a_temp .= "OR c_headline LIKE '%".$t."%' ";
+          $a_temp .= "OR c_tags LIKE '%".$t."%' ";
+          
+          $h_search .= ($w?"OR ":"").$h_temp;
+          $c_search .= ($w?"OR ":"").$h_temp."OR ".$c_temp;
+          $a_search .= ($w?"OR ":"").$h_temp."OR ".$c_temp."OR ".$a_temp;
+          
+          if($k !== $lastArrayKey)
           {
-            $sql .= $c_quality_score." AS c_quality_score, ";
-            $sql .= $c_importance_score." AS c_importance_score, ";
-            $sql .= $c_credibility_score." AS c_credibility_score, ";
+            $ext_terms_array[] = $t.' '.$terms_array[$k+1];
           }
-          $sql .= $c_keyword_score." AS c_keyword_score, ";
-          $sql .= $c_place_score." AS c_place_score, ";
-          $sql .= $c_category_score." AS c_category_score ";
-          $sql .= $cluster_include;
-          $sql .= "WHERE s.articleId IS NOT NULL ";
-          $sql .= "AND s.deleted = 0 ";
-          $sql .= "GROUP BY s.articleId ";
-        $sql .= ") c ON c.articleId = s.articleId ";
-        $sql .= "WHERE s.deleted = 0 ";
+          
+          $w++;
+        }
+        $h_search .= ") ";
+        $c_search .= ") ";
+        $a_search .= ") ";
       }
-    $sql .= ") items ";
-    $sql .= "WHERE deleted = 0 ";
-    if($where) { $sql .= "AND ".$where." "; }
-    if($type && $id) { $sql .= "AND IF(type = '".$type."', IF(id = ".$id.", 0, 1), 1) = 1 "; }
-    if($keywords) { $sql .= "AND keyword_score > 0.3 "; }
-    if($place) { $sql .= "AND (place_score > 0 OR placeId IS NULL) "; }
-    if($categories_list) { $sql .= "AND category_score > 0 "; }
-    if($results == 'visited') { $sql .= "AND visited = 1 "; }
-    if($results == 'unvisited') { $sql .= "AND visited = 0 "; }
-    if($userId) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
-    $sql .= "ORDER BY ".$order." DESC, ";
-    $sql .= "type ASC ";
-    if($limit) { $sql .= "LIMIT ".(($page-1) * $limit).", ".$limit; }
-
-    //die($sql);
-
-    $q = $this->db->query($sql);
-    return $q->result();
+  
+      $article_scores = $scores = "m.score AS cred_score, ";
+      $article_scores = $scores .= "s.decay AS decay_score ";
+  
+      if($comments)
+      {
+        $comments_include = "COUNT(commentId) as comments ";
+        $comments_include .= "FROM comments ";
+        $comments_include .= "WHERE deleted = 0 ";
+      }
+  
+      $view_include = "COUNT(viewId) AS views ";
+      $view_include .= "FROM views ";
+  
+      $viewed_include = "IF(viewId IS NULL, 0, 1) AS viewed ";
+      $viewed_include .= "FROM views ";
+      $viewed_include .= "WHERE userId = ".$this->session->userdata('userId')." ";
+  
+      $image_include = "imageId FROM images ";
+      $image_include .= "WHERE deleted = 0 AND active = 1 ";
+      $image_include .= "LIMIT 1 ";
+  
+      $sub_score = "SUM(m.score) AS cred_score, ";
+      $sub_score .= "SUM(s.decay) AS decay_score ";
+  
+      if($results !== 'headlines')
+      {
+        $headline_include = "LEFT JOIN ( ";
+          $headline_include .= "SELECT s.clusterId, COUNT(s.headlineId) AS h_count, ";
+          $headline_include .= "s.headline AS h_headline, s.tags AS h_tags, ";
+          $headline_include .= $sub_score;
+          $headline_include .= "FROM headlines s ";
+          $headline_include .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
+          $headline_include .= "WHERE s.clusterId IS NOT NULL ";
+          $headline_include .= "AND s.deleted = 0 ";
+          $headline_include .= "GROUP BY clusterId ";
+        $headline_include .= ") h ON h.clusterId = s.clusterId ";
+      }
+  
+      $global_select = "s.headline, s.tags, i2.image, s.createdOn, s.editedOn, ";
+      if($userId && !$subscriptions) { $global_select .= "s.createdBy, s.editedBy, "; }
+  
+      $sql = "SELECT ";
+        $sql .= "*, OLD_PASSWORD(id) AS hashId, ((cred_score + sub_score) / decay_score) AS x_score ";
+        //$sql .= "*, OLD_PASSWORD(id) AS hashId, (((cred_score / 2) + (sub_score / 2)) * decay_score) AS score, ((cred_score / 2) * decay_score) AS x_score ";
+      $sql .= "FROM ( ";
+        if(!in_array($results, array('clusters', 'articles')))
+        {
+          $sql .= "SELECT ";
+            $sql .= "'headline' AS type, s.headlineId AS id, IF(views IS NULL, 0, views) AS views, 0 AS h_count, 0 AS c_count, 0 AS sub_score, ";
+            $sql .= "s.notes AS article, '' AS c_headline, '' AS c_tags, '' AS h_headline, '' AS h_tags, ";
+            $sql .= $global_select;
+            if($comments) { $sql .= "comments, "; }
+            if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
+            $sql .= $scores;
+          $sql .= "FROM headlines s ";
+          $sql .= "LEFT JOIN headlines_history h ON h.headlineId = s.headlineId ";
+          $sql .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
+          $sql .= "LEFT JOIN ( ";
+            $sql .= "SELECT headlineId, ";
+            $sql .= $view_include;
+            $sql .= "GROUP BY headlineId ";
+          $sql .= ") v ON v.headlineId = s.headlineId ";
+          $sql .= "LEFT JOIN ( ";
+            $sql .= "SELECT headlineId, ";
+            $sql .= $image_include;
+          $sql .= ") i1 ON i1.headlineId = s.headlineId ";
+          $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.headlineId = s.headlineId) ";
+          if($comments)
+          {
+            $sql .= "LEFT JOIN ( ";
+              $sql .= "SELECT headlineId, ";
+              $sql .= $comments_include;
+              $sql .= "GROUP BY headlineId ";
+            $sql .= ") x ON x.headlineId = s.headlineId ";
+          }
+          if($subscriptions) { $sql .= "JOIN subscriptions b ON b.headlineId = s.headlineId "; }
+          if(in_array($results, array('visited', 'unvisited')))
+          {
+            $sql .= "LEFT JOIN (";
+              $sql .= "SELECT headlineId, ";
+              $sql .= $viewed_include;
+              $sql .= "GROUP BY headlineId ";
+            $sql .= ") d ON d.headlineId = s.headlineId ";
+          }
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+            $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
+            if($terms) { $sql .= "AND ".$h_search; }
+            if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
+            if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR h.editedBy = ".$userId.") "; }
+            if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
+          $sql .= "GROUP BY s.headlineId ";
+        }
+  
+        if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
+  
+        if(!in_array($results, array('headlines', 'articles')))
+        {
+          $sql .= "SELECT ";
+            $sql .= "'cluster' AS type, s.clusterId AS id, IF(views IS NULL, 0, views) AS views, h_count, 0 AS c_count, ";
+            $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+            $sql .= "'' AS article, '' AS c_headline, '' AS c_tags, GROUP_CONCAT(h_headline SEPARATOR ' '), GROUP_CONCAT(h_tags SEPARATOR ' '), ";
+            $sql .= $global_select;
+            if($comments) { $sql .= "comments, "; }
+            if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
+            $sql .= $scores;
+          $sql .= "FROM clusters s ";
+          $sql .= "LEFT JOIN clusters_history c ON c.clusterId = s.clusterId ";
+          $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
+          $sql .= "LEFT JOIN ( ";
+            $sql .= "SELECT clusterId, ";
+            $sql .= $view_include;
+            $sql .= "GROUP BY clusterId ";
+          $sql .= ") v ON v.clusterId = s.clusterId ";
+          $sql .= "LEFT JOIN ( ";
+            $sql .= "SELECT clusterId, ";
+            $sql .= $image_include;
+          $sql .= ") i1 ON i1.clusterId = s.clusterId ";
+          $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.clusterId = s.clusterId) ";
+          $sql .= $headline_include;
+          if($comments)
+          {
+            $sql .= "LEFT JOIN ( ";
+              $sql .= "SELECT clusterId, ";
+              $sql .= $comments_include;
+              $sql .= "GROUP BY clusterId ";
+            $sql .= ") x ON x.clusterId = s.clusterId ";
+          }
+          if($subscriptions) { $sql .= "JOIN subscriptions b ON b.clusterId = s.clusterId "; }
+          if(in_array($results, array('visited', 'unvisited')))
+          {
+            $sql .= "LEFT JOIN (";
+              $sql .= "SELECT clusterId, ";
+              $sql .= $viewed_include;
+            $sql .= ") d ON d.clusterId = s.clusterId ";
+          }
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+            $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
+            if($terms) { $sql .= "AND ".$c_search; }
+            if($exclusive && !$subscriptions) { $sql .= "AND s.articleId IS null "; }
+            if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR c.editedBy = ".$userId.") "; }
+            if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
+          $sql .= "GROUP BY s.clusterId ";
+        }
+  
+        if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
+  
+        if(!in_array($results, array('headlines', 'clusters')))
+        {
+          $sql .= "SELECT ";
+            $sql .= "'article' AS type, s.articleId AS id, IF(views IS NULL, 0, views) AS views, h_count, c_count, ";
+            $sql .= "((((c.cred_score / 2) + c.sub_score) * c.decay_score) / c_count) AS sub_score, ";
+            $sql .= "s.article, GROUP_CONCAT(c_headline SEPARATOR ' '), GROUP_CONCAT(c_tags SEPARATOR ' '), h_headline, h_tags, ";
+            $sql .= $global_select;
+            if($comments) { $sql .= "comments, "; }
+            if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
+            $sql .= $article_scores;
+          $sql .= "FROM articles s ";
+          $sql .= "LEFT JOIN articles_history a ON a.articleId = s.articleId ";
+          $sql .= "LEFT JOIN metadata m ON m.articleId = s.articleId ";
+          $sql .= "LEFT JOIN ( ";
+            $sql .= "SELECT articleId, ";
+            $sql .= $view_include;
+            $sql .= "GROUP BY articleId ";
+          $sql .= ") v ON v.articleId = s.articleId ";
+          $sql .= "LEFT JOIN ( ";
+            $sql .= "SELECT articleId, ";
+            $sql .= $image_include;
+          $sql .= ") i1 ON i1.articleId = s.articleId ";
+          $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.articleId = s.articleId) ";
+          $sql .= "LEFT JOIN ( ";
+            $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, SUM(h.h_count) AS h_count, ";
+            $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+            $sql .= "s.headline AS c_headline, s.tags AS c_tags, h_headline, h_tags, ";
+            $sql .= $sub_score;
+            $sql .= "FROM clusters s ";
+            $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
+            $sql .= $headline_include;
+            $sql .= "WHERE s.articleId IS NOT NULL ";
+            $sql .= "AND s.deleted = 0 ";
+            $sql .= "GROUP BY articleId ";
+          $sql .= ") c ON c.articleId = s.articleId ";
+          if($comments)
+          {
+            $sql .= "LEFT JOIN ( ";
+              $sql .= "SELECT articleId, ";
+              $sql .= $comments_include;
+              $sql .= "GROUP BY articleId ";
+            $sql .= ") x ON x.articleId = s.articleId ";
+          }
+          if($subscriptions) { $sql .= "JOIN subscriptions b ON b.articleId = s.articleId "; }
+          if(in_array($results, array('visited', 'unvisited')))
+          {
+            $sql .= "LEFT JOIN (";
+              $sql .= "SELECT articleId, ";
+              $sql .= $viewed_include;
+            $sql .= ") d ON d.articleId = s.articleId ";
+          }
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+            $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
+            if($terms) { $sql .= "AND ".$a_search; }
+            if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR a.editedBy = ".$userId.") "; }
+            if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
+          $sql .= "GROUP BY s.articleId ";
+        }
+      $sql .= ") items ";
+      $sql .= "WHERE 1 = 1 ";
+      if($where) { $sql .= "AND ".$where." "; }
+      if($results == 'visited') { $sql .= "AND visited = 1 "; }
+      if($results == 'unvisited') { $sql .= "AND visited = 0 "; }
+      if($order !== 'score') { $sql .= "ORDER BY ".$order." DESC "; }
+      else { $sql .= "ORDER BY x_score DESC "; }
+      if($limit && $order !== 'score') { $sql .= "LIMIT ".(($page-1) * $limit).", ".$limit; }
+  
+      $q = $this->db->query($sql);
+      $results = $q->result();
+      
+      if($terms && $order == "score")
+      {
+        $total = array();
+        $search = array();
+        $sub = array();
+        $cred = array();
+        $decay = array();
+        foreach($results as $key => $r)
+        {
+          $score = 0;
+          foreach(array_merge($terms_array, $ext_terms_array) as $t)
+          {
+            if(preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->headline))
+            {
+              if(preg_match('/(\b'.$t.'\b)/i', $r->headline, $matches)) { $score += 1.00 * sizeof($matches);  }
+              elseif(preg_match('/(\B'.$t.'\b|\b'.$t.'\B)/i', $r->headline, $matches)) { $score += 0.85 * sizeof($matches);  }
+              elseif(preg_match('/(\B'.$t.'\B)/i', $r->headline, $matches)) { $score += 0.70 * sizeof($matches);  }
+            }
+            if(preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->tags))
+            {
+              if(preg_match('/(\b'.$t.'\b)/i', $r->tags, $matches)) { $score += 0.90 * sizeof($matches);  }
+              elseif(preg_match('/(\B'.$t.'\b|\b'.$t.'\B)/i', $r->tags, $matches)) { $score += 0.75 * sizeof($matches);  }
+              elseif(preg_match('/(\B'.$t.'\B)/i', $r->tags, $matches)) { $score += 0.60 * sizeof($matches);  }
+            }
+            if($r->type == "article")
+            {
+              if($r->article && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->article))
+              {
+                if(preg_match('/(\b'.$t.'\b)/i', $r->article, $matches)) { $score += 0.90 * sizeof($matches);  }
+                elseif(preg_match('/(\B'.$t.'\b|\b'.$t.'\B)/i', $r->article, $matches)) { $score += 0.75 * sizeof($matches);  }
+                elseif(preg_match('/(\B'.$t.'\B)/i', $r->article, $matches)) { $score += 0.60 * sizeof($matches);  }
+              }
+              if($r->c_headline && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->c_headline))
+              {
+                if(preg_match('/(\b'.$t.'\b)/i', $r->c_headline, $matches)) { $score += 0.80 * sizeof($matches) / $r->c_count;  }
+                elseif(preg_match('/(\B'.$t.'\b|\b'.$t.'\B)/i', $r->c_headline, $matches)) { $score += 0.65 * sizeof($matches) / $r->c_count;  }
+                elseif(preg_match('/(\B'.$t.'\B)/i', $r->c_headline, $matches)) { $score += 0.50 * sizeof($matches) / $r->c_count;  }
+              }
+              if($r->c_tags && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->c_tags))
+              {
+                if(preg_match('/(\b'.$t.'\b)/i', $r->c_tags, $matches)) { $score += 0.70 * sizeof($matches) / $r->c_count;  }
+                elseif(preg_match('/(\B'.$t.'\b|\b'.$t.'\B)/i', $r->c_tags, $matches)) { $score += 0.55 * sizeof($matches) / $r->c_count;  }
+                elseif(preg_match('/(\B'.$t.'\B)/i', $r->c_tags, $matches)) { $score += 0.40 * sizeof($matches) / $r->c_count;  }
+              }
+              if($r->h_headline && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->h_headline))
+              {
+                if(preg_match('/(\b'.$t.'\b)/i', $r->h_headline, $matches)) { $score += 0.60 * sizeof($matches) / $r->h_count;  }
+                elseif(preg_match('/(\B'.$t.'\b|\b'.$t.'\B)/i', $r->h_headline, $matches)) { $score += 0.45 * sizeof($matches) / $r->h_count;  }
+                elseif(preg_match('/(\B'.$t.'\B)/i', $r->h_headline, $matches)) { $score += 0.30 * sizeof($matches) / $r->h_count;  }
+              }
+              if($r->h_tags && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->h_tags))
+              {
+                if(preg_match('/(\b'.$t.'\b)/i', $r->h_tags, $matches)) { $score += 0.50 * sizeof($matches) / $r->h_count;  }
+                elseif(preg_match('/(\B'.$t.'\b|\b'.$t.'\B)/i', $r->h_tags, $matches)) { $score += 0.35 * sizeof($matches) / $r->h_count;  }
+                elseif(preg_match('/(\B'.$t.'\B)/i', $r->h_tags, $matches)) { $score += 0.20 * sizeof($matches) / $r->h_count;  }
+              }
+            }
+            elseif($r->type == "cluster")
+            {
+              if($r->h_headline && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->h_headline))
+              {
+                if(preg_match('/(\b'.$t.'\b)/i', $r->h_headline, $matches)) { $score += 0.80 * sizeof($matches) / $r->h_count;  }
+                elseif(preg_match('/(\B'.$t.'\b|\b'.$t.'\B)/i', $r->h_headline, $matches)) { $score += 0.65 * sizeof($matches) / $r->h_count;  }
+                elseif(preg_match('/(\B'.$t.'\B)/i', $r->h_headline, $matches)) { $score += 0.50 * sizeof($matches) / $r->h_count;  }
+              }
+              if($r->h_tags && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->h_tags))
+              {
+                if(preg_match('/(\b'.$t.'\b)/i', $r->h_tags, $matches)) { $score += 0.70 * sizeof($matches) / $r->h_count;  }
+                elseif(preg_match('/(\B'.$t.'\b|\b'.$t.'\B)/i', $r->h_tags, $matches)) { $score += 0.55 * sizeof($matches) / $r->h_count;  }
+                elseif(preg_match('/(\B'.$t.'\B)/i', $r->h_tags, $matches)) { $score += 0.40 * sizeof($matches) / $r->h_count;  }
+              }
+            }
+            else
+            {  
+              if($r->article && preg_match('/(\b'.$t.'\b|\B'.$t.'\b|\b'.$t.'\B|\B'.$t.'\B)/i', $r->article))
+              {
+                if(preg_match('/(\b'.$t.'\b)/i', $r->article, $matches)) { $score += 0.90 * sizeof($matches);  }
+                elseif(preg_match('/(\B'.$t.'\b|\b'.$t.'\B)/i', $r->article, $matches)) { $score += 0.75 * sizeof($matches);  }
+                elseif(preg_match('/(\B'.$t.'\B)/i', $r->article, $matches)) { $score += 0.60 * sizeof($matches);  }
+              }
+            }
+          }
+          
+          $search[$key] = $score / (sizeof($terms_array) + sizeof($ext_terms_array));
+          $total[$key]  = ($search[$key] + $r->cred_score + $r->sub_score) / $r->decay_score;
+          $sub[$key] = $r->sub_score;
+          $cred[$key] = $r->cred_score;
+          $decay[$key] = $r->decay_score;
+        }
+        array_multisort($total, SORT_DESC, $search, SORT_DESC, $sub, SORT_DESC, $cred, SORT_DESC, $decay, SORT_DESC, $results);
+      }
+      
+      if($query)
+      {
+        $this->ci->database->edit('search', array('searchId' => $query->searchId), array('data' => json_encode($results)), false);
+      }
+      else
+      {
+        $this->ci->database->add('search', array('filters' => $filters, 'data' => json_encode($results)));
+      }
+      
+      if($order == 'score') { $results = array_slice($results, ($page-1) * $limit, $limit); }
+    }
+    
+    return $results;
   }
 
-  /**
-   * Search Stream
-   *
-   * @access public
-   * @param string
-   * @param string
-   * @param array
-   * @param string
-   * @param int
-   * @param string
-   * @param bool
-   *
-   * @return int
-   */
-  public function _search_count($keywords = '', $place = '', $categories_list = array(), $type = '', $id = 0, $where = '', $results = 'all')
+  function search_count($terms = "", $where = "", $order = "score", $results = "all", $comments = false, $limit = 0, $page = 1, $userId = null, $subscriptions = false, $exclusive = true)
   {
-    $key_array = preg_split($this->config->item('regEx_spaces'), $this->db->escape_str($keywords));
-    $key_array = array_filter($key_array, "strlen");
-    $keyword_score = $keywords?"(k_matches / ".sizeof($key_array).")":"0";
-
-    $place = $this->db->escape_str($place);
-    $place_if = "IF(p.place = '".$place."', 1, ";
-    $place_if .= "IF(p.place LIKE '%".$place."%', .667, ";
-    if(strlen($place) >= 3)
+    
+    $this->ci =& get_instance();
+    $this->ci->load->model('database_model', 'database', true);
+    $this->ci->load->model('utility_model', 'utility', true);
+    
+    if($order == "score")
     {
-      $length = round(strlen($place)/3);
-      $place_if .= "IF(p.place LIKE '%".substr($place, $length, -$length)."%', .333, 0) ";
-    }
-    else { $place_if .= "0"; }
-    $place_if .= "))";
-    $place_score = $place?$place_if:"0";
-
-    $category_score = $categories_list?"(cat_count / ".sizeof($categories_list).")":"0";
-
-    $c_keyword_score = "((h_keyword_score / h_count) + ".$keyword_score.")";
-    $c_place_score = "((h_place_score / h_count) + ".$place_score.")";
-    $c_category_score = "((h_category_score / h_count) + ".$category_score.")";
-
-    $case = "CASE ";
-      $case .= "WHEN keyword IN ('".implode("', '", $key_array)."') ";
-        $case .= "THEN 1 ";
-      $case .= "WHEN keyword RLIKE '".implode("|", $key_array)."' ";
-        $case .= "THEN .667 ";
-      $shortk = array();
-      foreach($key_array as $k)
+      $filters = json_encode(array(
+        'terms' => $terms,
+        'where' => $where,
+        'order' => $order,
+        'results' => $results,
+        'comments' => $comments,
+        'limit' => ($order !== "score")?$limit:0,
+        'page' => ($order !== "score")?$page:0,
+        'userId' => $userId,
+        'subscriptions' => $subscriptions,
+        'exclusive' => $exclusive
+      ));
+    
+      $query = $this->ci->database->get_single('search', array('filters' => $filters));
+    
+      if($query && $query->editedOn > time()-(60*60))
       {
-        if(strlen($k) >= 3)
+        $results = json_decode($query->data);
+        
+        $count = sizeof($results);
+      }
+    }
+    
+    if(!isset($count))
+    {
+
+      if($terms)
+      {
+        $terms = str_replace(",", " ", $terms);
+        $terms = preg_replace('/[^A-Za-z0-9 ]/', '', $terms);
+        $terms = $this->ci->utility->blwords_strip($terms, 'regEx_spaces', ' ');
+        
+        $w = 0;
+        $h_search = "(";
+        $c_search = "(";
+        $a_search = "(";
+        $t_list = explode(' ', $terms);
+        foreach($t_list as $t)
         {
-          $length = round(strlen($k)/3);
-          $begin = substr($k, 0, $length);
-          $shortk[] = "^".$begin;
-          $end = substr($k, (strlen($k)-$length), $length);
-          $shortk[] = $end."$";
+          $t = $this->db->escape_str($t, true);
+          
+          $h_temp = "s.headline LIKE '%".$t."%' ";
+          $h_temp .= "OR s.tags LIKE '%".$t."%' ";
+          $c_temp = "h_headline LIKE '%".$t."%' ";
+          $c_temp .= "OR h_tags LIKE '%".$t."%' ";
+          $a_temp = "s.article LIKE '%".$t."%' ";
+          $a_temp .= "OR c_headline LIKE '%".$t."%' ";
+          $a_temp .= "OR c_tags LIKE '%".$t."%' ";
+          
+          $h_search .= ($w?"OR ":"").$h_temp;
+          $c_search .= ($w?"OR ":"").$h_temp."OR ".$c_temp;
+          $a_search .= ($w?"OR ":"").$h_temp."OR ".$c_temp."OR ".$a_temp;
+        
+          $w++;
         }
-        else
+        $h_search .= ") ";
+        $c_search .= ") ";
+        $a_search .= ") ";
+      }
+  
+      $article_scores = $scores = "(m.score) AS cred_score, ";
+      $article_scores = $scores .= "s.decay AS decay_score ";
+  
+      $view_include = "COUNT(viewId) AS views ";
+      $view_include .= "FROM views ";
+  
+      $viewed_include = "IF(viewId IS NULL, 0, 1) AS viewed ";
+      $viewed_include .= "FROM views ";
+      $viewed_include .= "WHERE userId = ".$this->session->userdata('userId')." ";
+  
+      $sub_score = "SUM(m.score) AS cred_score, ";
+      $sub_score .= "SUM(s.decay) AS decay_score ";
+  
+      if($results !== 'headline')
+      {
+        $headline_include = "LEFT JOIN ( ";
+          $headline_include .= "SELECT s.clusterId, COUNT(s.headlineId) AS h_count, ";
+          $headline_include .= "s.headline AS h_headline, s.tags AS h_tags, ";
+          $headline_include .= $sub_score;
+          $headline_include .= "FROM headlines s ";
+          $headline_include .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
+          $headline_include .= "WHERE s.clusterId IS NOT NULL ";
+          $headline_include .= "AND s.deleted = 0 ";
+          $headline_include .= "GROUP BY clusterId ";
+        $headline_include .= ") h ON h.clusterId = s.clusterId ";
+      }
+  
+      $sql = "SELECT ";
+        $sql .= "COUNT(id) AS items ";
+      $sql .= "FROM ( ";
+        if(!in_array($results, array('clusters', 'articles')))
         {
-          $shortk[] = "^".$k;
-          $shortk[] = $k."$";
+          $sql .= "SELECT ";
+            $sql .= "'headline' AS type, s.headlineId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, 0 AS h_count, 0 AS c_count, 0 AS sub_score, ";
+            if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
+            $sql .= $scores;
+          $sql .= "FROM headlines s ";
+          $sql .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
+          $sql .= "LEFT JOIN ( ";
+            $sql .= "SELECT headlineId, ";
+            $sql .= $view_include;
+            $sql .= "GROUP BY headlineId ";
+          $sql .= ") v ON v.headlineId = s.headlineId ";
+          if($subscriptions) { $sql .= "JOIN subscriptions b ON b.headlineId = s.headlineId "; }
+          if(in_array($results, array('visited', 'unvisited')))
+          {
+            $sql .= "LEFT JOIN (";
+              $sql .= "SELECT headlineId, ";
+              $sql .= $viewed_include;
+              $sql .= "GROUP BY headlineId ";
+            $sql .= ") d ON d.headlineId = s.headlineId ";
+          }
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+            if($terms) { $sql .= "AND ".$h_search; }
+            if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
+            if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
+            if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
         }
-      }
-      $case .= "WHEN keyword RLIKE '".implode("|", $shortk)."' ";
-        $case .= "THEN .333 ";
-      $case .= "ELSE 0 ";
-    $case .= "END ";
-
-    $viewed_include = "IF(viewId IS NULL, 0, 1) AS viewed ";
-    $viewed_include .= "FROM views ";
-    $viewed_include .= "WHERE userId = ".$this->session->userdata('userId')." ";
-
-    $keyword_include = "SUM(".$case.") AS k_matches ";
-    $keyword_include .= "FROM keywords ";
-    $keyword_include .= "WHERE deleted = 0 ";
-
-    $catlist_include = "COUNT(catlistId) AS cat_count ";
-    $catlist_include .= "FROM catlist ";
-    $catlist_include .= "WHERE categoryId IN (".implode(',', $categories_list).") ";
-    $catlist_include .= "AND deleted = 0 ";
-
-    $headline_include = "FROM headlines s ";
-    $headline_include .= $this->places_join;
-    if(in_array($results, array('visited', 'unvisited')))
-    {
-      $headline_include .= "LEFT JOIN (";
-        $headline_include .= "SELECT headlineId, ";
-        $headline_include .= $viewed_include;
-      $headline_include .= ") d ON d.headlineId = s.headlineId ";
-    }
-    if($keywords)
-    {
-      $headline_include .= "LEFT JOIN ( ";
-        $headline_include .= "SELECT headlineId, ";
-        $headline_include .= $keyword_include;
-        $headline_include .= "GROUP BY headlineId ";
-      $headline_include .= ") k ON k.headlineId = s.headlineId ";
-    }
-    if($categories_list)
-    {
-      $headline_include .= "LEFT JOIN ( ";
-        $headline_include .= "SELECT headlineId, ";
-        $headline_include .= $catlist_include;
-        $headline_include .= "GROUP BY headlineId ";
-      $headline_include .= ") l ON l.headlineId = s.headlineId ";
-    }
-
-    $cluster_include = "FROM clusters s ";
-    $cluster_include .= $this->places_join;
-    if(in_array($results, array('visited', 'unvisited')))
-    {
-      $cluster_include .= "LEFT JOIN (";
-        $cluster_include .= "SELECT clusterId, ";
-        $cluster_include .= $viewed_include;
-      $cluster_include .= ") d ON d.clusterId = s.clusterId ";
-    }
-    if($keywords)
-    {
-      $cluster_include .= "LEFT JOIN ( ";
-        $cluster_include .= "SELECT clusterId, ";
-        $cluster_include .= $keyword_include;
-        $cluster_include .= "GROUP BY clusterId ";
-      $cluster_include .= ") k ON k.clusterId = s.clusterId ";
-    }
-    if($categories_list)
-    {
-      $cluster_include .= "LEFT JOIN ( ";
-        $cluster_include .= "SELECT clusterId, ";
-        $cluster_include .= $catlist_include;
-        $cluster_include .= "GROUP BY clusterId ";
-      $cluster_include .= ") l ON l.clusterId = s.clusterId ";
-    }
-    $cluster_include .= "LEFT JOIN ( ";
-      $cluster_include .= "SELECT s.clusterId, COUNT(s.headlineId) AS h_count, ";
-      $cluster_include .= $keyword_score." AS h_keyword_score, ";
-      $cluster_include .= $place_score." AS h_place_score, ";
-      $cluster_include .= $category_score." AS h_category_score ";
-      $cluster_include .= $headline_include;
-      $cluster_include .= "WHERE s.clusterId IS NOT NULL ";
-      $cluster_include .= "AND s.deleted = 0 ";
-      $cluster_include .= "GROUP BY s.clusterId ";
-    $cluster_include .= ") h ON h.clusterId = s.clusterId ";
-
-    $sql = "SELECT COUNT(id) AS items ";
-    $sql .= "FROM ( ";
-      if(!in_array($results, array('clusters', 'articles')))
-      {
-        $sql .= "SELECT s.headlineId AS id, 'headline' AS type, ".$this->generic_select.", ";
-        $sql .= "0 AS h_count, 0 AS c_count, ";
-        if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-        $sql .= $keyword_score." AS keyword_score, ";
-        $sql .= $place_score." AS place_score, ";
-        $sql .= $category_score." AS category_score ";
-        $sql .= $headline_include;
-        $sql .= "WHERE s.clusterId IS NULL ";
-        $sql .= "AND s.deleted = 0 ";
-      }
-      if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
-      if(!in_array($results, array('headlines', 'articles')))
-      {
-        $sql .= "SELECT s.clusterId AS id, 'cluster' AS type, ".$this->generic_select.", ";
-        $sql .= "h_count, 0 AS c_count, ";
-        if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-        $sql .= $c_keyword_score." AS keyword_score, ";
-        $sql .= $c_place_score." AS place_score, ";
-        $sql .= $c_category_score." AS category_score ";
-        $sql .= $cluster_include;
-        $sql .= "WHERE s.articleId IS NULL ";
-        $sql .= "AND s.deleted = 0 ";
-      }
-      if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
-      if(!in_array($results, array('headlines', 'clusters')))
-      {
-        $sql .= "SELECT s.articleId AS id, 'article' AS type, ".$this->generic_select.", ";
-        $sql .= "h_count, c_count, ";
-        if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
-        $sql .= "((c_keyword_score / c_count) + ".$keyword_score.") AS keyword_score, ";
-        $sql .= "((c_place_score / c_count) + ".$place_score.") AS place_score, ";
-        $sql .= "((c_category_score / c_count) + ".$category_score.") AS category_score ";
-        $sql .= "FROM articles s ";
-        $sql .= "LEFT JOIN metadata m ON m.articleId = s.articleId ";
-        $sql .= $this->places_join;
-        if($keywords)
+  
+        if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
+  
+        if(!in_array($results, array('headlines', 'articles')))
         {
+          $sql .= "SELECT ";
+            $sql .= "'cluster' AS type, s.clusterId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, h_count, 0 AS c_count, ";
+            $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+            if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
+            $sql .= $scores;
+          $sql .= "FROM clusters s ";
+          $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
+          $sql .= "LEFT JOIN ( ";
+            $sql .= "SELECT clusterId, ";
+            $sql .= $view_include;
+            $sql .= "GROUP BY clusterId ";
+          $sql .= ") v ON v.clusterId = s.clusterId ";
+          $sql .= $headline_include;
+          if($exclusive && $subscriptions) { $sql .= "JOIN subscriptions b ON b.clusterId = s.clusterId "; }
+          if(in_array($results, array('visited', 'unvisited')))
+          {
+            $sql .= "LEFT JOIN (";
+              $sql .= "SELECT clusterId, ";
+              $sql .= $viewed_include;
+            $sql .= ") d ON d.clusterId = s.clusterId ";
+          }
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+            if($terms) { $sql .= "AND ".$c_search; }
+            if(!$subscriptions) { $sql .= "AND s.articleId IS null "; }
+            if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
+            if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
+        }
+  
+        if(!in_array($results, array('headlines', 'clusters', 'articles'))) { $sql .= "UNION ALL "; }
+  
+        if(!in_array($results, array('headlines', 'clusters')))
+        {
+          $sql .= "SELECT ";
+            $sql .= "'article' AS type, s.articleId AS id, s.createdBy, s.editedBy, IF(views IS NULL, 0, views) AS views, h_count, c_count, ";
+            $sql .= "((((c.cred_score / 2) + c.sub_score) * c.decay_score) / c_count) AS sub_score, ";
+            if(in_array($results, array('visited', 'unvisited'))) { $sql .= "IF(viewed IS NULL, 0, 1) AS visited, "; }
+            $sql .= $article_scores;
+          $sql .= "FROM articles s ";
+          $sql .= "LEFT JOIN metadata m ON m.articleId = s.articleId ";
           $sql .= "LEFT JOIN ( ";
             $sql .= "SELECT articleId, ";
-            $sql .= $keyword_include;
+            $sql .= $view_include;
             $sql .= "GROUP BY articleId ";
-          $sql .= ") k ON k.articleId = s.articleId ";
-        }
-        if($categories_list)
-        {
+          $sql .= ") v ON v.articleId = s.articleId ";
           $sql .= "LEFT JOIN ( ";
-            $sql .= "SELECT articleId, ";
-            $sql .= $catlist_include;
+            $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, SUM(h.h_count) AS h_count, ";
+            $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
+            $sql .= "s.headline AS c_headline, s.tags AS c_tags, h_headline, h_tags, ";
+            $sql .= $sub_score;
+            $sql .= "FROM clusters s ";
+            $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
+            $sql .= $headline_include;
+            $sql .= "WHERE s.articleId IS NOT NULL ";
+            $sql .= "AND s.deleted = 0 ";
             $sql .= "GROUP BY articleId ";
-          $sql .= ") l ON l.articleId = s.articleId ";
+          $sql .= ") c ON c.articleId = s.articleId ";
+          if($subscriptions) { $sql .= "JOIN subscriptions b ON b.articleId = s.articleId "; }
+          if(in_array($results, array('visited', 'unvisited')))
+          {
+            $sql .= "LEFT JOIN (";
+              $sql .= "SELECT articleId, ";
+              $sql .= $viewed_include;
+            $sql .= ") d ON d.articleId = s.articleId ";
+          }
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+            if($terms) { $sql .= "AND ".$a_search; }
+            if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
+            if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
         }
-        if(in_array($results, array('visited', 'unvisited')))
-        {
-          $sql .= "LEFT JOIN (";
-            $sql .= "SELECT articleId, ";
-            $sql .= $viewed_include;
-          $sql .= ") d ON d.articleId = s.articleId ";
-        }
-        $sql .= "LEFT JOIN (";
-          $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, ";
-          $sql .= "h_count, ";
-          $sql .= $c_keyword_score." AS c_keyword_score, ";
-          $sql .= $c_place_score." AS c_place_score, ";
-          $sql .= $c_category_score." AS c_category_score ";
-          $sql .= $cluster_include;
-          $sql .= "WHERE s.articleId IS NOT NULL ";
-          $sql .= "AND s.deleted = 0 ";
-          $sql .= "GROUP BY s.articleId ";
-        $sql .= ") c ON c.articleId = s.articleId ";
-        $sql .= "WHERE s.deleted = 0 ";
-      }
-    $sql .= ") items ";
-    $isWhere = false;
-    if($where) { $sql .= (($isWhere)?"AND":"WHERE")." ".$where." "; $isWhere = true; }
-    if($type && $id) { $sql .= (($isWhere)?"AND":"WHERE")." IF(type = '".$type."', IF(id = ".$id.", 0, 1), 1) = 1 "; $isWhere = true; }
-    if($keywords) { $sql .= (($isWhere)?"AND":"WHERE")." keyword_score > 0 "; $isWhere = true; }
-    if($place) { $sql .= (($isWhere)?"AND":"WHERE")." place_score > 0 "; $isWhere = true; }
-    if($categories_list) { $sql .= (($isWhere)?"AND":"WHERE")." category_score > 0 "; $isWhere = true; }
-    if($results == 'visited') { $sql .= (($isWhere)?"AND":"WHERE")." visited = 1 "; $isWhere = true; }
-    if($results == 'unvisited') { $sql .= (($isWhere)?"AND":"WHERE")." visited = 0 "; $isWhere = true; }
-
-    $q = $this->db->query($sql);
-    return $q->row();
+      $sql .= ") items ";
+      $sql .= "WHERE 1 = 1 ";
+      if($where) { $sql .= "AND ".$where." "; }
+      if($results == 'visited') { $sql .= "AND visited = 1 "; }
+      if($results == 'unvisited') { $sql .= "AND visited = 0 "; }
+  
+      $q = $this->db->query($sql);
+      $results = $q->row();
+      
+      $count = $results->items;
+    
+    }
+    
+    return $count;
   }
 
   function autocompare($type, $id)
@@ -1869,479 +1513,350 @@ class Stream_model extends CI_Model
 
     $keywords = trim($o_headline.' '.$o_tags);
     $if = "IF(headline REGEXP '".str_replace(' ', '|', $keywords)."', 1, IF(tags REGEXP '".str_replace(' ', '|', $keywords)."', 1, 0)) =";
-    $where = array($if => 1, 'deleted' => 0);
+    $where = array($if => 1, 'deleted' => 0, 'hidden' => 0, 'adminOnly' => 0);
     $o_success = array(
       'headline' => array(),
       'cluster' => array(),
       'article' => array()
     );
-
-    $a_where = $where;
-    if($type = 'article') { $a_where['articleId !='] = $id; }
-    $a_list = $this->ci->database->get('articles', $a_where);
-    foreach($a_list as $i)
+    
+    if($type == 'cluster')
     {
-      if($score = $this->item_compare($i, $o_headline, $o_tags))
+      // Get Matching Articles
+      $a_where = $where;
+      if($type = 'article') { $a_where['articleId !='] = $id; }
+      $a_list = $this->ci->database->get('articles', $a_where);
+      foreach($a_list as $i)
       {
-        $o_success['article'][] = array('id' => $i->articleId, 'ovn' => $score);
-      }
-    }
-
-    $c_where = $where;
-    if($type = 'cluster') { $c_where['clusterId !='] = $id; }
-    $c_list = $this->ci->database->get('clusters', $c_where+array('articleId' => null));
-    foreach($c_list as $i)
-    {
-      if($score = $this->item_compare($i, $o_headline, $o_tags))
-      {
-        $o_success['cluster'][] = array('id' => $i->clusterId, 'ovn' => $score);
-      }
-    }
-
-    $h_where = $where;
-    if($type = 'headline') { $h_where['headlineId !='] = $id; }
-    $h_list = $this->ci->database->get('headlines', $h_where+array('clusterId' => null));
-    foreach($h_list as $i)
-    {
-      if($score = $this->item_compare($i, $o_headline, $o_tags))
-      {
-        $o_success['headline'][] = array('id' => $i->headlineId, 'ovn' => $score);
-      }
-    }
-
-    foreach($o_success['article'] as $key => $o)
-    {
-      $n_item = $this->ci->database->get_single("articles", array("articleId" => $o['id']));
-      $n_headline = $this->ci->utility->blwords_strip($n_item->headline, 'regEx_spaces', ' ');
-      $n_tags = $this->ci->utility->blwords_strip($n_item->tags, 'regEx_commas', ' ');
-
-      if($score = $this->item_compare($original, $n_headline, $n_tags))
-      {
-        $o_success['article'][$key]['item'] = $n_item;
-        $o_success['article'][$key]['nvo'] = $score;
-      }
-      else { unset($o_success['article'][$key]); }
-    }
-    $o_success['article'] = array_values($o_success['article']);
-
-    foreach($o_success['cluster'] as $key => $o)
-    {
-      $n_item = $this->ci->database->get_single("clusters", array("clusterId" => $o['id']));
-      $n_headline = $this->ci->utility->blwords_strip($n_item->headline, 'regEx_spaces', ' ');
-      $n_tags = $this->ci->utility->blwords_strip($n_item->tags, 'regEx_commas', ' ');
-
-      if($score = $this->item_compare($original, $n_headline, $n_tags))
-      {
-        $o_success['cluster'][$key]['item'] = $n_item;
-        $o_success['cluster'][$key]['nvo'] = $score;
-      }
-      else { unset($o_success['cluster'][$key]); }
-    }
-    $o_success['cluster'] = array_values($o_success['cluster']);
-
-    foreach($o_success['headline'] as $key => $o)
-    {
-      $n_item = $this->ci->database->get_single("headlines", array("headlineId" => $o['id']));
-      $n_headline = $this->ci->utility->blwords_strip($n_item->headline, 'regEx_spaces', ' ');
-      $n_tags = $this->ci->utility->blwords_strip($n_item->tags, 'regEx_commas', ' ');
-
-      if($score = $this->item_compare($original, $n_headline, $n_tags))
-      {
-        $o_success['headline'][$key]['item'] = $n_item;
-        $o_success['headline'][$key]['nvo'] = $score;
-      }
-      else { unset($o_success['headline'][$key]); }
-    }
-    $o_success['headline'] = array_values($o_success['headline']);
-
-    if(sizeof($o_success['article']) == 1)
-    {
-      $article_where = array('articleId' => $o_success['article'][0]['id']);
-      $resources = array();
-      $images = array();
-      // get
-      $articleResources = $this->ci->database->get_array('resources', $article_where+array('deleted' => 0), 'resource');
-      foreach($articleResources as $ar)
-      {
-        if(!in_array($ar, $resources)) { $resources[] = $ar; }
-      }
-      $articleImages = $this->ci->database->get_array('images', $article_where+array('deleted' => 0), 'image');
-      foreach($articleImages as $ai)
-      {
-        if(!in_array($ai, $images)) { $images[] = $ai; }
-      }
-      if($type == 'cluster')
-      {
-        $nInsert = array('clusterId' => $id, 'parentId' => $o_success['article'][0]['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $id), $article_where);
-        // transfer
-        $cluster_where = array('clusterId' => $id, 'deleted' => 0);
-        $thisResources = $this->ci->database->get_array('resources', $cluster_where, 'resource');
-        foreach($thisResources as $tr)
+        if($score = $this->item_compare($i, $o_headline, $o_tags))
         {
-          if(!in_array($tr, $resources))
-          {
-            $resources[] = $tr;
-            $this->ci->database->add('resources', $article_where+array('resource' => $tr, 'deleted' => 0), 'resourceId');
-          }
-        }
-        $thisImages = $this->ci->database->get_array('images', $cluster_where, 'image');
-        foreach($thisImages as $ti)
-        {
-          if(!in_array($ti, $images))
-          {
-            $images[] = $ti;
-            $this->ci->database->add('images', $article_where+array('image' => $ti, 'deleted' => 0), 'imageId');
-          }
+          $o_success['article'][] = array('id' => $i->articleId, 'ovn' => $score, 'item' => $i);
         }
       }
+
+      foreach($o_success['article'] as $key => $o)
+      {
+        $n_headline = $this->ci->utility->blwords_strip($o['item']->headline, 'regEx_spaces', ' ');
+        $n_tags = $this->ci->utility->blwords_strip($o['item']->tags, 'regEx_commas', ' ');
+  
+        if($score = $this->item_compare($original, $n_headline, $n_tags))
+        {
+          $o_success['article'][$key]['nvo'] = $score;
+        }
+        else { unset($o_success['article'][$key]); }
+      }
+      $o_success['article'] = array_values($o_success['article']);
+    }
+    
+    if(($type == 'cluster' && !sizeof($o_success['article'])) || $type !== 'cluster')
+    {
+      // Get Matching Clusters
+      $c_where = $where;
+      if($type = 'cluster') { $c_where['clusterId !='] = $id; }
+      $c_list = $this->ci->database->get('clusters', $c_where+array('articleId' => null));
+      foreach($c_list as $i)
+      {
+        if($score = $this->item_compare($i, $o_headline, $o_tags))
+        {
+          $o_success['cluster'][] = array('id' => $i->clusterId, 'ovn' => $score, 'item' => $i);
+        }
+      }
+  
       foreach($o_success['cluster'] as $key => $o)
       {
-        $nInsert = array('clusterId' => $o['id'], 'parentId' => $o_success['article'][0]['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $o['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $o['id']), $article_where);
-        // transfer
-        $cluster_where = array('clusterId' => $o['id'], 'deleted' => 0);
-        $thisResources = $this->ci->database->get_array('resources', $cluster_where, 'resource');
-        foreach($thisResources as $tr)
+        $n_headline = $this->ci->utility->blwords_strip($o['item']->headline, 'regEx_spaces', ' ');
+        $n_tags = $this->ci->utility->blwords_strip($o['item']->tags, 'regEx_commas', ' ');
+  
+        if($score = $this->item_compare($original, $n_headline, $n_tags))
         {
-          if(!in_array($tr, $resources))
-          {
-            $resources[] = $tr;
-            $this->ci->database->add('resources', $article_where+array('resource' => $tr, 'deleted' => 0), 'resourceId');
-          }
+          $o_success['cluster'][$key]['nvo'] = $score;
         }
-        $thisImages = $this->ci->database->get_array('images', $cluster_where, 'image');
-        foreach($thisImages as $ti)
+        else { unset($o_success['cluster'][$key]); }
+      }
+      $o_success['cluster'] = array_values($o_success['cluster']);
+    }
+
+    if($type !== 'article')
+    {
+      // Get Matching Headlines
+      $h_where = $where;
+      if($type = 'headline') { $h_where['headlineId !='] = $id; }
+      $h_list = $this->ci->database->get('headlines', $h_where+array('clusterId' => null));
+      foreach($h_list as $i)
+      {
+        if($score = $this->item_compare($i, $o_headline, $o_tags))
         {
-          if(!in_array($ti, $images))
-          {
-            $images[] = $ti;
-            $this->ci->database->add('images', $article_where+array('image' => $ti, 'deleted' => 0), 'imageId');
-          }
+          $o_success['headline'][] = array('id' => $i->headlineId, 'ovn' => $score, 'item' => $i);
         }
       }
-      $o_success['cluster'] = array();
-    }
-    elseif($o_success['article'])
-    {
-      foreach($o_success['cluster'] as $o)
+  
+      foreach($o_success['headline'] as $key => $o)
       {
-        $t_score = 0;
-        $t_item = null;
+        $n_headline = $this->ci->utility->blwords_strip($o['item']->headline, 'regEx_spaces', ' ');
+        $n_tags = $this->ci->utility->blwords_strip($o['item']->tags, 'regEx_commas', ' ');
+  
+        if($score = $this->item_compare($original, $n_headline, $n_tags))
+        {
+          $o_success['headline'][$key]['nvo'] = $score;
+        }
+        else { unset($o_success['headline'][$key]); }
+      }
+      $o_success['headline'] = array_values($o_success['headline']);
+    }
+    
+    // Add Items to Items
+    if($type == 'article')
+    {
+      if(sizeof($o_success['cluster']))
+      {
+        foreach($o_success['cluster'] as $i)
+        {
+          if(!$i['item']->parentId)
+          {
+            // Add Clusters to Article
+            $nInsert = array('clusterId' => $i['id'], 'parentId' => $id, 'createdOn' => time());
+            $subscribers = $this->ci->database->get('subscriptions', array('clusterId' => $i['id'], 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('clusters', array('clusterId' => $i['id']), array('articleId' => $id));
+          } 
+        }
+      }
+    }
+    elseif($type == 'cluster')
+    {
+      if(sizeof($o_success['article']) > 1)
+      {
+        // Find Best Matching Article for Cluster
+        $temp_score = 0;
+        $temp_item = null;
         foreach($o_success['article'] as $key => $n)
         {
           $n_headline = $this->ci->utility->blwords_strip($n['item']->headline, 'regEx_spaces', ' ');
           $n_tags = $this->ci->utility->blwords_strip($n['item']->tags, 'regEx_commas', ' ');
-
-          if($score = $this->item_compare($o['item'], $n_headline, $n_tags))
+          
+          $score = $n['ovn'] + $n['nvo'];
+          if($score > $temp_score)
           {
-            if($score > $t_score)
-            {
-              $t_score = $score;
-              $t_item = $n;
-            }
+            $temp_score = $score;
+            $temp_item = $n;
           }
         }
-        $article_where = array('articleId' => $t_item['id']);
+        
+        // Add Cluster to Best Matching Article
+        $nInsert = array('clusterId' => $id, 'parentId' => $temp_item['id'], 'createdOn' => time());
+        $subscribers = $this->ci->database->get('subscriptions', array('clusterId' => $id, 'deleted' => 0));
+        foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+        $this->ci->database->edit('clusters', array('clusterId' => $id), array('articleId' => $temp_item['id']));
+      }
+      elseif(sizeof($o_success['article']) == 1)
+      {
+        // Add Cluster to Article
+        $articleId = $o_success['article'][key($o_success['article'])]['id'];
+        $nInsert = array('clusterId' => $id, 'parentId' => $articleId, 'createdOn' => time());
+        $subscribers = $this->ci->database->get('subscriptions', array('clusterId' => $id, 'deleted' => 0));
+        foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+        $this->ci->database->edit('clusters', array('clusterId' => $id), array('articleId' => $articleId));
+      }
+      elseif(sizeof($o_success['cluster']))
+      {
+        // Find Available Clusters and Sort by Highest Rated Cluster
+        $clusters = array($id);
+        $meta_scores = array(0);
+        foreach($o_success['cluster'] as $i)
+        {
+          if(!$i['item']->parentId && !$i['item']->adminOnly)
+          {
+            $clusters[] = $i['id'];
+            $meta = $this->ci->database->get_single('metadata', array('clusterId' => $i['id']), $select = 'score');
+            $meta_scores[] = $meta->score;
+          }
+        }
+        array_multisort($meta_scores, SORT_DESC, $clusters);
+        
+        // Get Data from Clusters
+        $top_item = null;
+        $tags = array();
         $resources = array();
         $images = array();
-        // get
-        $articleResources = $this->ci->database->get_array('resources', $article_where+array('deleted' => 0), 'resource');
-        foreach($articleResources as $ar)
+        foreach($clusters as $c)
         {
-          if(!in_array($ar, $resources)) { $resources[] = $ar; }
-        }
-        $articleImages = $this->ci->database->get_array('images', $article_where+array('deleted' => 0), 'image');
-        foreach($articleImages as $ai)
-        {
-          if(!in_array($ai, $images)) { $images[] = $ai; }
-        }
-        //
-        $nInsert = array('clusterId' => $o['id'], 'parentId' => $t_item['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $o['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $o['id']), $article_where);
-        // transfer
-        $cluster_where = array('clusterId' => $o['id'], 'deleted' => 0);
-        $thisResources = $this->ci->database->get_array('resources', $cluster_where, 'resource');
-        foreach($thisResources as $tr)
-        {
-          if(!in_array($tr, $resources))
+          $temp_item = $this->ci->database->get_single('clusters', array('clusterId' => $c), 'headline, tags');
+          if(!$top_item) { $top_item = $temp_item; }
+          
+          foreach(explode(',', $temp_item->tags) as $t)
           {
-            $resources[] = $tr;
-            $this->ci->database->add('resources', $article_where+array('resource' => $tr, 'deleted' => 0), 'resourceId');
+            if(!preg_grep("/\b".$t."\b/i", $tags)) { $tags[] = $t; }
+          }
+          
+          $temp_resources = $this->ci->database->get_array('resources', array('clusterId' => $c, 'deleted' => 0), 'resource');
+          foreach($temp_resources as $r)
+          {
+            if(!preg_grep("/\b".$r."/\bi", $resources)) { $resources[] = $r; }
+          }
+          
+          $temp_images = $this->ci->database->get_array('images', array('clusterId' => $c, 'deleted' => 0), 'image');
+          foreach($temp_images as $i)
+          {
+            if(!preg_grep("/\b".$i."\b/i", $images)) { $images[] = $i; }
           }
         }
-        $thisImages = $this->ci->database->get_array('images', $cluster_where, 'image');
-        foreach($thisImages as $ti)
+        
+        // Create Article
+        $insert = array('headline' => $top_item->headline, 'tags' => implode(',', $tags), 'createdOn' => time());
+        $articleId = $this->ci->database->add('articles', $insert, 'articleId');
+        $this->database_model->add('subscriptions', array('userId' => 3, 'articleId' => $articleId, 'createdOn' => time()), 'subscriptionId');
+        
+        // Add Metadata
+        $metadata = array('articleId' => $articleId, 'quality' => 0, 'importance' => 0);
+        $metadata['credibility'] = $this->ci->utility->credibility('article', $articleId);
+        $this->ci->database->add('metadata', $metadata, 'metadataId');
+        
+        // Add Images/Resources/etc.
+        $clusters_update = array('articleId' => $articleId);
+        $this->ci->database->add('catlist', array('categoryId' => 1)+$clusters_update, 'catlistId');
+        foreach($images as $image)
         {
-          if(!in_array($ti, $images))
-          {
-            $images[] = $ti;
-            $this->ci->database->add('images', $article_where+array('image' => $ti, 'deleted' => 0), 'imageId');
-          }
+          $this->ci->database->add('images', array('image' => $image)+$clusters_update, 'imageId');
+        }
+        foreach($resources as $resource)
+        {
+          $this->ci->database->add('resources', array('resource' => $resource)+$clusters_update, 'resourceId');
+        }
+        
+        // Add Clusters to Article
+        foreach($clusters as $c)
+        {
+          $nInsert = array('clusterId' => $c, 'parentId' => $articleId, 'createdOn' => time());
+          $subscribers = $this->ci->database->get('subscriptions', array('clusterId' => $c, 'deleted' => 0));
+          foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+          $this->ci->database->edit('clusters', array('clusterId' => $c), $clusters_update);
         }
       }
-      if($type == 'cluster')
+      
+      if(sizeof($o_success['headline']))
       {
-        $t_score = 0;
-        $t_item = null;
-        foreach($o_success['article'] as $key => $n)
+        foreach($o_success['headline'] as $i)
         {
-          $n_headline = $this->ci->utility->blwords_strip($n['item']->headline, 'regEx_spaces', ' ');
-          $n_tags = $this->ci->utility->blwords_strip($n['item']->tags, 'regEx_commas', ' ');
-
-          $score = $o['ovn'] + $o['nvo'];
-          if($score > $t_score)
+          if(!$i['item']->parentId)
           {
-            if($score > $t_score)
-            {
-              $t_score = $score;
-              $t_item = $n;
-            }
+            // Add Headlines to Cluster
+            $nInsert = array('headlineId' => $i['id'], 'parentId' => $id, 'createdOn' => time());
+            $subscribers = $this->ci->database->get('subscriptions', array('headlineId' => $i['id'], 'deleted' => 0));
+            foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+            $this->ci->database->edit('clusters', array('headlineId' => $i['id']), array('clusterId' => $id));
           }
         }
-        $nInsert = array('clusterId' => $id, 'parentId' => $t_item['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $id), array('articleId' => $t_item['id']));
       }
-      $o_success['cluster'] = array();
     }
-
-    if(sizeof($o_success['cluster']) == 1)
+    else
     {
-      if($type == 'cluster')
+      if(sizeof($o_success['cluster']) > 1)
       {
-        $new_temp = $o_success['cluster'];
-        $new_temp[] = array('item' => $original, 'ovn' => 0, 'nvo' => 0);
-        $articleId = $this->new_article($new_temp);
-        //
-        $nInsert = array('clusterId' => $id, 'parentId' => $articleId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $id), array('articleId' => $articleId));
-        //
-        $nInsert = array('clusterId' => $o_success['cluster'][0]['id'], 'parentId' => $articleId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $o_success['cluster'][0]['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $o_success['cluster'][0]['id']), array('articleId' => $articleId));
-      }
-
-      $cluster_where = array('clusterId' => $o_success['cluster'][0]['id']);
-      $resources = array();
-      $images = array();
-      // get
-      $clusterResources = $this->ci->database->get_array('resources', $cluster_where+array('deleted' => 0), 'resource');
-      foreach($clusterResources as $cr)
-      {
-        if(!in_array($cr, $resources)) { $resources[] = $cr; }
-      }
-      $clusterImages = $this->ci->database->get_array('images', $cluster_where+array('deleted' => 0), 'image');
-      foreach($clusterImages as $ci)
-      {
-        if(!in_array($ci, $images)) { $images[] = $ci; }
-      }
-
-      if($type == 'headline')
-      {
-        $nInsert = array('headlineId' => $id, 'parentId' => $o_success['cluster'][0]['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $id), $cluster_where);
-        // transfer
-        $headline_where = array('clusterId' => $id, 'deleted' => 0);
-        $thisResources = $this->ci->database->get_array('resources', $headline_where, 'resource');
-        foreach($thisResources as $tr)
-        {
-          if(!in_array($tr, $resources))
-          {
-            $resources[] = $tr;
-            $this->ci->database->add('resources', $cluster_where+array('resource' => $tr, 'deleted' => 0), 'resourceId');
-          }
-        }
-        $thisImages = $this->ci->database->get_array('images', $headline_where, 'image');
-        foreach($thisImages as $ti)
-        {
-          if(!in_array($ti, $images))
-          {
-            $images[] = $ti;
-            $this->ci->database->add('images', $cluster_where+array('image' => $ti, 'deleted' => 0), 'imageId');
-          }
-        }
-      }
-      foreach($o_success['headline'] as $o)
-      {
-        $nInsert = array('headlineId' => $id, 'parentId' => $o_success['cluster'][0]['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $o['id']), $cluster_where);
-        // transfer
-        $headline_where = array('clusterId' => $o['id'], 'deleted' => 0);
-        $thisResources = $this->ci->database->get_array('resources', $headline_where, 'resource');
-        foreach($thisResources as $tr)
-        {
-          if(!in_array($tr, $resources))
-          {
-            $resources[] = $tr;
-            $this->ci->database->add('resources', $cluster_where+array('resource' => $tr, 'deleted' => 0), 'resourceId');
-          }
-        }
-        $thisImages = $this->ci->database->get_array('images', $headline_where, 'image');
-        foreach($thisImages as $ti)
-        {
-          if(!in_array($ti, $images))
-          {
-            $images[] = $ti;
-            $this->ci->database->add('images', $cluster_where+array('image' => $ti, 'deleted' => 0), 'imageId');
-          }
-        }
-      }
-      $o_success['headline'] = array();
-    }
-    elseif($o_success['cluster'])
-    {
-      if($type == 'cluster')
-      {
-        $new_temp = $o_success['cluster'];
-        $new_temp[] = array('item' => $original, 'ovn' => 0, 'nvo' => 0);
-        $articleId = $this->new_article($new_temp);
-        //
-        $nInsert = array('clusterId' => $id, 'parentId' => $articleId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $id), array('articleId' => $articleId));
-      }
-      else { $articleId = $this->new_article($o_success['cluster']); }
-      foreach($o_success['cluster'] as $o)
-      {
-        $nInsert = array('clusterId' => $o['id'], 'parentId' => $articleId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('clusterId' => $o['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('clusters', array('clusterId' => $o['id']), array('articleId' => $articleId));
-      }
-
-      if($type == 'headline')
-      {
-        $t_score = 0;
-        $t_item = null;
-        foreach($o_success['cluster'] as $key => $o)
-        {
-          $score = $o['ovn'] + $o['nvo'];
-          if($score > $t_score)
-          {
-            $t_score = $score;
-            $t_item = $o;
-          }
-        }
-        $nInsert = array('headlineId' => $id, 'parentId' => $t_item['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $id), array('clusterId' => $t_item['id']));
-      }
-      foreach($o_success['headline'] as $o)
-      {
-        $t_score = 0;
-        $t_item = null;
+        // Find Best Matching Cluster for Headline
+        $temp_score = 0;
+        $temp_item = null;
         foreach($o_success['cluster'] as $key => $n)
         {
           $n_headline = $this->ci->utility->blwords_strip($n['item']->headline, 'regEx_spaces', ' ');
           $n_tags = $this->ci->utility->blwords_strip($n['item']->tags, 'regEx_commas', ' ');
-
-          if($score = $this->item_compare($o['item'], $n_headline, $n_tags))
+          
+          $score = $n['ovn'] + $n['nvo'];
+          if($score > $temp_score)
           {
-            if($score > $t_score)
-            {
-              $t_score = $score;
-              $t_item = $n;
-            }
+            $temp_score = $score;
+            $temp_item = $n;
           }
         }
-        $cluster_where = array('clusterId' => $t_item['id']);
+        
+        // Add Headline to Best Matching Cluster
+        $nInsert = array('headlineId' => $id, 'parentId' => $temp_item['id'], 'createdOn' => time());
+        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
+        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+        $this->ci->database->edit('clusters', array('headlineId' => $id), array('clusterId' => $temp_item['id']));
+      }
+      if(sizeof($o_success['cluster']) == 1)
+      {
+        // Add Headline to Cluster
+        $clusterId = $o_success['article'][key($o_success['cluster'])]['id'];
+        $nInsert = array('headlineId' => $id, 'parentId' => $clusterId, 'createdOn' => time());
+        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
+        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+        $this->ci->database->edit('clusters', array('headlineId' => $id), array('clusterId' => $clusterId));
+      }
+      elseif(sizeof($o_success['headline']))
+      {
+        // Find Available Headlines and Sort by Highest Rated Headline
+        $headlines = array($id);
+        $meta_scores = array(0);
+        foreach($o_success['headline'] as $i)
+        {
+          if(!$i['item']->parentId && !$i['item']->adminOnly)
+          {
+            $headlines[] = $i['id'];
+            $meta = $this->ci->database->get_single('metadata', array('headlineId' => $i['id']), $select = 'score');
+            $meta_scores[] = $meta->score;
+          }
+        }
+        array_multisort($meta_scores, SORT_DESC, $headlines);
+        
+        // Get Data from Headlines
+        $top_item = null;
+        $tags = array();
         $resources = array();
         $images = array();
-        // get
-        $clusterResources = $this->ci->database->get_array('resources', $cluster_where+array('deleted' => 0), 'resource');
-        foreach($clusterResources as $cr)
+        foreach($headlines as $h)
         {
-          if(!in_array($cr, $resources)) { $resources[] = $cr; }
-        }
-        $clusterImages = $this->ci->database->get_array('images', $cluster_where+array('deleted' => 0), 'image');
-        foreach($clusterImages as $ci)
-        {
-          if(!in_array($ci, $images)) { $images[] = $ci; }
-        }
-        //
-        $nInsert = array('headlineId' => $o['id'], 'parentId' => $t_item['id'], 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $o['id']), array('clusterId' => $t_item['id']));
-        // transfer
-        $headline_where = array('clusterId' => $o['id'], 'deleted' => 0);
-        $thisResources = $this->ci->database->get_array('resources', $headline_where, 'resource');
-        foreach($thisResources as $tr)
-        {
-          if(!in_array($tr, $resources))
+          $temp_item = $this->ci->database->get_single('headlines', array('headlineId' => $h), 'headline, tags');
+          if(!$top_item) { $top_item = $temp_item; }
+          
+          foreach(explode(',', $temp_item->tags) as $t)
           {
-            $resources[] = $tr;
-            $this->ci->database->add('resources', $cluster_where+array('resource' => $tr, 'deleted' => 0), 'resourceId');
+            if(!preg_grep("/\b".$t."\b/i", $tags)) { $tags[] = $t; }
+          }
+          
+          $temp_resources = $this->ci->database->get_array('resources', array('headlineId' => $h, 'deleted' => 0), 'resource');
+          foreach($temp_resources as $r)
+          {
+            if(!preg_grep("/\b".$r."/\bi", $resources)) { $resources[] = $r; }
+          }
+          
+          $temp_images = $this->ci->database->get_array('images', array('headlineId' => $h, 'deleted' => 0), 'image');
+          foreach($temp_images as $i)
+          {
+            if(!preg_grep("/\b".$i."\b/i", $images)) { $images[] = $i; }
           }
         }
-        $thisImages = $this->ci->database->get_array('images', $headline_where, 'image');
-        foreach($thisImages as $ti)
+        
+        // Create Cluster
+        $insert = array('headline' => $top_item->headline, 'tags' => implode(',', $tags), 'createdOn' => time());
+        $clusterId = $this->ci->database->add('clusters', $insert, 'clusterId');
+        $this->database_model->add('subscriptions', array('userId' => 3, 'clusterId' => $clusterId, 'createdOn' => time()), 'subscriptionId');
+        
+        // Add Metadata
+        $metadata = array('clusterId' => $clusterId, 'quality' => 0, 'importance' => 0);
+        $metadata['credibility'] = $this->ci->utility->credibility('cluster', $clusterId);
+        $this->ci->database->add('metadata', $metadata, 'metadataId');
+        
+        // Add Images/Resources/etc.
+        $headlines_update = array('clusterId' => $clusterId);
+        $this->ci->database->add('catlist', array('categoryId' => 1)+$headlines_update, 'catlistId');
+        foreach($images as $image)
         {
-          if(!in_array($ti, $images))
-          {
-            $images[] = $ti;
-            $this->ci->database->add('images', $cluster_where+array('image' => $ti, 'deleted' => 0), 'imageId');
-          }
+          $this->ci->database->add('images', array('image' => $image)+$headlines_update, 'imageId');
         }
-      }
-      $o_success['headline'] = array();
-    }
-
-    if(sizeof($o_success['headline']) == 1)
-    {
-      if($type == 'headline')
-      {
-        $new_temp = $o_success['headline'];
-        $new_temp[] = array('item' => $original, 'ovn' => 0, 'nvo' => 0);
-        $clusterId = $this->new_cluster($new_temp);
-        //
-        $nInsert = array('headlineId' => $id, 'parentId' => $clusterId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $id), array('clusterId' => $clusterId));
-        //
-        $nInsert = array('headlineId' => $o_success['headline'][0]['id'], 'parentId' => $clusterId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o_success['headline'][0]['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $o_success['headline'][0]['id']), array('clusterId' => $clusterId));
-      }
-    }
-    elseif($o_success['headline'])
-    {
-      if($type == 'headline')
-      {
-        $new_temp = $o_success['headline'];
-        $new_temp[] = array('item' => $original, 'ovn' => 0, 'nvo' => 0);
-        $clusterId = $this->new_cluster($new_temp);
-        $nInsert = array('headlineId' => $id, 'parentId' => $clusterId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $id, 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $id), array('clusterId' => $clusterId));
-      }
-      else { $clusterId = $this->new_cluster($o_success['headline']); }
-      foreach($o_success['headline'] as $o)
-      {
-        $nInsert = array('headlineId' => $o['id'], 'parentId' => $clusterId, 'createdOn' => time());
-        $subscribers = $this->database_model->get('subscriptions', array('headlineId' => $o['id'], 'deleted' => 0));
-        foreach($subscribers as $s) { $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
-        $this->ci->database->edit('headlines', array('headlineId' => $o['id']), array('clusterId' => $clusterId));
+        foreach($resources as $resource)
+        {
+          $this->ci->database->add('resources', array('resource' => $resource)+$headlines_update, 'resourceId');
+        }
+        
+        // Add Headlines to Cluster
+        foreach($headlines as $h)
+        {
+          $nInsert = array('headlineId' => $h, 'parentId' => $clusterId, 'createdOn' => time());
+          $subscribers = $this->ci->database->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+          foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+          $this->ci->database->edit('headlines', array('headlineId' => $h), $headlines_update);
+        }
       }
     }
   }
@@ -2408,44 +1923,58 @@ class Stream_model extends CI_Model
     return false;
   }
 
-  private function new_article($clusters = array())
+  private function new_article($data = array(), $userId = 0)
   {
-    $t_score = 0;
-    $t_item = null;
-    $tags = "";
+    // Find Available Clusters and Sort by Highest Rated Cluster
+    $clusters = array();
+    $meta_scores = array(0);
+    foreach($data as $i)
+    {
+      $clusters[] = $i['id'];
+      $meta = $this->ci->database->get_single('metadata', array('clusterId' => $i['id']), $select = 'score');
+      $meta_scores[] = $meta->score;
+    }
+    array_multisort($meta_scores, SORT_DESC, $clusters);
+    
+    // Get Data from Clusters
+    $top_item = null;
+    $tags = array();
     $resources = array();
     $images = array();
-    foreach($clusters as $key => $o)
+    foreach($clusters as $c)
     {
-      $tags .= ($tags?',':'').$o['item']->tags;
-      $thisResources = $this->ci->database->get_array('resources', array('clusterId' => $o['item']->clusterId, 'deleted' => 0), 'resource');
-      foreach($thisResources as $tr)
+      $temp_item = $this->ci->database->get_single('clusters', array('clusterId' => $c), 'headline, tags');
+      if(!$top_item) { $top_item = $temp_item; }
+      
+      foreach(explode(',', $temp_item->tags) as $t)
       {
-        if(!in_array($tr, $resources)) { $resources[] = $tr; }
+        if(!preg_grep("/\b".$t."\b/i", $tags)) { $tags[] = $t; }
       }
-      $thisImages = $this->ci->database->get_array('images', array('headlineId' => $o['item']->headlineId, 'deleted' => 0), 'image');
-      foreach($thisImages as $ti)
+      
+      $temp_resources = $this->ci->database->get_array('resources', array('clusterId' => $c, 'deleted' => 0), 'resource');
+      foreach($temp_resources as $r)
       {
-        if(!in_array($ti, $images)) { $images[] = $ti; }
+        if(!preg_grep("/\b".$r."/\bi", $resources)) { $resources[] = $r; }
       }
-
-      $score = $o['ovn'] + $o['nvo'];
-      if($score > $t_score)
+      
+      $temp_images = $this->ci->database->get_array('images', array('clusterId' => $c, 'deleted' => 0), 'image');
+      foreach($temp_images as $i)
       {
-        $t_score = $score;
-        $t_item = $o;
+        if(!preg_grep("/\b".$i."\b/i", $images)) { $images[] = $i; }
       }
     }
-
-    $insert = array('headline' => $t_item['item']->headline, 'tags' => $tags, 'createdOn' => time());
+    // Create Article
+    $insert = array('headline' => $top_item->headline, 'tags' => implode(',', $tags), 'createdOn' => time(), 'createdBy' => $userId);
+    if($userId) { $insert['editedBy'] = $userId; }
     $articleId = $this->ci->database->add('articles', $insert, 'articleId');
     $this->database_model->add('subscriptions', array('userId' => 3, 'articleId' => $articleId, 'createdOn' => time()), 'subscriptionId');
-
-    // Metadata
+    
+    // Add Metadata
     $metadata = array('articleId' => $articleId, 'quality' => 0, 'importance' => 0);
     $metadata['credibility'] = $this->ci->utility->credibility('article', $articleId);
     $this->ci->database->add('metadata', $metadata, 'metadataId');
-
+    
+    // Add Images/Resources/etc.
     $clusters_update = array('articleId' => $articleId);
     $this->ci->database->add('catlist', array('categoryId' => 1)+$clusters_update, 'catlistId');
     foreach($images as $image)
@@ -2456,60 +1985,89 @@ class Stream_model extends CI_Model
     {
       $this->ci->database->add('resources', array('resource' => $resource)+$clusters_update, 'resourceId');
     }
-
-    return $articleId;
+    
+    // Add Clusters to Article
+    foreach($clusters as $c)
+    {
+      $nInsert = array('clusterId' => $c, 'parentId' => $articleId, 'createdOn' => time());
+      $subscribers = $this->ci->database->get('subscriptions', array('clusterId' => $c, 'deleted' => 0));
+      foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+      $this->ci->database->edit('clusters', array('clusterId' => $c, 'editedBy' => $userId), $clusters_update);
+    }
   }
 
-  private function new_cluster($headlines = array())
+  private function new_cluster($data = array(), $userId = 0, $articleId = 0)
   {
-    $t_score = 0;
-    $t_item = null;
-    $tags = "";
+    // Find Available Headlines and Sort by Highest Rated Headline
+    $headlines = array($id);
+    $meta_scores = array(0);
+    foreach($data as $i)
+    {
+      $headlines[] = $i['id'];
+      $meta = $this->ci->database->get_single('metadata', array('headlineId' => $i['id']), $select = 'score');
+      $meta_scores[] = $meta->score;
+    }
+    array_multisort($meta_scores, SORT_DESC, $headlines);
+    
+    // Get Data from Headlines
+    $top_item = null;
+    $tags = array();
     $resources = array();
     $images = array();
-    foreach($headlines as $key => $o)
+    foreach($headlines as $h)
     {
-      $tags .= ($tags?',':'').$o['item']->tags;
-      $thisResources = $this->ci->database->get_array('resources', array('headlineId' => $o['item']->headlineId, 'deleted' => 0), 'resource');
-      foreach($thisResources as $tr)
+      $temp_item = $this->ci->database->get_single('headlines', array('headlineId' => $h), 'headline, tags');
+      if(!$top_item) { $top_item = $temp_item; }
+      
+      foreach(explode(',', $temp_item->tags) as $t)
       {
-        if(!in_array($tr, $resources)) { $resources[] = $tr; }
+        if(!preg_grep("/\b".$t."\b/i", $tags)) { $tags[] = $t; }
       }
-      $thisImages = $this->ci->database->get_array('images', array('headlineId' => $o['item']->headlineId, 'deleted' => 0), 'image');
-      foreach($thisImages as $ti)
+      
+      $temp_resources = $this->ci->database->get_array('resources', array('headlineId' => $h, 'deleted' => 0), 'resource');
+      foreach($temp_resources as $r)
       {
-        if(!in_array($ti, $images)) { $images[] = $ti; }
+        if(!preg_grep("/\b".$r."/\bi", $resources)) { $resources[] = $r; }
       }
-
-      $score = $o['ovn'] + $o['nvo'];
-      if($score > $t_score)
+      
+      $temp_images = $this->ci->database->get_array('images', array('headlineId' => $h, 'deleted' => 0), 'image');
+      foreach($temp_images as $i)
       {
-        $t_score = $score;
-        $t_item = $o;
+        if(!preg_grep("/\b".$i."\b/i", $images)) { $images[] = $i; }
       }
     }
-
-    $insert = array('headline' => $t_item['item']->headline, 'tags' => $tags, 'createdOn' => time());
+    
+    // Create Cluster
+    $insert = array('headline' => $top_item->headline, 'tags' => implode(',', $tags), 'createdOn' => time(), 'createdBy' => $userId);
+    if($articleId) { $insert['articleId'] = $articleId; }
     $clusterId = $this->ci->database->add('clusters', $insert, 'clusterId');
     $this->database_model->add('subscriptions', array('userId' => 3, 'clusterId' => $clusterId, 'createdOn' => time()), 'subscriptionId');
-
-    // Metadata
+    
+    // Add Metadata
     $metadata = array('clusterId' => $clusterId, 'quality' => 0, 'importance' => 0);
     $metadata['credibility'] = $this->ci->utility->credibility('cluster', $clusterId);
     $this->ci->database->add('metadata', $metadata, 'metadataId');
-
-    $headline_update = array('clusterId' => $clusterId);
-    $this->ci->database->add('catlist', array('categoryId' => 1)+$headline_update, 'catlistId');
+    
+    // Add Images/Resources/etc.
+    $headlines_update = array('clusterId' => $clusterId);
+    $this->ci->database->add('catlist', array('categoryId' => 1)+$headlines_update, 'catlistId');
     foreach($images as $image)
     {
-      $this->ci->database->add('images', array('image' => $image)+$headline_update, 'imageId');
+      $this->ci->database->add('images', array('image' => $image)+$headlines_update, 'imageId');
     }
     foreach($resources as $resource)
     {
-      $this->ci->database->add('resources', array('resource' => $resource)+$headline_update, 'resourceId');
+      $this->ci->database->add('resources', array('resource' => $resource)+$headlines_update, 'resourceId');
     }
-
-    return $clusterId;
+    
+    // Add Headlines to Cluster
+    foreach($headlines as $h)
+    {
+      $nInsert = array('headlineId' => $h, 'parentId' => $clusterId, 'createdOn' => time());
+      $subscribers = $this->ci->database->get('subscriptions', array('headlineId' => $h, 'deleted' => 0));
+      foreach($subscribers as $s) { $noticeId = $this->ci->database->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId'); }
+      $this->ci->database->edit('headlines', array('headlineId' => $h, 'editedBy' => $userId), $headlines_update);
+    }
   }
 }
 

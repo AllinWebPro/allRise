@@ -1,5 +1,20 @@
 <h1>Changelog</h1>
 
+<h2>Version 1.0.0.0</h2>
+
+<h4>Fixes:</h4>
+* Pagination issue on Ajax Search
+
+<h4>Notes:</h4>
+* Official Release
+
+<h3>Updates:</h3>
+* Site Metadata
+** Titles
+** Descriptions
+** Keywords
+** Links
+
 <h2>Version 0.9.7.0</h2>
 
 <h3>Updates:</h3>

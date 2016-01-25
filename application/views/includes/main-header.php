@@ -1,14 +1,14 @@
 <header id="main-bar" class="pure-g-r vertical-padding-xsmall">
   <div id="logo" class="pure-u-1-6">
     <div class="horizontal-padding-xlarge center-text">
-      <a href="<?php echo site_url('search'); ?>" title="<?php echo SITE_TITLE; ?>" class="branding">all<span class="orange">Rise</span></a>
+      <a href="<?php echo site_url('stream'); ?>" title="<?php echo SITE_TITLE; ?>" class="branding">all<span class="orange">Rise</span></a>
     </div>
   </div>
   <div class="pure-u-1-24 pure-hidden-phone"></div>
   <div class="pure-u-1-2 pure-hidden-phone">
     <div class="horizontal-padding">
       <?php if($page !== 'login-register'): ?>
-        <form action="<?php echo site_url('search'); ?>" class="pure-form pure-g-r vertical-padding-xsmall" novalidate>
+        <form action="<?php echo site_url('stream'); ?>" class="pure-form pure-g-r vertical-padding-xsmall" novalidate>
           <div class="pure-u-5-6">
             <?php echo form_input('k', '', 'placeholder="Keywords, Tags (e.g. Dragons)" class="pure-input-1 no-round" id="k"'); ?>
           </div>

@@ -66,7 +66,7 @@ class Login extends CI_Controller
     }
     elseif($_POST) { $this->data['login_errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     // Load View
-    $this->data['title'] = "Login / Register";
+    $this->data['title'] = "";
     if(isset($_REQUEST['ajax']) && $_REQUEST['ajax'] == 1)
     {
       $this->load->view('includes/functions');

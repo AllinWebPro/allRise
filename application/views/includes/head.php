@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width">
   <meta name="revisit-after" content="1 day">
   <!--facebook-->
-  <meta property="og:title" content="<?php echo $title; ?>">
+  <meta property="og:title" content="<?php echo ($title)?$title:SITE_TITLE; ?>">
   <meta property="og:site_name" content="<?php echo SITE_TITLE; ?>">
   <meta property="og:description" content="<?php echo metadata('description', isset($description)?$description:''); ?>">
   <meta property="og:type" content="article">
@@ -20,11 +20,11 @@
   <!--twitter-->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@weallrise" />
-  <meta name="twitter:title" content="<?php echo $title; ?>">
+  <meta name="twitter:title" content="<?php echo ($title)?$title:SITE_TITLE; ?>">
   <meta name="twitter:description" content="<?php echo metadata('description', isset($description)?$description:''); ?>">
   <meta name="twitter:image" content="<?php echo isset($images_output[0])?stripslashes($images_output[0]->image):(isset($images[0])?stripslashes($images[0]->image):site_url('media/img/allRise-logo.gif')); ?>">
   <!--end twitter-->
-  <title><?php echo $title; ?> .::. <?php echo SITE_TITLE; ?></title>
+  <title><?php echo ($title)?$title.' | ':''; ?><?php echo SITE_TITLE; ?></title>
   <link rel="stylesheet" href="//yui.yahooapis.com/pure/0.3.0/pure-min.css">
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css">
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic">

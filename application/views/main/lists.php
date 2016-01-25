@@ -19,7 +19,7 @@
         <div class="bottom-padding-xsmall pure-hidden-phone">
           <strong><a name="search"><i class="fa fa-search"></i></a> Advanced Search</strong>
         </div>
-        <form class="pure-u-1 pure-form ajax-list" method="get" action="<?php echo site_url('search'); ?>">
+        <form class="pure-u-1 pure-form ajax-list" method="get" action="<?php echo site_url('stream'); ?>">
           <fieldset class="item pure-group pure-u-1 vertical-padding-tiny">
             <div class="pure-g">
               <input type="text" name="k" id="filter-k" class="pure-input-1" placeholder="Keywords, Tags (e.g. Dragons)" value="<?php echo $search; ?>">
@@ -96,7 +96,7 @@
       <form method="post" action="<?php echo site_url('search/join'); ?>" class="ajax-join">
         <div class="vertical-padding-xsmall">
           <div class="horizontal-padding-small bottom-padding-xsmall">
-            <strong><a name="results"><i class="fa fa-align-justify"></i></a> Search Results</strong>
+            <strong><a name="results"><i class="fa fa-align-justify"></i></a> Stream Results</strong>
             <?php if($this->session->userdata('isLoggedIn') && in_array($this->session->userdata('level'), array('m', 'a'))): ?>
               <input type="hidden" name="ajax" value="<?php echo site_url('ajax/join'); ?>">
               <input type="hidden" name="uri" value="<?php echo ltrim($uri."&pg=".$current, '&'); ?>">

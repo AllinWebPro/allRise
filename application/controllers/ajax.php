@@ -630,7 +630,7 @@ class Ajax extends CI_Controller
     if($subscription) { $userId = $this->session->userdata('userId'); }
     $this->data['items'] = $this->stream_model->search($search, $where, $sort, $results, $comments, $limit, $current, $userId, $subscription);
     $count = $this->stream_model->search_count($search, $where, $sort, $results, $comments, $limit, $current, $userId, $subscription);
-    $this->data['pages'] = ceil(($count->items) / $limit);
+    $this->data['pages'] = ceil($count / $limit);
     $this->load->view('includes/functions');
     $this->load->view("main/lists", $this->data);
   }

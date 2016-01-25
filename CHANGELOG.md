@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 0.9.7.0</h2>
+
+<h3>Updates:</h3>
+* Unlink Children While Viewing Parent
+* Move Subscribe Button
+
 <h2>Version 0.9.6.3</h2>
 
 <h4>Fixes:</h4>

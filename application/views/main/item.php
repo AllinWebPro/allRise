@@ -1,15 +1,6 @@
 <nav id="sort" class="pure-menu pure-menu-open pure-menu-horizontal pure-u-1">
   <ul class="pure-g-r pure-u-1 center-text left-align">
     <li class="pure-u-1-6 left-align pure-menu-selected"><a><?php echo ucfirst($type); ?></a></li>
-    <?php if($this->session->userdata('isLoggedIn') && !isset($history)): ?>
-      <?php if($subscription): ?>
-        <li class="pure-u-1-6 right-align pure-menu-selected">
-          <a id="subscribe" href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline)); ?>?subscribe=0" class="ajax" data-type="item">Unsubscribe</a></li>
-      <?php else: ?>
-        <li class="pure-u-1-6 right-align pure-menu-selected">
-          <a id="subscribe" href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline)); ?>?subscribe=1" class="ajax" data-type="item">Subscribe</a></li>
-      <?php endif; ?>
-    <?php endif; ?>
   </ul>
 </nav>
 <?php if(isset($_REQUEST['n']) && $_REQUEST['n'] && isset($parent) && $parent): ?>
@@ -209,6 +200,10 @@
                   <?php if(sizeof($c_contributors[$c->clusterId])): ?>
                     <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-users"></i> <?php echo sizeof($c_contributors[$c->clusterId]); ?></span>
                   <?php endif; ?>
+                  <?php if(in_array($this->session->userdata('level'), array('m', 'a'))): ?>
+                    <span class="horizontal-padding-tiny">
+                      <a href="<?php echo site_url('c/unlink/'.$c->hashId); ?>"><i class="fa fa-chain-broken fa-3-4"></i> Unlink</a></span>
+                  <?php endif; ?>
                 </span>
               </div>
               <?php foreach($headlines[$c->clusterId] as $h): ?>
@@ -241,6 +236,10 @@
                     <?php endif; ?>
                     <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-user"></i>
                       <a href="<?php echo site_url('u/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
+                    <?php if(in_array($this->session->userdata('level'), array('m', 'a'))): ?>
+                      <span class="horizontal-padding-tiny">
+                        <a href="<?php echo site_url('h/unlink/'.$h->hashId); ?>"><i class="fa fa-chain-broken fa-3-4"></i> Unlink</a></span>
+                    <?php endif; ?>
                     <?php if($h->notes): ?><span class="horizontal-padding-tiny note-toggle pointer"><i class="fa fa-3-4 fa-file-text-o"></i> View Note</span><?php endif; ?>
                   </span>
                   <?php if($h->notes): ?><div class="note-text show-none em top-margin-xsmall left-margin horizontal-padding-small vertical-padding-xsmall"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $h->notes))); ?></div><?php endif; ?>
@@ -284,6 +283,10 @@
                   <?php endif; ?>
                   <span class="horizontal-padding-tiny"><i class="fa fa-3-4 fa-user"></i>
                     <a href="<?php echo site_url('u/'.$h_contributors[$h->headlineId][0]->user); ?>"><?php echo $h_contributors[$h->headlineId][0]->user; ?></a></span>
+                  <?php if(in_array($this->session->userdata('level'), array('m', 'a'))): ?>
+                    <span class="horizontal-padding-tiny">
+                      <a href="<?php echo site_url('h/unlink/'.$h->hashId); ?>"><i class="fa fa-chain-broken fa-3-4"></i> Unlink</a></span>
+                  <?php endif; ?>
                   <?php if($h->notes): ?><span class="horizontal-padding-tiny note-toggle pointer"><i class="fa fa-3-4 fa-file-text-o"></i> View Note</span><?php endif; ?>
                 </span>
                 <?php if($h->notes): ?><div class="note-text show-none em top-margin-xsmall horizontal-padding-small vertical-padding-xsmall"><?php echo stripslashes(str_replace('\r', '', str_replace('\n', '<br>', $h->notes))); ?></div><?php endif; ?>
@@ -340,8 +343,20 @@
               <?php endif; ?>
             </div>
           </div>
+          <?php if(!isset($history)): ?>
+            <div class="pure-u-1 center-text top-margin-small">
+              <?php if($subscription): ?>
+                <a id="subscribe" href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline)); ?>?subscribe=0" class="ajax pure-button pure-u-1 no-lr-padding" data-type="item">Unsubscribe</a>
+              <?php else: ?>
+                <a id="subscribe" href="<?php echo site_url(substr($type, 0, 1).'/'.$item->hashId.'/'.get_url_string($item->headline)); ?>?subscribe=1" class="ajax pure-button pure-u-1 no-lr-padding" data-type="item">Subscribe</a>
+              <?php endif; ?>
+            </div>
+          <?php endif; ?>
+        </div>
+        <hr>
+        <div class="horizontal-margin-small bottom-margin-small">
           <?php if($type !== 'headline' || ($item->createdBy == $this->session->userdata('userId') || in_array($this->session->userdata('level'), array('m', 'a')))): ?>
-            <div class="pure-u-1 center-text vertical-margin-small">
+            <div class="pure-u-1 center-text top-margin-xsmall bottom-margin-small">
               <a class="pure-button pure-u-1 no-lr-padding" href="<?php echo site_url(substr($type, 0, 1).'/modify/'.$item->hashId); ?>">
                 <i class="fa fa-pencil-square-o fa-9-10"></i> Modify <?php echo ucfirst($type); ?></a>
             </div>

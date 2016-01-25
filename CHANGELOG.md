@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 1.0.0.1</h2>
+
+<h4>Fixes:</h4>
+* Login Redirect URL
+* Article Create issue
+
 <h2>Version 1.0.0.0</h2>
 
 <h4>Fixes:</h4>

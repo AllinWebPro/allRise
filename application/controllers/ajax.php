@@ -45,6 +45,8 @@ class Ajax extends CI_Controller
    */
   public function article($childId = 0, $childType = '')
   {
+    $response = array('success' => 0);
+    
     $this->form_validation->set_rules('headline', 'Headline', 'trim|required|xss_clean|callback_clean_url|max_length[255]');
     $this->form_validation->set_rules('article', 'Article', 'trim|strip_html_tags');
     

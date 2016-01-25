@@ -37,7 +37,7 @@
           <input type="password" name="password" value="<?php echo set_value('password', $this->input->post('password')); ?>" id="login-password" class="pure-input-1" placeholder="Password" required>
         </fieldset>
         <div class="pure-controls">
-          <input type="hidden" name="redirect" value="<?php echo isset($_GET['r'])?$_GET['r']:'search'; ?>">
+          <input type="hidden" name="redirect" value="<?php echo isset($_GET['r'])?$_GET['r']:'stream'; ?>">
           <input type="hidden" name="ajax" value="<?php echo site_url('ajax/login'); ?>">
           <button type="submit" class="pure-button pure-input-1">Login <i class="fa fa-sign-in"></i></button>
         </div>
@@ -72,7 +72,7 @@
             <a href="<?php echo site_url('terms'); ?>" data-ajax="<?php echo site_url('ajax/page/terms'); ?>" title="Terms of Use" data-modal='modal-page'>Terms of Use</a> &amp;
             <a href="<?php echo site_url('policy'); ?>" data-ajax="<?php echo site_url('ajax/page/policy'); ?>" title="Privacy Policy" data-modal='modal-page'>Privacy Policy</a>
           </label>
-          <input type="hidden" name="redirect" value="<?php echo isset($_GET['r'])?$_GET['r']:'search'; ?>">
+          <input type="hidden" name="redirect" value="<?php echo isset($_GET['r'])?$_GET['r']:'stream'; ?>">
           <input type="hidden" name="ajax" value="<?php echo site_url('ajax/register'); ?>">
           <button type="submit" class="pure-button pure-input-1">Register <i class="fa fa-arrow-right"></i></button>
         </div>

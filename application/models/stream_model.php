@@ -1524,7 +1524,7 @@ class Stream_model extends CI_Model
     {
       // Get Matching Articles
       $a_where = $where;
-      if($type = 'article') { $a_where['articleId !='] = $id; }
+      if($type == 'article') { $a_where['articleId !='] = $id; }
       $a_list = $this->ci->database->get('articles', $a_where);
       foreach($a_list as $i)
       {
@@ -1552,7 +1552,7 @@ class Stream_model extends CI_Model
     {
       // Get Matching Clusters
       $c_where = $where;
-      if($type = 'cluster') { $c_where['clusterId !='] = $id; }
+      if($type == 'cluster') { $c_where['clusterId !='] = $id; }
       $c_list = $this->ci->database->get('clusters', $c_where+array('articleId' => null));
       foreach($c_list as $i)
       {
@@ -1580,7 +1580,7 @@ class Stream_model extends CI_Model
     {
       // Get Matching Headlines
       $h_where = $where;
-      if($type = 'headline') { $h_where['headlineId !='] = $id; }
+      if($type == 'headline') { $h_where['headlineId !='] = $id; }
       $h_list = $this->ci->database->get('headlines', $h_where+array('clusterId' => null));
       foreach($h_list as $i)
       {

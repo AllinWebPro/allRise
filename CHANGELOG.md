@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 1.0.0.4</h2>
+
+<h4>Fixes:</h4>
+* Item create Autocompare issue
+
 <h2>Version 1.0.0.3</h2>
 
 <h4>Fixes:</h4>

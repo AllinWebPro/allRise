@@ -61,6 +61,8 @@ var $stream,
     form_submit = false,
     browsers = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
 
+var current_page = window.location.href;
+
 $(function() {
   
   $("a[rel^='prettyPhoto']").prettyPhoto();

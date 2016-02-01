@@ -1,5 +1,12 @@
 <h1>Changelog</h1>
 
+<h2>Version 1.0.0.2</h2>
+
+<h4>Fixes:</h4>
+* Keep search on stream load
+* External link http/https fix
+* AJAX page title
+
 <h2>Version 1.0.0.1</h2>
 
 <h4>Fixes:</h4>

@@ -54,4 +54,11 @@ function get_100_char($string = '')
   }
   return $string;
 }
+
+function fix_url($url)
+{
+  $url = str_replace('http:', '', $url);
+  $url = str_replace('https:', '', $url);
+  return $url;
+}
 ?>

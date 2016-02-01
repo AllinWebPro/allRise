@@ -105,7 +105,7 @@
               <div class="pure-u-1-4">
                 <div class="horizontal-padding-small vertical-padding-small">
                   <a href="<?php echo stripslashes($i->image); ?>" rel="prettyPhoto[galleries]">
-                    <img src="<?php echo stripslashes($i->image); ?>" class="border"></a>
+                    <img src="<?php echo fix_url(stripslashes($i->image)); ?>" class="border"></a>
                 </div>
               </div>
             <?php endif; ?>

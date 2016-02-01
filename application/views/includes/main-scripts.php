@@ -1,7 +1,6 @@
 <script>
-var site_title = ".::. <?php echo SITE_TITLE; ?>";
+var site_title = " | <?php echo SITE_TITLE; ?>";
 var site_url = "<?php echo site_url(); ?>";
-var current_page = window.location.href;
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>

@@ -108,7 +108,7 @@
             <div class="pure-g-r">
               <?php foreach($items as $i): ?>
                 <div class="pure-u-1-2">
-                  <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline)); ?>" class="ajax" data-type="item">
+                  <a title="<?php echo stripslashes($i->headline); ?>" href="<?php echo fix_url(site_url(substr($i->type, 0, 1).'/'.$i->hashId.'/'.get_url_string($i->headline))); ?>" class="ajax" data-type="item">
                     <div class="vertical-padding-xsmall horizontal-padding-small">
                       <div class="list-image right-margin-xsmall left-align">
                         <?php if($i->image && @getimagesize($i->image)): ?>
@@ -205,4 +205,7 @@
     </div>
   </section>-->
 </div>
-<script>if(window.jQuery) { $("#k").val($("#filter-k").val()); }</script>
+<script>
+if(window.jQuery) { $("#k").val($("#filter-k").val()); }
+else { document.getElementById('k').value = document.getElementById('filter-k').value; }
+</script>

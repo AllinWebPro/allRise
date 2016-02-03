@@ -23,7 +23,7 @@ class Notifications extends CI_Controller
     }
     $this->data['current'] = $current;
     $this->data['user'] = $this->database_model->get_single('users', array('userId' => $this->session->userdata('userId')));
-    $display = array();
+    $display = array("mentions");
     if($this->data['user']->comments) { $display[] = "comments"; }
     if($this->data['user']->edits) { $display[] = "edits"; }
     if($this->data['user']->parents) { $display[] = "joins"; }

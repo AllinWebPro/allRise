@@ -536,6 +536,11 @@
                   {
                     foreach($url[0] as $u) { $text = str_replace($u, "<a href='$u' target='_blank' rel='nofollow'>$u</a>", $text); }
                   }
+                  $reg_exUser = "/(?<=[\s])@[^\s.,!?]+/";
+                  if(preg_match_all($reg_exUser, $text, $user))
+                  {
+                    foreach($user[0] as $u) { $text = str_replace($u, "<a href='".site_url('u/'.str_replace('@', '', $u))."'>$u</a>", $text); }
+                  }
                   echo $text;
                   ?>
                 </span>

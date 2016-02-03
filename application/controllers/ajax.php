@@ -27,7 +27,7 @@ class Ajax extends CI_Controller
     $user = $this->database_model->get_single('users', array('userId' => $this->session->userdata('userId')));
     if($user)
     {
-      $display = array();
+      $display = array("mentions");
       if($user->comments) { $display[] = "comments"; }
       if($user->edits) { $display[] = "edits"; }
       if($user->parents) { $display[] = "joins"; }
@@ -232,6 +232,16 @@ class Ajax extends CI_Controller
           if($s->userId !== $userId)
           {
             $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId');
+          }
+        }
+        $reg_exUser = "/(?<=[\s])@[^\s.,!?]+/";
+        if(preg_match_all($reg_exUser, $text, $users))
+        {
+          foreach($users[0] as $u)
+          {
+            $user = $this->database_model->get_single('users', array('user' => str_replace('@', '', $u), 'deleted' => 1));
+            $user_insert = array('userId' => $user->userId, 'mention' => 1);
+            $noticeId = $this->database_model->add('notices', $nInsert+$user_insert, 'noticeId');
           }
         }
         $response['prepend'] = array();
@@ -877,7 +887,7 @@ class Ajax extends CI_Controller
     }
     $this->data['current'] = $current;
     $this->data['user'] = $this->database_model->get_single('users', array('userId' => $this->session->userdata('userId')));
-    $display = array();
+    $display = array("mentions");
     if($this->data['user']->comments) { $display[] = "comments"; }
     if($this->data['user']->edits) { $display[] = "edits"; }
     if($this->data['user']->parents) { $display[] = "joins"; }
@@ -1183,6 +1193,7 @@ class Ajax extends CI_Controller
     if($target == 'notices')
     {
       $user = $this->database_model->get_single('users', array('userId' => $this->session->userdata('userId')));
+      $display = array("mentions");
       if($user->comments) { $display[] = "comments"; }
       if($user->edits) { $display[] = "edits"; }
       if($user->parents) { $display[] = "joins"; }
@@ -1250,6 +1261,19 @@ class Ajax extends CI_Controller
     $this->data['contributors'] = $this->stream_model->get_contributors($type, $id);
     $this->$target($dir);
     $this->utility_model->metadata($type, $id);
+  }
+  
+  public function users()
+  {
+    $users = $this->database_model->get('users', array('user LIKE' => '%'.$_REQUEST['term'].'%', 'deleted' => 0), 10);
+    
+    $return = array();
+    foreach($users as $u)
+    {
+      $return[] = $u->user;
+    }
+    
+    echo json_encode($return);
   }
 
   /**
@@ -1391,6 +1415,11 @@ class Ajax extends CI_Controller
       if(preg_match_all($reg_exUrl, $text, $url))
       {
         foreach($url[0] as $u) { $text = str_replace($u, "<a href='$u' target='_blank' rel='nofollow'>$u</a>", $text); }
+      }
+      $reg_exUser = "/(?<=[\s])@[^\s.,!?]+/";
+      if(preg_match_all($reg_exUser, $text, $user))
+      {
+        foreach($user[0] as $u) { $text = str_replace($u, "<a href='".site_url('u/'.str_replace('@', '', $u))."'>$u</a>", $text); }
       }
       $return .= '<span class="text">'.$text.'</span>';
     $return .= '</article>';

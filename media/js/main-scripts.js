@@ -67,6 +67,12 @@ $(function() {
   
   $("a[rel^='prettyPhoto']").prettyPhoto();
   
+  $("#add-comment, #comment-edit").triggeredAutocomplete({
+    hidden: '#hidden_inputbox',
+    source: "/ajax/users",
+    trigger: "@" 
+  });
+  
   var $textareas = jQuery('textarea');  
   if($textareas)
   {

@@ -34,6 +34,11 @@
         <?php elseif($n->action == 'joins'): ?>
           <div class="icon-box"><?php echo file_get_contents('media/svg/'.$n->type.'.svg'); ?></div>
           <em>&ldquo;<?php echo stripslashes($n->headline); ?>&rdquo;</em> has been upgraded to <?php echo ($n->type == 'headline')?'a Cluster':'an Article'; ?>
+        <?php elseif($n->action == 'mentions'): ?>
+          <?php $people = explode(' ', $n->users); ?>
+          <strong><?php echo $people[0]; ?></strong>
+          mentioned you in a comment on <div class="icon-box"><?php echo file_get_contents('media/svg/'.$n->type.'.svg'); ?></div>
+          <em>&ldquo;<?php echo stripslashes($n->headline); ?>&rdquo;</em>
         <?php endif; ?>
       </a><br>
       <span class="grey">

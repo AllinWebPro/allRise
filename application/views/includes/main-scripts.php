@@ -8,6 +8,7 @@ var site_url = "<?php echo site_url(); ?>";
 <script src="<?php echo site_url('media/ckeditor/adapters/jquery.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/vendor/masonry.pkgd.min.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/vendor/jquery.prettyPhoto.js'); ?>"></script>
+<script src="<?php echo site_url('media/js/vendor/triggered.autocomplete.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/fix.js'); ?>"></script>
 <script src="<?php echo site_url('media/js/main-scripts.js'); ?>"></script>
 <?php if($this->session->userdata('isLoggedIn') && $this->session->flashdata('tutorial')): ?>

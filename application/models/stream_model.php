@@ -424,7 +424,7 @@ class Stream_model extends CI_Model
     return $results;
   }
 
-  function notifications($userId, $time, $display = array('edits', 'joins', 'comments'), $limit = 10, $page = 1)
+  function notifications($userId, $time, $display = array('edits', 'joins', 'comments', 'mentions'), $limit = 10, $page = 1)
   {
     $select_one = "headline, instances, users, action, n.createdOn, photo, views ";
 
@@ -471,32 +471,52 @@ class Stream_model extends CI_Model
       $sql .= "SELECT s.headlineId AS id, OLD_PASSWORD(s.headlineId) AS hashId, 'headline' AS type, $select_one";
       $sql .= "FROM headlines s ";
       $sql .= "LEFT JOIN ( ";
+        $sections = 0;
+    
         if(in_array('edits', $display))
         {
           $sql .= "$select_headline 'edits' AS action, $select_two";
           $sql .= $h_notice_join;
           $sql .= "WHERE n.edited = 1 $notice_where";
           $sql .= "GROUP BY headlineId ";
+          
+          $sections++;
         }
-
-        if(sizeof($display) >= 2) { $sql .= "UNION ALL "; }
 
         if(in_array('joins', $display))
         {
+          if($sections) { $sql .= "UNION ALL "; }
+        
           $sql .= "$select_headline 'joins' AS action, $select_two";
           $sql .= $h_notice_join;
           $sql .= "WHERE parentId IS NOT NULL $notice_where";
           $sql .= "GROUP BY headlineId ";
+          
+          $sections++;
         }
-
-        if(sizeof($display) >= 2) { $sql .= "UNION ALL "; }
 
         if(in_array('comments', $display))
         {
+          if($sections) { $sql .= "UNION ALL "; }
+        
           $sql .= "$select_headline 'comments' AS action, $select_two";
           $sql .= $h_notice_join;
-          $sql .= "WHERE commentId IS NOT NULL $notice_where";
+          $sql .= "WHERE commentId IS NOT NULL AND mention = 0 $notice_where";
           $sql .= "GROUP BY headlineId ";
+          
+          $sections++;
+        }
+
+        if(in_array('mentions', $display))
+        {
+          if($sections) { $sql .= "UNION ALL "; }
+        
+          $sql .= "$select_headline 'mentions' AS action, $select_two";
+          $sql .= $h_notice_join;
+          $sql .= "WHERE commentId IS NOT NULL AND mention = 1 $notice_where";
+          $sql .= "GROUP BY headlineId ";
+          
+          $sections++;
         }
       $sql .= ") n ";
       $sql .= "ON n.headlineId = s.headlineId ";
@@ -507,33 +527,52 @@ class Stream_model extends CI_Model
       $sql .= "SELECT s.clusterId AS id, OLD_PASSWORD(s.clusterId) AS hashId, 'cluster' AS type, $select_one";
       $sql .= "FROM clusters s ";
       $sql .= "LEFT JOIN ( ";
-
+        $sections = 0;
+    
         if(in_array('edits', $display))
         {
           $sql .= "$select_cluster 'edits' AS action, $select_two";
           $sql .= $c_notice_join;
           $sql .= "WHERE n.edited = 1 $notice_where";
           $sql .= "GROUP BY clusterId ";
+          
+          $sections++;
         }
-
-        if(sizeof($display) >= 2) { $sql .= "UNION ALL "; }
 
         if(in_array('joins', $display))
         {
+          if($sections) { $sql .= "UNION ALL "; }
+        
           $sql .= "$select_cluster 'joins' AS action, $select_two";
           $sql .= $c_notice_join;
           $sql .= "WHERE parentId IS NOT NULL $notice_where";
           $sql .= "GROUP BY clusterId ";
+          
+          $sections++;
         }
-
-        if(sizeof($display) >= 2) { $sql .= "UNION ALL "; }
 
         if(in_array('comments', $display))
         {
+          if($sections) { $sql .= "UNION ALL "; }
+        
           $sql .= "$select_cluster 'comments' AS action, $select_two";
           $sql .= $c_notice_join;
-          $sql .= "WHERE commentId IS NOT NULL $notice_where";
+          $sql .= "WHERE commentId IS NOT NULL AND mention = 0 $notice_where";
           $sql .= "GROUP BY clusterId ";
+          
+          $sections++;
+        }
+
+        if(in_array('mentions', $display))
+        {
+          if($sections) { $sql .= "UNION ALL "; }
+        
+          $sql .= "$select_cluster 'mentions' AS action, $select_two";
+          $sql .= $c_notice_join;
+          $sql .= "WHERE commentId IS NOT NULL AND mention = 1 $notice_where";
+          $sql .= "GROUP BY clusterId ";
+          
+          $sections++;
         }
       $sql .= ") n ";
       $sql .= "ON n.clusterId = s.clusterId ";
@@ -544,32 +583,52 @@ class Stream_model extends CI_Model
       $sql .= "SELECT s.articleId AS id, OLD_PASSWORD(s.articleId) AS hashId, 'article' AS type, $select_one";
       $sql .= "FROM articles s ";
       $sql .= "LEFT JOIN ( ";
+        $sections = 0;
+    
         if(in_array('edits', $display))
         {
           $sql .= "$select_article 'edits' AS action, $select_two";
           $sql .= $a_notice_join;
           $sql .= "WHERE n.edited = 1 $notice_where";
           $sql .= "GROUP BY articleId ";
+          
+          $sections++;
         }
-
-        if(sizeof($display) >= 2) { $sql .= "UNION ALL "; }
 
         if(in_array('joins', $display))
         {
+          if($sections) { $sql .= "UNION ALL "; }
+        
           $sql .= "$select_article 'joins' AS action, $select_two";
           $sql .= $a_notice_join;
           $sql .= "WHERE parentId IS NOT NULL $notice_where";
           $sql .= "GROUP BY articleId ";
+          
+          $sections++;
         }
-
-        if(sizeof($display) >= 2) { $sql .= "UNION ALL "; }
 
         if(in_array('comments', $display))
         {
+          if($sections) { $sql .= "UNION ALL "; }
+        
           $sql .= "$select_article 'comments' AS action, $select_two";
           $sql .= $a_notice_join;
-          $sql .= "WHERE commentId IS NOT NULL $notice_where";
+          $sql .= "WHERE commentId IS NOT NULL AND mention = 0 $notice_where";
           $sql .= "GROUP BY articleId ";
+          
+          $sections++;
+        }
+
+        if(in_array('mentions', $display))
+        {
+          if($sections) { $sql .= "UNION ALL "; }
+        
+          $sql .= "$select_article 'mentions' AS action, $select_two";
+          $sql .= $a_notice_join;
+          $sql .= "WHERE commentId IS NOT NULL AND mention = 1 $notice_where";
+          $sql .= "GROUP BY articleId ";
+          
+          $sections++;
         }
       $sql .= ") n ";
       $sql .= "ON n.articleId = s.articleId ";
@@ -582,7 +641,7 @@ class Stream_model extends CI_Model
     return $q->result();
   }
 
-  function notifications_count($userId, $time, $display = array('edits', 'joins', 'comments'), $views = "all")
+  function notifications_count($userId, $time, $display = array('edits', 'joins', 'comments', 'mentions'), $views = "all")
   {
     $select_headline = "SELECT DISTINCT n.headlineId, COUNT(n.headlineId) AS instances, ";
 
@@ -608,32 +667,52 @@ class Stream_model extends CI_Model
       $sql .= "SELECT s.headlineId AS id, OLD_PASSWORD(s.headlineId) AS hashId, 'headline' AS type ";
       $sql .= "FROM headlines s ";
       $sql .= "LEFT JOIN ( ";
+        $sections = 0;
+    
         if(in_array('edits', $display))
         {
           $sql .= "$select_headline 'edits' AS action ";
           $sql .= $notice_join;
           $sql .= "WHERE n.edited = 1 $notice_where";
           $sql .= "GROUP BY headlineId ";
+          
+          $sections++;
         }
-
-        if(sizeof($display) >= 2) { $sql .= "UNION ALL "; }
 
         if(in_array('joins', $display))
         {
+          if($sections) { $sql .= "UNION ALL "; }
+        
           $sql .= "$select_headline 'joins' AS action ";
           $sql .= $notice_join;
           $sql .= "WHERE parentId IS NOT NULL $notice_where";
           $sql .= "GROUP BY headlineId ";
+          
+          $sections++;
         }
-
-        if(sizeof($display) >= 2) { $sql .= "UNION ALL "; }
 
         if(in_array('comments', $display))
         {
+          if($sections) { $sql .= "UNION ALL "; }
+        
           $sql .= "$select_headline 'comments' AS action ";
           $sql .= $notice_join;
           $sql .= "WHERE commentId IS NOT NULL $notice_where";
           $sql .= "GROUP BY headlineId ";
+          
+          $sections++;
+        }
+
+        if(in_array('mentions', $display))
+        {
+          if($sections) { $sql .= "UNION ALL "; }
+        
+          $sql .= "$select_headline 'mentions' AS action ";
+          $sql .= $notice_join;
+          $sql .= "WHERE commentId IS NOT NULL AND mention = 1 $notice_where";
+          $sql .= "GROUP BY headlineId ";
+          
+          $sections++;
         }
       $sql .= ") n ";
       $sql .= "ON n.headlineId = s.headlineId ";
@@ -644,33 +723,52 @@ class Stream_model extends CI_Model
       $sql .= "SELECT s.clusterId AS id, OLD_PASSWORD(s.clusterId) AS hashId, 'cluster' AS type ";
       $sql .= "FROM clusters s ";
       $sql .= "LEFT JOIN ( ";
-
+        $sections = 0;
+    
         if(in_array('edits', $display))
         {
           $sql .= "$select_cluster 'edits' AS action ";
           $sql .= $notice_join;
           $sql .= "WHERE n.edited = 1 $notice_where";
           $sql .= "GROUP BY clusterId ";
+          
+          $sections++;
         }
-
-        if(sizeof($display) >= 2) { $sql .= "UNION ALL "; }
 
         if(in_array('joins', $display))
         {
+          if($sections) { $sql .= "UNION ALL "; }
+        
           $sql .= "$select_cluster 'joins' AS action ";
           $sql .= $notice_join;
           $sql .= "WHERE parentId IS NOT NULL $notice_where";
           $sql .= "GROUP BY clusterId ";
+          
+          $sections++;
         }
-
-        if(sizeof($display) >= 2) { $sql .= "UNION ALL "; }
 
         if(in_array('comments', $display))
         {
+          if($sections) { $sql .= "UNION ALL "; }
+        
           $sql .= "$select_cluster 'comments' AS action ";
           $sql .= $notice_join;
           $sql .= "WHERE commentId IS NOT NULL $notice_where";
           $sql .= "GROUP BY clusterId ";
+          
+          $sections++;
+        }
+
+        if(in_array('mentions', $display))
+        {
+          if($sections) { $sql .= "UNION ALL "; }
+        
+          $sql .= "$select_cluster 'mentions' AS action ";
+          $sql .= $notice_join;
+          $sql .= "WHERE commentId IS NOT NULL AND mention = 1 $notice_where";
+          $sql .= "GROUP BY clusterId ";
+          
+          $sections++;
         }
       $sql .= ") n ";
       $sql .= "ON n.clusterId = s.clusterId ";
@@ -681,32 +779,52 @@ class Stream_model extends CI_Model
       $sql .= "SELECT s.articleId AS id, OLD_PASSWORD(s.articleId) AS hashId, 'article' AS type ";
       $sql .= "FROM articles s ";
       $sql .= "LEFT JOIN ( ";
+        $sections = 0;
+    
         if(in_array('edits', $display))
         {
           $sql .= "$select_article 'edits' AS action ";
           $sql .= $notice_join;
           $sql .= "WHERE n.edited = 1 $notice_where";
           $sql .= "GROUP BY articleId ";
+          
+          $sections++;
         }
-
-        if(sizeof($display) >= 2) { $sql .= "UNION ALL "; }
 
         if(in_array('joins', $display))
         {
+          if($sections) { $sql .= "UNION ALL "; }
+        
           $sql .= "$select_article 'joins' AS action ";
           $sql .= $notice_join;
           $sql .= "WHERE parentId IS NOT NULL $notice_where";
           $sql .= "GROUP BY articleId ";
+          
+          $sections++;
         }
-
-        if(sizeof($display) >= 2) { $sql .= "UNION ALL "; }
 
         if(in_array('comments', $display))
         {
+          if($sections) { $sql .= "UNION ALL "; }
+        
           $sql .= "$select_article 'comments' AS action ";
           $sql .= $notice_join;
           $sql .= "WHERE commentId IS NOT NULL $notice_where";
           $sql .= "GROUP BY articleId ";
+          
+          $sections++;
+        }
+
+        if(in_array('mentions', $display))
+        {
+          if($sections) { $sql .= "UNION ALL "; }
+        
+          $sql .= "$select_article 'mentions' AS action ";
+          $sql .= $notice_join;
+          $sql .= "WHERE commentId IS NOT NULL AND mention = 1 $notice_where";
+          $sql .= "GROUP BY articleId ";
+          
+          $sections++;
         }
       $sql .= ") n ";
       $sql .= "ON n.articleId = s.articleId ";

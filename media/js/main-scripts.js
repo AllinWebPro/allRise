@@ -89,7 +89,7 @@ $(function() {
         search: function() {
           // custom minLength
           var term = extractLast( this.value );
-          if ( term.length < 2 ) {
+          if ( term.length < 3 ) {
             return false;
           }
         },

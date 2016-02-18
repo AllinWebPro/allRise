@@ -1,5 +1,11 @@
 <h1>Changelog</h1>
 
+<h2>Version 1.2.1.0</h2>
+
+<h4>Updates:</h4>
+* Autocomplete Word Min-Length
+* Allow for '-' in Keywords
+
 <h2>Version 1.2.0.0</h2>
 
 <h4>Added:</h4>

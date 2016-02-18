@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 1.2.1.1</h2>
+
+<h4>Fixes:</h4>
+* Remove 'g' from 'preg_replace'
+
 <h2>Version 1.2.1.0</h2>
 
 <h4>Updates:</h4>

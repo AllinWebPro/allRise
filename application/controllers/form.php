@@ -143,7 +143,7 @@ class Form extends CI_Controller
       //
       $headline = $this->utility_model->blwords_strip($insert['headline'], 'regEx_spaces', ' ');
       $tags = $this->utility_model->blwords_strip($insert['tags'], 'regEx_commas', ' ');
-      $keywords = explode(' ', preg_replace('/[^a-z\d\'\- ]/gi', '', $headline))+explode(' ', preg_replace('/[^a-z\d\'\- ]/gi', '', $tags));
+      $keywords = explode(' ', preg_replace('/[^a-z\d\'\- ]/i', '', $headline))+explode(' ', preg_replace('/[^a-z\d\'\- ]/i', '', $tags));
       foreach($keywords as $k)
       {
         if(strlen($k) > 2 && !$this->database_model->get_count('autocomplete', array("keyword REGEXP '^".$this->db->escape_str($k, true)."$'" => null)))
@@ -323,7 +323,7 @@ class Form extends CI_Controller
         //
         $headline = $this->utility_model->blwords_strip($update['headline'], 'regEx_spaces', ' ');
         $tags = $this->utility_model->blwords_strip($update['tags'], 'regEx_commas', ' ');
-        $keywords = explode(' ', preg_replace('/[^a-z\d\'\- ]/gi', '', $headline))+explode(' ', preg_replace('/[^a-z\d\'\- ]/gi', '', $tags));
+        $keywords = explode(' ', preg_replace('/[^a-z\d\'\- ]/i', '', $headline))+explode(' ', preg_replace('/[^a-z\d\'\- ]/i', '', $tags));
         foreach($keywords as $k)
         {
           if(strlen($k) > 2 && !$this->database_model->get_count('autocomplete', array("keyword REGEXP '^".$this->db->escape_str($k, true)."$'" => null)))

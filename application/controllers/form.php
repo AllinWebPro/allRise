@@ -140,6 +140,18 @@ class Form extends CI_Controller
       }
         
       $id = $this->database_model->add($this->data['type']."s", $insert, $this->data['type']."Id");
+      //
+      $headline = $this->utility_model->blwords_strip($insert['headline'], 'regEx_spaces', ' ');
+      $tags = $this->utility_model->blwords_strip($insert['tags'], 'regEx_commas', ' ');
+      $keywords = explode(' ', preg_replace('/[^a-z\d\' ]/i', '', $headline))+explode(' ', preg_replace('/[^a-z\d\' ]/i', '', $tags));
+      foreach($keywords as $k)
+      {
+        if(!$this->database_model->get_count('autocomplete', array("keyword REGEXP '^".$this->db->escape_str($k, true)."$'" => null)))
+        {
+          $this->database_model->add('autocomplete', array('keyword' => strtolower($this->db->escape_str($k, true))));
+        }
+      }
+      //
       $sInsert = array($this->data['type'].'Id' => $id, 'userId' => $userId);
       $subscriptionId = $this->database_model->add('subscriptions', $sInsert+array('createdOn' => time()), 'subscriptionId');
       if($this->data['type'] == 'headline')
@@ -308,6 +320,18 @@ class Form extends CI_Controller
         }
 
         $this->database_model->edit($this->data['type'].'s', array($this->data['type'].'Id' => $this->data['id']), $update);
+        //
+        $headline = $this->utility_model->blwords_strip($update['headline'], 'regEx_spaces', ' ');
+        $tags = $this->utility_model->blwords_strip($update['tags'], 'regEx_commas', ' ');
+        $keywords = explode(' ', preg_replace('/[^a-z\d\' ]/i', '', $headline))+explode(' ', preg_replace('/[^a-z\d\' ]/i', '', $tags));
+        foreach($keywords as $k)
+        {
+          if(!$this->database_model->get_count('autocomplete', array("keyword REGEXP '^".$this->db->escape_str($k, true)."$'" => null)))
+          {
+            $this->database_model->add('autocomplete', array('keyword' => strtolower($this->db->escape_str($k, true))));
+          }
+        }
+        //
         $this->utility_model->keywords($this->data['type'], $this->data['id'], $post['headline'], $post['tags']);
         if($this->data['type'] == 'cluster' && !$this->data['item']->articleId) { $this->stream_model->autocompare($this->data['type'], $id); }
         elseif($this->data['type'] == 'headline' && !$this->data['item']->clusterId) { $this->stream_model->autocompare($this->data['type'], $id); }

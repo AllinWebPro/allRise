@@ -92,6 +92,18 @@ class Ajax extends CI_Controller
       }
       $insert['active'] = 1;
       $id = $this->database_model->add("articles", $insert, "articleId");
+      //
+      $headline = $this->utility_model->blwords_strip($insert['headline'], 'regEx_spaces', ' ');
+      $tags = $this->utility_model->blwords_strip($insert['tags'], 'regEx_commas', ' ');
+      $keywords = explode(' ', preg_replace('/[^a-z\d\' ]/i', '', $headline))+explode(' ', preg_replace('/[^a-z\d\' ]/i', '', $tags));
+      foreach($keywords as $k)
+      {
+        if(!$this->database_model->get_count('autocomplete', array("keyword REGEXP '^".$this->db->escape_str($k, true)."$'" => null)))
+        {
+          $this->database_model->add('autocomplete', array('keyword' => strtolower($this->db->escape_str($k, true))));
+        }
+      }
+      //
       if($childId && $childType)
       {
         $items = array(
@@ -147,6 +159,24 @@ class Ajax extends CI_Controller
       $response['redirect'] = site_url('a/'.$item_temp->hashId);
     }
     elseif($_POST) { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
+    $this->_output_json($response);
+  }
+  
+  function autocomplete()
+  {
+    $response = array();
+    $this->form_validation->set_rules('term', 'Term', 'trim|xss_clean');
+    if($this->form_validation->run())
+    {
+      $or = array(
+        "keyword REGEXP '^".$this->db->escape_str($this->input->post('term'), true)."$'" => null,
+        "keyword REGEXP '^".$this->db->escape_str($this->input->post('term'), true)."'" => null,
+        "keyword REGEXP '".$this->db->escape_str($this->input->post('term'), true)."$'" => null,
+        "keyword REGEXP '".$this->db->escape_str($this->input->post('term'), true)."'" => null
+      );
+      $keywords = $this->database_model->get_or('autocomplete', array(), $or);
+      foreach($keywords as $k) { $response[] = ucwords(stripslashes($k->keyword)); }
+    }
     $this->_output_json($response);
   }
 
@@ -371,6 +401,18 @@ class Ajax extends CI_Controller
       }
       $insert['active'] = 1;
       $id = $this->database_model->add("headlines", $insert, "headlineId");
+      //
+      $headline = $this->utility_model->blwords_strip($insert['headline'], 'regEx_spaces', ' ');
+      $tags = $this->utility_model->blwords_strip($insert['tags'], 'regEx_commas', ' ');
+      $keywords = explode(' ', preg_replace('/[^a-z\d\' ]/i', '', $headline))+explode(' ', preg_replace('/[^a-z\d\' ]/i', '', $tags));
+      foreach($keywords as $k)
+      {
+        if(!$this->database_model->get_count('autocomplete', array("keyword REGEXP '^".$this->db->escape_str($k, true)."$'" => null)))
+        {
+          $this->database_model->add('autocomplete', array('keyword' => strtolower($this->db->escape_str($k, true))));
+        }
+      }
+      //
       if($parentId && $parentType)
       {
         $items = array(
@@ -477,6 +519,18 @@ class Ajax extends CI_Controller
       }
       $insert['active'] = 1;
       $id = $this->database_model->add("clusters", $insert, "clusterId");
+      //
+      $headline = $this->utility_model->blwords_strip($insert['headline'], 'regEx_spaces', ' ');
+      $tags = $this->utility_model->blwords_strip($insert['tags'], 'regEx_commas', ' ');
+      $keywords = explode(' ', preg_replace('/[^a-z\d\' ]/i', '', $headline))+explode(' ', preg_replace('/[^a-z\d\' ]/i', '', $tags));
+      foreach($keywords as $k)
+      {
+        if(!$this->database_model->get_count('autocomplete', array("keyword REGEXP '^".$this->db->escape_str($k, true)."$'" => null)))
+        {
+          $this->database_model->add('autocomplete', array('keyword' => strtolower($this->db->escape_str($k, true))));
+        }
+      }
+      //
       if($otherId && $otherType)
       {
         $items = array(
@@ -1085,6 +1139,18 @@ class Ajax extends CI_Controller
         }
       }
       $this->database_model->edit($type.'s', array($type.'Id' => $id), $item);
+      //
+      $headline = $this->utility_model->blwords_strip($item['headline'], 'regEx_spaces', ' ');
+      $tags = $this->utility_model->blwords_strip($item['tags'], 'regEx_commas', ' ');
+      $keywords = explode(' ', preg_replace('/[^a-z\d\' ]/i', '', $headline))+explode(' ', preg_replace('/[^a-z\d\' ]/i', '', $tags));
+      foreach($keywords as $k)
+      {
+        if(!$this->database_model->get_count('autocomplete', array("keyword REGEXP '^".$this->db->escape_str($k, true)."$'" => null)))
+        {
+          $this->database_model->add('autocomplete', array('keyword' => strtolower($this->db->escape_str($k, true))));
+        }
+      }
+      //
       $this->utility_model->keywords($type, $id, $post['headline'], $post['tags']);
 
       $sInsert = array($type.'Id' => $id, 'userId' => $userId);

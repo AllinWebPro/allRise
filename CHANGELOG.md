@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 1.2.0.0</h2>
+
+<h4>Added:</h4>
+* Tag Autocomplete
+
 <h2>Version 1.1.0.0</h2>
 
 <h4>Added:</h4>

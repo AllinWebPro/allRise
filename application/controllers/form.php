@@ -174,16 +174,16 @@ class Form extends CI_Controller
         $this->stream_model->manual_join($items);
       }
       $this->utility_model->add_keywords($this->data['type'], $id, $post['headline'], $post['tags']);
-      if(isset($post['image']) && $post['image'])
+      if(isset($post['add-image']) && $post['add-image'])
       {
-        foreach($post['image'] as $i)
+        foreach($post['add-image'] as $i)
         {
           if($i !== '') { $this->database_model->add("images", array($this->data['type'].'Id' => $id, 'image' => $this->db->escape_str($i), 'editedBy' => $userId), 'imageId'); }
         }
       }
-      if(isset($post['resource']) && $post['resource'])
+      if(isset($post['add-resource']) && $post['add-resource'])
       {
-        foreach($post['resource'] as $r)
+        foreach($post['add-resource'] as $r)
         {
           if($r !== '') { $this->database_model->add("resources", array($this->data['type'].'Id' => $id, 'resource' => $this->db->escape_str($r), 'editedBy' => $userId), 'resourceId'); }
         }

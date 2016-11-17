@@ -130,16 +130,16 @@ class Ajax extends CI_Controller
         $this->database_model->add("catlist", array('articleId' => $id, 'categoryId' => $c, 'editedBy' => $userId), 'catlistId');
       }
       $this->utility_model->add_keywords('article', $id, $post['headline'], $post['tags']);
-      if(isset($post['image']) && $post['image'])
+      if(isset($post['add-image']) && $post['add-image'])
       {
-        foreach($post['image'] as $i)
+        foreach($post['add-image'] as $i)
         {
           if($i !== '') { $this->database_model->add("images", array('articleId' => $id, 'image' => $this->db->escape_str($i), 'editedBy' => $userId), 'imageId'); }
         }
       }
-      if(isset($post['resource']) && $post['resource'])
+      if(isset($post['add-resource']) && $post['add-resource'])
       {
-        foreach($post['resource'] as $r)
+        foreach($post['add-resource'] as $r)
         {
           if($r !== '') { $this->database_model->add("resources", array('articleId' => $id, 'resource' => $this->db->escape_str($r), 'editedBy' => $userId), 'resourceId'); }
         }
@@ -432,16 +432,16 @@ class Ajax extends CI_Controller
         $this->database_model->add("catlist", array('headlineId' => $id, 'categoryId' => $c, 'editedBy' => $userId), 'catlistId');
       }
       $this->utility_model->add_keywords('headline', $id, $post['headline'], $post['tags']);
-      if(isset($post['image']) && $post['image'])
+      if(isset($post['add-image']) && $post['add-image'])
       {
-        foreach($post['image'] as $i)
+        foreach($post['add-image'] as $i)
         {
           if($i !== '') { $this->database_model->add("images", array('headlineId' => $id, 'image' => $this->db->escape_str($i), 'editedBy' => $userId), 'imageId'); }
         }
       }
-      if(isset($post['resource']) && $post['resource'])
+      if(isset($post['add-resource']) && $post['add-resource'])
       {
-        foreach($post['resource'] as $r)
+        foreach($post['add-resource'] as $r)
         {
           if($r !== '') { $this->database_model->add("resources", array('headlineId' => $id, 'resource' => $this->db->escape_str($r), 'editedBy' => $userId), 'resourceId'); }
         }
@@ -549,16 +549,16 @@ class Ajax extends CI_Controller
         $this->database_model->add("catlist", array('clusterId' => $id, 'categoryId' => $c, 'editedBy' => $userId), 'catlistId');
       }
       $this->utility_model->add_keywords('cluster', $id, $post['headline'], $post['tags']);
-      if(isset($post['image']) && $post['image'])
+      if(isset($post['add-image']) && $post['add-image'])
       {
-        foreach($post['image'] as $i)
+        foreach($post['add-image'] as $i)
         {
           if($i !== '') { $this->database_model->add("images", array('clusterId' => $id, 'image' => $this->db->escape_str($i), 'editedBy' => $userId), 'imageId'); }
         }
       }
-      if(isset($post['resource']) && $post['resource'])
+      if(isset($post['add-resource']) && $post['add-resource'])
       {
-        foreach($post['resource'] as $r)
+        foreach($post['add-resource'] as $r)
         {
           if($r !== '') { $this->database_model->add("resources", array('clusterId' => $id, 'resource' => $this->db->escape_str($r), 'editedBy' => $userId), 'resourceId'); }
         }
@@ -1299,6 +1299,18 @@ class Ajax extends CI_Controller
       else { $response['errors'] = "No user could be found."; }
     }
     else { $response['errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
+    $this->_output_json($response);
+  }
+  
+  public function sugestion()
+  {
+    $response = array();
+    $this->form_validation->set_rules('headline', 'Headline', 'trim|xss_clean');
+    $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
+    if($this->form_validation->run())
+    {
+      $this->stream_model->get_suggestions($this->input->post('headline'), $this->input->post('tags'));
+    }
     $this->_output_json($response);
   }
 

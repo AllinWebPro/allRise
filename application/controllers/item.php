@@ -388,6 +388,16 @@ class Item extends CI_Controller
             $noticeId = $this->database_model->add('notices', $nInsert+array('userId' => $s->userId), 'noticeId');
           }
         }
+        $reg_exUser = "/(?<=[\s])@[^\s.,!?]+/";
+        if(preg_match_all($reg_exUser, $post['comment'], $users))
+        {
+          foreach($users[0] as $u)
+          {
+            $user = $this->database_model->get_single('users', array('user' => str_replace('@', '', $u), 'deleted' => 1));
+            $user_insert = array('userId' => $user->userId, 'mention' => 1);
+            $noticeId = $this->database_model->add('notices', $nInsert+$user_insert, 'noticeId');
+          }
+        }
       }
       elseif($_POST) { $this->data['comment_errors'] = ($_POST)?$this->form_validation->error_array():'No data submitted.'; }
     }

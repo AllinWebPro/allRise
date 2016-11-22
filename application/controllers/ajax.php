@@ -265,7 +265,7 @@ class Ajax extends CI_Controller
           }
         }
         $reg_exUser = "/(?<=[\s])@[^\s.,!?]+/";
-        if(preg_match_all($reg_exUser, $text, $users))
+        if(preg_match_all($reg_exUser, $post['comment'], $users))
         {
           foreach($users[0] as $u)
           {

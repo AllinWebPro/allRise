@@ -5,8 +5,8 @@
 * MySQL Version: 5.6+
 
 <h2>Version Information <sup>[1]</sup> <sup>[2]</sup></h2>
-* Latest Stable Version: 361
-* Latest Development Version: 361
+* Latest Stable Version: 362
+* Latest Development Version: 362
 
 <h3>Citations</h3>
 1. New version system as of 361.

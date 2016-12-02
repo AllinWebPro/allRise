@@ -1,5 +1,10 @@
 <h1>Changelog</h1>
 
+<h2>Version 363</h2>
+
+<h3>Added:</h3>
+* "Created by" in Footer
+
 <h2>Version 362</h2>
 
 <h3>Fix:</h3>

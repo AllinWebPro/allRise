@@ -1,17 +1,17 @@
-<h1>AllRise Platform</h1>
+# AllRise Platform
 
-<h2>System Requirements</h2>
+## System Requirements
 * PHP Version: 5.3+
 * MySQL Version: 5.6+
 
-<h2>Version Information <sup>[1]</sup> <sup>[2]</sup></h2>
-* Latest Stable Version: 362
-* Latest Development Version: 362
+## Version Information ^1^ ^2^
+* Latest Stable Version: 364
+* Latest Development Version: 364
 
-<h3>Citations</h3>
+### Citations
 1. New version system as of 361.
-2. For changes see <a href="https://github.com/AllinWebPro/allRise/blob/development/CHANGELOG.md">changelog</a>
+2. For changes see [changelog](https://github.com/AllinWebPro/allRise/blob/development/CHANGELOG.md)
 
-<h4>Old Links</h4>
-* <a href="https://github.com/AllinWebPro/allRise/blob/development/README.old.md">README.md</a>
-* <a href="https://github.com/AllinWebPro/allRise/blob/development/CHANGELOG.old.md">CHANGELOG.md</a>
+#### Old Links
+[README.md](https://github.com/AllinWebPro/allRise/blob/development/README.old.md)
+[CHANGELOG.md](https://github.com/AllinWebPro/allRise/blob/development/CHANGELOG.old.md)

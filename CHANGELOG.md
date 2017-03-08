@@ -1,17 +1,22 @@
-<h1>Changelog</h1>
+# Changelog
 
-<h2>Version 363</h2>
+## Version 364
 
-<h3>Added:</h3>
+### Update:
+* README.md & CHANGELOG.md files
+
+## Version 363
+
+### Added:
 * "Created by" in Footer
 
-<h2>Version 362</h2>
+## Version 362
 
-<h3>Fix:</h3>
+### Fix:
 * Mention Comment Notification issue
 * issue with \n on article/note output
 
-<h2>Version 361</h2>
+## Version 361
 
-<h3>Fix:</h3>
+### Fix:
 * Add Image/Resource on Create

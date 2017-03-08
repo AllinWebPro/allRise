@@ -4,7 +4,7 @@
 * PHP Version: 5.3+
 * MySQL Version: 5.6+
 
-## Version Information ^1^ ^2^
+## Version Information
 * Latest Stable Version: 364
 * Latest Development Version: 364
 
@@ -13,5 +13,5 @@
 2. For changes see [changelog](https://github.com/AllinWebPro/allRise/blob/development/CHANGELOG.md)
 
 #### Old Links
-[README.md](https://github.com/AllinWebPro/allRise/blob/development/README.old.md)
-[CHANGELOG.md](https://github.com/AllinWebPro/allRise/blob/development/CHANGELOG.old.md)
+* [README.md](https://github.com/AllinWebPro/allRise/blob/development/README.old.md)
+* [CHANGELOG.md](https://github.com/AllinWebPro/allRise/blob/development/CHANGELOG.old.md)

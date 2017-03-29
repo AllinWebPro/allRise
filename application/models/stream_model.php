@@ -1388,13 +1388,16 @@ class Stream_model extends CI_Model
         array_multisort($total, SORT_DESC, $search, SORT_DESC, $sub, SORT_DESC, $cred, SORT_DESC, $decay, SORT_DESC, $results);
       }
       
-      if($query)
+      if($order !== 'createdOn')
       {
-        $this->ci->database->edit('search', array('searchId' => $query->searchId), array('data' => json_encode($results)), false);
-      }
-      else
-      {
-        $this->ci->database->add('search', array('filters' => $filters, 'data' => json_encode($results)));
+        if($query)
+        {
+          $this->ci->database->edit('search', array('searchId' => $query->searchId), array('data' => json_encode($results)), false);
+        }
+        else
+        {
+          $this->ci->database->add('search', array('filters' => $filters, 'data' => json_encode($results)));
+        }
       }
       
       if($order == 'score') { $results = array_slice($results, ($page-1) * $limit, $limit); }

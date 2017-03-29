@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 365
+
+### Update:
+* Remove Cache from "Latest Entries"
+
+### Fix:
+* Add "http://" to needed URL's
+
 ## Version 364
 
 ### Update:

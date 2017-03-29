@@ -125,8 +125,8 @@
         <?php if($resources): ?>
           <?php foreach($resources as $r): ?>
             <div class="pure-u-1 truncate">
-              <a href="<?php echo stripslashes($r->resource); ?>" target="_blank" rel="nofollow">
-                 <?php echo $r->resourceId; ?>. <?php echo stripslashes($r->resource); ?></a>
+              <a href="<?php echo add_http(stripslashes($r->resource)); ?>" target="_blank" rel="nofollow">
+                 <?php echo $r->resourceId; ?>. <?php echo add_http(stripslashes($r->resource)); ?></a>
             </div>
           <?php endforeach; ?>
         <?php else: ?>

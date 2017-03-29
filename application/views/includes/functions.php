@@ -61,4 +61,11 @@ function fix_url($url)
   $url = str_replace('https:', '', $url);
   return $url;
 }
+
+function add_http($url) {
+    if (!preg_match("~^(?:f|ht)tps?://~i", $url)) {
+        $url = "http://" . $url;
+    }
+    return $url;
+}
 ?>

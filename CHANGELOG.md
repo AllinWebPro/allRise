@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 366
+
+### Update:
+* New Social Image
+
 ## Version 365
 
 ### Update:

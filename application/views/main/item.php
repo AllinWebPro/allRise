@@ -20,13 +20,13 @@
     <div class="horizontal-margin-small vertical-margin-small">
       <div class="horizontal-padding-small vertical-padding-xsmall">
         <h2><?php echo stripslashes($item->headline); ?></h2>
-        <div class="horizontal-padding-tiny vertical-padding-tiny top-padding-xsmall grey">
-          <span class="right-padding-tiny"><i class="fa fa-3-4 fa-edit horizontal-padding-tiny"></i>
+        <div class="horizontal-padding-tiny vertical-padding-tiny top-padding-xsmall grey meta">
+          <span class="right-padding-tiny"><!--<i class="fa fa-3-4 fa-edit horizontal-padding-tiny"></i> --><strong>Last Edit:</strong>
             <time>
               <?php if($item->editedOn > strtotime(date("m/d/Y"))): ?>
                 Today at <?php echo date("h:ia", $item->editedOn); ?>
               <?php elseif($item->editedOn > strtotime(date("m/d/Y", strtotime("-1 day")))): ?>
-                Yesterday at <?php echo date("h:ia", $item->editedOn); ?>d
+                Yesterday at <?php echo date("h:ia", $item->editedOn); ?>
               <?php elseif(date("Y", $item->editedOn) == date("Y")): ?>
                 <?php echo date("F dS", $item->editedOn); ?> at <?php echo date("h:ia", $item->editedOn); ?>
               <?php else: ?>
@@ -35,7 +35,7 @@
             </time>
           </span>
           <?php if($item->createdOn !== $item->editedOn): ?>
-            <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
+            <span class="right-padding-tiny"><!--<i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i> --><strong>Created:</strong>
               <time>
                 <?php if($item->createdOn > strtotime(date("m/d/Y"))): ?>
                   Today at <?php echo date("h:ia", $item->createdOn); ?>
@@ -96,7 +96,7 @@
       <hr>
       <div class="horizontal-padding-small vertical-padding-xsmall pure-g-r" id="item-images">
         <div class="pure-u-1 bottom-padding-small">
-          <strong><a name="images"><i class="fa fa-camera"></i></a> Images</strong>
+          <strong><a name="images"><i class="fa fa-camera"></i></a> Images (<?php echo sizeof($images); ?>)</strong>
         </div>
         <?php if($images): ?>
           <div class="clear"></div>
@@ -120,13 +120,13 @@
       <hr>
       <div class="horizontal-padding-small vertical-padding-small top-padding-xsmall">
         <div class="pure-u-1 bottom-padding-small">
-          <strong><a name="resources"><i class="fa fa-link"></i></a> Resources</strong>
+          <strong><a name="resources"><i class="fa fa-link"></i></a> Resources (<?php echo sizeof($resources); ?>)</strong>
         </div>
         <?php if($resources): ?>
           <?php foreach($resources as $r): ?>
             <div class="pure-u-1 truncate">
               <a href="<?php echo add_http(stripslashes($r->resource)); ?>" target="_blank" rel="nofollow">
-                 <?php echo $r->resourceId; ?>. <?php echo add_http(stripslashes($r->resource)); ?></a>
+                 <?php echo add_http(stripslashes($r->resource)); ?></a>
             </div>
           <?php endforeach; ?>
         <?php else: ?>
@@ -397,7 +397,7 @@
         </div>
         <div class="horizontal-padding-small vertical-padding-small pure-g">
           <a class="pure-button pure-u-1 no-lr-padding" href="<?php echo site_url(substr($type, 0, 1).'/modify/'.$item->hashId); ?>">
-            <i class="fa fa-pencil-square-o fa-9-10"></i> Modify Current Version</a>
+            <i class="fa fa-pencil-square-o fa-9-10"></i> Modify Latest Version</a>
         </div>
       </div>
     </section>

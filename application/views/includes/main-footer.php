@@ -16,9 +16,7 @@
     <span>&copy; <?php echo date("Y"); ?></span>
     | <a href="<?php echo site_url('p/terms'); ?>" title="Terms of Use">Terms of Use</a>
     | <a href="<?php echo site_url('p/policy'); ?>" title="Privacy Policy">Privacy Policy</a>
-  </div>
-  <div class="pure-u-1 center-text grey">
-    Created by <a href="http://allinwebpro.com" title="AllinWebPro.com, LLC">AllinWebPro.com, LLC</a>
+    | Created by <a href="http://allinwebpro.com" title="AllinWebPro.com, LLC">AllinWebPro.com, LLC</a>
   </div>
 </footer>
 <div id="modal-page" title="" class="modal-content">

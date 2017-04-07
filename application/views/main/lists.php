@@ -38,7 +38,10 @@
             <input type="hidden" name="subscription" id="filter-subscription" value="<?php echo $subscription; ?>">
             <input type="hidden" name="u" id="filter-u" value="<?php echo $userId; ?>">
             <input type="hidden" name="ajax" value="<?php echo site_url('ajax/lists'); ?>">
-            <button type="submit" class="pure-button pure-input-1"><i class="fa fa-search"></i> Search</button>
+            <div class="pure-g-r">
+              <div class="pure-u-1-2"></div>
+              <button type="submit" class="pure-button pure-u-1-2 right-align"><i class="fa fa-search"></i> Search</button>
+            </div>
           </fieldset>
         </form>
       </div>
@@ -123,8 +126,8 @@
                       </p>
                     </div>
                   </a>
-                  <span class="grey">
-                    <span class="right-padding-tiny"><i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i>
+                  <span class="grey meta">
+                    <span class="right-padding-tiny"><!--<i class="fa fa-3-4 fa-clock-o horizontal-padding-tiny"></i> --><strong>Last Edit:</strong>
                       <time>
                         <?php if($i->editedOn > strtotime(date("m/d/Y"))): ?>
                           Today <span class="pure-visible-desktop">at <?php echo date("h:ia", $i->editedOn); ?></span>

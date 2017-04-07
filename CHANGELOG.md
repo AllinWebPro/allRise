@@ -1,5 +1,20 @@
 # Changelog
 
+## Version 367
+
+### Fix:
+* Random "d" on page
+
+### Update:
+* Removal of Resource ID
+* Count Images/Resources
+* Text Changes
+* Removal of Text Shadow on Buttons
+* Updated Footer
+* Added Letter Spacing
+* Adjust Display of Times
+* Adjust Line Height
+
 ## Version 366
 
 ### Update:

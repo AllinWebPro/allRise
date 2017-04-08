@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 368
+
+### Fix:
+* Headline Note Line Break issue
+* Items Disapearing When All Images Removed
+
+### Update:
+* Increase Homepage Readability
+
 ## Version 367
 
 ### Fix:

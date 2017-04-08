@@ -86,6 +86,7 @@ article.content img { border:1px solid #333;margin:5px;padding:5px; }
   overflow: overlay;
 }
 [data-page=login-register] legend { color:#fff; }
+.homepage-wrapper { background-color:rgba(0,0,0,0.3); }
 
 .modal-content { display:none; }
 .photo-frame, .meta-frame { overflow:hidden;width:46%; }

@@ -20,7 +20,7 @@
           <fieldset class="item pure-group pure-u-1">
             <input type="text" name="headline" id="item-headline" class="pure-input-1" placeholder="Headline*" value="<?php echo isset($_GET['headline'])?$_GET['headline']:(isset($item)?stripslashes($item->headline):''); ?>" required title="Max length 255 characters.">
             <?php if($type == 'headline'): ?>
-              <textarea name="notes" id="item-notes" class="pure-input-1" placeholder="Description"><?php echo isset($item->notes)?stripcslashes(str_replace('\r', '', str_replace('\n', '', $item->notes))):''; ?></textarea>
+              <textarea name="notes" id="item-notes" class="pure-input-1" placeholder="Description"><?php echo isset($item->notes)?stripcslashes($item->notes):''; ?></textarea>
             <?php elseif($type == 'article'): ?>
               <textarea name="article" id="item-article" class="pure-input-1" placeholder="Article"><?php echo isset($item->article)?stripslashes(str_replace('\r', '', str_replace('\n', '', $item->article))):''; ?></textarea>
             <?php endif; ?>

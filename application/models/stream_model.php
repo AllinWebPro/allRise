@@ -1146,7 +1146,7 @@ class Stream_model extends CI_Model
             $sql .= "SELECT headlineId, ";
             $sql .= $image_include;
           $sql .= ") i1 ON i1.headlineId = s.headlineId ";
-          $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.headlineId = s.headlineId) ";
+          $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.headlineId = s.headlineId AND (i2.active = 1 && i2.deleted = 0)) ";
           if($comments)
           {
             $sql .= "LEFT JOIN ( ";
@@ -1165,7 +1165,6 @@ class Stream_model extends CI_Model
             $sql .= ") d ON d.headlineId = s.headlineId ";
           }
           $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
-            $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
             if($terms) { $sql .= "AND ".$h_search; }
             if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
             if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR h.editedBy = ".$userId.") "; }
@@ -1197,7 +1196,7 @@ class Stream_model extends CI_Model
             $sql .= "SELECT clusterId, ";
             $sql .= $image_include;
           $sql .= ") i1 ON i1.clusterId = s.clusterId ";
-          $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.clusterId = s.clusterId) ";
+          $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.clusterId = s.clusterId AND (i2.active = 1 && i2.deleted = 0)) ";
           $sql .= $headline_include;
           if($comments)
           {
@@ -1216,7 +1215,6 @@ class Stream_model extends CI_Model
             $sql .= ") d ON d.clusterId = s.clusterId ";
           }
           $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
-            $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
             if($terms) { $sql .= "AND ".$c_search; }
             if($exclusive && !$subscriptions) { $sql .= "AND s.articleId IS null "; }
             if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR c.editedBy = ".$userId.") "; }
@@ -1248,7 +1246,7 @@ class Stream_model extends CI_Model
             $sql .= "SELECT articleId, ";
             $sql .= $image_include;
           $sql .= ") i1 ON i1.articleId = s.articleId ";
-          $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.articleId = s.articleId) ";
+          $sql .= "LEFT JOIN images i2 ON (i2.imageId = i2.imageId AND i2.articleId = s.articleId AND (i2.active = 1 && i2.deleted = 0)) ";
           $sql .= "LEFT JOIN ( ";
             $sql .= "SELECT s.articleId, COUNT(s.clusterId) AS c_count, SUM(h.h_count) AS h_count, ";
             $sql .= "((((h.cred_score / 2)) * h.decay_score) / h_count) AS sub_score, ";
@@ -1278,7 +1276,6 @@ class Stream_model extends CI_Model
             $sql .= ") d ON d.articleId = s.articleId ";
           }
           $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
-            $sql .= "AND ((i2.active = 1 && i2.deleted = 0) || i2.imageId IS null) ";
             if($terms) { $sql .= "AND ".$a_search; }
             if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR a.editedBy = ".$userId.") "; }
             if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }

@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 369
+
+### Fix:
+* Homepage Mobile issue
+
+### Added:
+* Saving Draft on Unpublished Items
+* View Draft List on Stream Page
+
 ## Version 368
 
 ### Fix:

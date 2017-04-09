@@ -1113,6 +1113,7 @@ class Stream_model extends CI_Model
           $headline_include .= "FROM headlines s ";
           $headline_include .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
           $headline_include .= "WHERE s.clusterId IS NOT NULL ";
+          $headline_include .= "AND s.active = 1 ";
           $headline_include .= "AND s.deleted = 0 ";
           $headline_include .= "GROUP BY clusterId ";
         $headline_include .= ") h ON h.clusterId = s.clusterId ";
@@ -1164,7 +1165,7 @@ class Stream_model extends CI_Model
               $sql .= "GROUP BY headlineId ";
             $sql .= ") d ON d.headlineId = s.headlineId ";
           }
-          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 AND s.active = 1 ";
             if($terms) { $sql .= "AND ".$h_search; }
             if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
             if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR h.editedBy = ".$userId.") "; }
@@ -1214,7 +1215,7 @@ class Stream_model extends CI_Model
               $sql .= $viewed_include;
             $sql .= ") d ON d.clusterId = s.clusterId ";
           }
-          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 AND s.active = 1 ";
             if($terms) { $sql .= "AND ".$c_search; }
             if($exclusive && !$subscriptions) { $sql .= "AND s.articleId IS null "; }
             if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR c.editedBy = ".$userId.") "; }
@@ -1256,6 +1257,7 @@ class Stream_model extends CI_Model
             $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
             $sql .= $headline_include;
             $sql .= "WHERE s.articleId IS NOT NULL ";
+            $sql .= "AND s.active = 1 ";
             $sql .= "AND s.deleted = 0 ";
             $sql .= "GROUP BY articleId ";
           $sql .= ") c ON c.articleId = s.articleId ";
@@ -1275,7 +1277,7 @@ class Stream_model extends CI_Model
               $sql .= $viewed_include;
             $sql .= ") d ON d.articleId = s.articleId ";
           }
-          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 AND s.active = 1 ";
             if($terms) { $sql .= "AND ".$a_search; }
             if($userId && !$subscriptions) { $sql .= "AND (s.createdBy = ".$userId." OR a.editedBy = ".$userId.") "; }
             if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
@@ -1494,6 +1496,7 @@ class Stream_model extends CI_Model
           $headline_include .= "FROM headlines s ";
           $headline_include .= "LEFT JOIN metadata m ON m.headlineId = s.headlineId ";
           $headline_include .= "WHERE s.clusterId IS NOT NULL ";
+          $headline_include .= "AND s.active = 1 ";
           $headline_include .= "AND s.deleted = 0 ";
           $headline_include .= "GROUP BY clusterId ";
         $headline_include .= ") h ON h.clusterId = s.clusterId ";
@@ -1524,7 +1527,7 @@ class Stream_model extends CI_Model
               $sql .= "GROUP BY headlineId ";
             $sql .= ") d ON d.headlineId = s.headlineId ";
           }
-          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 AND s.active = 1 ";
             if($terms) { $sql .= "AND ".$h_search; }
             if($exclusive && !$subscriptions) { $sql .= "AND s.clusterId IS null "; }
             if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
@@ -1556,7 +1559,7 @@ class Stream_model extends CI_Model
               $sql .= $viewed_include;
             $sql .= ") d ON d.clusterId = s.clusterId ";
           }
-          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 AND s.active = 1 ";
             if($terms) { $sql .= "AND ".$c_search; }
             if(!$subscriptions) { $sql .= "AND s.articleId IS null "; }
             if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
@@ -1588,6 +1591,7 @@ class Stream_model extends CI_Model
             $sql .= "LEFT JOIN metadata m ON m.clusterId = s.clusterId ";
             $sql .= $headline_include;
             $sql .= "WHERE s.articleId IS NOT NULL ";
+            $sql .= "AND s.active = 1 ";
             $sql .= "AND s.deleted = 0 ";
             $sql .= "GROUP BY articleId ";
           $sql .= ") c ON c.articleId = s.articleId ";
@@ -1599,7 +1603,7 @@ class Stream_model extends CI_Model
               $sql .= $viewed_include;
             $sql .= ") d ON d.articleId = s.articleId ";
           }
-          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 ";
+          $sql .= "WHERE s.deleted = 0 AND s.hidden = 0 AND s.active = 1 ";
             if($terms) { $sql .= "AND ".$a_search; }
             if($userId && !$subscriptions) { $sql .= "AND (createdBy = ".$userId." OR editedBy = ".$userId.") "; }
             if($subscriptions) { $sql .= "AND b.userId = ".$userId." AND b.deleted = 0 "; }
@@ -1618,6 +1622,38 @@ class Stream_model extends CI_Model
     }
     
     return $count;
+  }
+  
+  function drafts($userId)
+  {
+    $sql = "SELECT *, OLD_PASSWORD(id) AS hashId ";
+    $sql .= "FROM ( ";
+      $sql .= "SELECT 'headline' AS type, headlineId AS id, headline, createdOn ";
+      $sql .= "FROM headlines ";
+      $sql .= "WHERE createdBy = ".$userId." ";
+      $sql .= "AND active = 0 ";
+      $sql .= "AND deleted = 0 ";
+      
+      $sql .= "UNION ALL ";
+      
+      $sql .= "SELECT 'cluster' AS type, clusterId AS id, headline, createdOn ";
+      $sql .= "FROM clusters ";
+      $sql .= "WHERE createdBy = ".$userId." ";
+      $sql .= "AND active = 0 ";
+      $sql .= "AND deleted = 0 ";
+      
+      $sql .= "UNION ALL ";
+      
+      $sql .= "SELECT 'article' AS type, articleId AS id, headline, createdOn ";
+      $sql .= "FROM articles ";
+      $sql .= "WHERE createdBy = ".$userId." ";
+      $sql .= "AND active = 0 ";
+      $sql .= "AND deleted = 0 ";
+    $sql .= ") AS items ";
+    $sql .= "ORDER BY createdOn DESC ";
+    
+    $q = $this->db->query($sql);
+    return $q->result();
   }
 
   function autocompare($type, $id)

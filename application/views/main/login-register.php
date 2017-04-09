@@ -1,5 +1,5 @@
 <?php $video_url = 'https://www.youtube.com/embed/mBBqb97IQMo'; ?>
-<div class="pure-u-1 homepage-wrapper">
+<div class="pure-u-1 pure-g-r homepage-wrapper">
   <aside class="pure-hidden-phone pure-u-7-12 vertical-padding-xlarge">
     <div class="horizontal-padding-xlarge vertical-padding-xlarge">
       <p class="intro-text vertical-padding-xlarge">Collaborative News for Everyone.<br><br>allRise helps communities large and small connect in new ways to share real-time important information and easily build it into high-quality news articles.  It's democratic news by and for everyone.  Our goal is to become the most valuable source of real-time news in the world.</p>

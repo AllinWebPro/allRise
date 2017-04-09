@@ -200,13 +200,25 @@
       <?php endif; ?>
     </div>
   </section>
-  <!--<section id="search-filters" class="small">
-    <div class="horizontal-margin-small vertical-margin-small">
-      <h3 class="horizontal-padding-xsmall">Other</h3>
-      <div class="vertical-padding-xsmall">
+  <?php if(isset($drafts) && $drafts): ?>
+    <section id="drafts" class="small">
+      <div class="horizontal-margin-small vertical-margin-small">
+        <div class="vertical-padding-xsmall">
+          <div class="horizontal-padding-small bottom-padding-xsmall">
+            <strong><a name="results"><i class="fa fa-align-justify"></i></a> Personal Drafts</strong>
+          </div>
+          <div class="pure-g-r">
+            <ul class="pure-u-1">
+              <?php foreach($drafts as $d): ?>
+                <li><a title="<?php echo stripslashes($d->headline); ?>" href="<?php echo fix_url(site_url(substr($d->type, 0, 1).'/modify/'.$d->hashId)); ?>" class="ajax" data-type="item">
+                  <span class="icon-box"><?php echo file_get_contents('media/svg/'.$d->type.'.svg'); ?></span> <span class="list-title"><?php echo stripslashes($d->headline); ?></span></li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>-->
+    </section>
+  <?php endif; ?>
 </div>
 <script>
 if(window.jQuery) { $("#k").val($("#filter-k").val()); }

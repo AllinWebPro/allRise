@@ -131,7 +131,8 @@ class Form extends CI_Controller
       }
       if($this->data['type'] == 'headline') { $insert['notes'] = $this->db->escape_str($post['notes']); }
       if($this->data['type'] == 'article') { $insert['article'] = $this->db->escape_str(str_replace('\r', '', str_replace('\n', '', $post['article']))); }
-      $insert['active'] = 1;
+      if(isset($post['draft'])) { $insert['active'] = 0; }
+      else { $insert['active'] = 1; }
       
       if($this->session->userdata('level') == 'a')
       {
@@ -247,6 +248,8 @@ class Form extends CI_Controller
       $this->data['item'] = $this->database_model->get_single($this->data['type'].'s', array('OLD_PASSWORD('.$this->data['type'].'Id)' => $id, 'deleted' => 0));
       $typeId = $this->data['type']."Id";
       $this->data['id'] = $this->data['item']->$typeId;
+      
+      if($this->data['item']->active == 0 && $this->data['item']->createdBy !== $this->session->userdata('userId')) { redirect('stream'); }
     }
     else
     {
@@ -296,7 +299,8 @@ class Form extends CI_Controller
         // Update Proper Table
         if($this->data['type'] == 'headline') { $update['notes'] = $this->db->escape_str($post['notes']); }
         if($this->data['type'] == 'article') { $update['article'] = $this->db->escape_str(str_replace('\r', '', str_replace('\n', '', $post['article']))); }
-        $update['active'] = 1;
+        if(isset($post['draft'])) { $update['active'] = 0; }
+        else { $update['active'] = 1; }
 
         $sInsert = array($this->data['type'].'Id' => $this->data['id'], 'userId' => $userId);
         if(!$this->database_model->get_single('subscriptions', $sInsert))

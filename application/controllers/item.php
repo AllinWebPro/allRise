@@ -28,7 +28,7 @@ class Item extends CI_Controller
     // Grab Data by Type
     $this->data['type'] = $type;
     $this->data['id'] = $id;
-    $this->data['item'] = $this->database_model->get_single($type.'s', array($type.'Id' => $id, 'deleted' => 0), '*, OLD_PASSWORD('.$type.'Id) AS hashId');
+    $this->data['item'] = $this->database_model->get_single($type.'s', array($type.'Id' => $id, 'active' => 1, 'deleted' => 0), '*, OLD_PASSWORD('.$type.'Id) AS hashId');
     // Get Data
     if(isset($this->data['item']) && $this->data['item'])
     {
@@ -180,7 +180,7 @@ class Item extends CI_Controller
     // Grab Data by Type
     $this->data['type'] = $type;
     $this->data['hashId'] = $hashId;
-    $this->data['item'] = $this->database_model->get_single($type.'s', array('OLD_PASSWORD('.$type.'Id)' => $hashId, 'deleted' => 0), '*, OLD_PASSWORD('.$type.'Id) AS hashId');
+    $this->data['item'] = $this->database_model->get_single($type.'s', array('OLD_PASSWORD('.$type.'Id)' => $hashId, 'active' => 1, 'deleted' => 0), '*, OLD_PASSWORD('.$type.'Id) AS hashId');
     if(isset($_GET['hId']))
     {
       $this->data['item'] = $this->database_model->get_single($type.'s_history', array('OLD_PASSWORD(historyId)' => $_GET['hId'], 'deleted' => 0), '*, OLD_PASSWORD('.$type.'Id) AS hashId');

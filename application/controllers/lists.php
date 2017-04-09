@@ -48,6 +48,7 @@ class Lists extends CI_Controller
     $this->data['items'] = $this->stream_model->search($search, $where, $sort, $results, $comments, $limit, $current, $userId, $subscription);
     $count = $this->stream_model->search_count($search, $where, $sort, $results, $comments, $limit, $current, $userId, $subscription);
     $this->data['pages'] = ceil($count / $limit);
+    if($this->session->userdata('isLoggedIn')) { $this->data['drafts'] = $this->stream_model->drafts($this->session->userdata('userId')); }
     $this->data['title'] = "News Stream";
     if($search) { $this->data['title'] .= " [".$search."]"; }
     //print_r($this->data); die();

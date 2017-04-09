@@ -250,6 +250,9 @@
           <div class="pure-u-1 center-text bottom-margin-small">
             <button type="submit" class="pure-button pure-u-1 no-lr-padding">
               <i class="fa fa-pencil-square-o fa-9-10"></i> Publish <?php echo ucfirst($type); ?></button>
+            <?php if(!isset($id) || !$item->active): ?>
+              <input type="submit" name="draft" value="Save Draft" class="pure-button pure-u-1 no-lr-padding top-margin-xsmall grey-light-bg">
+            <?php endif; ?>
           </div>
           <?php if($type && isset($id) && $action !== 'add'): ?>
             <div class="pure-u-1 center-text">

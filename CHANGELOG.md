@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 370
+
+### Fix:
+* Line Height Stream issue
+
 ## Version 369
 
 ### Fix:

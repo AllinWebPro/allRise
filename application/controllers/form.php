@@ -131,7 +131,7 @@ class Form extends CI_Controller
       }
       if($this->data['type'] == 'headline') { $insert['notes'] = $this->db->escape_str($post['notes']); }
       if($this->data['type'] == 'article') { $insert['article'] = $this->db->escape_str(str_replace('\r', '', str_replace('\n', '', $post['article']))); }
-      if(isset($post['draft'])) { $insert['active'] = 0; }
+      if(isset($_POST['draft'])) { $insert['active'] = 0; }
       else { $insert['active'] = 1; }
       
       if($this->session->userdata('level') == 'a')
@@ -299,7 +299,7 @@ class Form extends CI_Controller
         // Update Proper Table
         if($this->data['type'] == 'headline') { $update['notes'] = $this->db->escape_str($post['notes']); }
         if($this->data['type'] == 'article') { $update['article'] = $this->db->escape_str(str_replace('\r', '', str_replace('\n', '', $post['article']))); }
-        if(isset($post['draft'])) { $update['active'] = 0; }
+        if(isset($_POST['draft'])) { $update['active'] = 0; }
         else { $update['active'] = 1; }
 
         $sInsert = array($this->data['type'].'Id' => $this->data['id'], 'userId' => $userId);

@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 371
+
+### Fix:
+* Create Draft issue
+
 ## Version 370
 
 ### Fix:

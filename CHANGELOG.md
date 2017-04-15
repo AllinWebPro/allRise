@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 372
+
+### Update:
+* Site width minimized
+* Turned off Draft Feature
+
+### Fix:
+* Sitemap Issue
+
 ## Version 371
 
 ### Fix:

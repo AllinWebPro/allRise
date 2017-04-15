@@ -15,7 +15,8 @@
     </div>
   </div>
 <?php endif; ?>
-<div id="item" class="pure-u-1 vertical-padding-small">
+<div class="pure-u-1-8"></div>
+<div id="item" class="pure-u-3-4 vertical-padding-small">
   <section class="large">
     <div class="horizontal-margin-small vertical-margin-small">
       <div class="horizontal-padding-small vertical-padding-xsmall">
@@ -628,6 +629,7 @@
     </section>
   <?php endif; ?>
 </div>
+<div class="pure-u-1-8"></div>
 <?php if($this->session->userdata('isLoggedIn')): ?>
   <div class="modal-content" id="comment-edit" title="Modify Comment">
     <form class="pure-u-1 pure-form ajax" method="post" action="<?php echo site_url($type.'/'.$id.'?comments=modify&commentId='); ?>" novalidate>

@@ -745,6 +745,12 @@ $(function() {
   });
   $(this).on('click', ".ui-widget-overlay", function(){ $(".ui-dialog-titlebar-close").trigger('click'); });
 
+  $(this).on('click', "#draft", function() {
+    console.log('test');
+    $("#active").val('0');
+    $("#item_form").submit();
+  });
+
   /*
    * Ajax Forms
    */

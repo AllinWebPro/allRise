@@ -237,6 +237,7 @@
           <input type="hidden" name="place" id="headline-place" class="pure-input-1 place-ac">
           <input type="hidden" name="placeId" id="headline-placeId">
           <input type="hidden" name="categoryId[]" id="headline-categoryId-1" value="1">
+          <input type="hidden" name="active" id="active" value="1">
           <?php if($type && isset($id) && $action !== 'add'): ?>
             <input type="hidden" name="type" value="<?php echo $type; ?>">
             <input type="hidden" name="id" value="<?php echo $id; ?>">
@@ -249,9 +250,9 @@
           <input type="hidden" name="form-page" value="1">
           <div class="pure-u-1 center-text bottom-margin-small">
             <button type="submit" class="pure-button pure-u-1 no-lr-padding">
-              <i class="fa fa-pencil-square-o fa-9-10"></i> Publish <?php echo ucfirst($type); ?></button>
+              <i class="fa fa-pencil-square-o fa-9-10"></i> Publish <?php echo ucfirst($type); ?>
             <?php if(!isset($id) || !$item->active): ?>
-              <input type="submit" name="draft" value="Save Draft" class="pure-button pure-u-1 no-lr-padding top-margin-xsmall grey-light-bg">
+              <!--<button type="button" id="draft" class="pure-button pure-u-1 no-lr-padding top-margin-xsmall grey-light-bg">Save Draft</button>-->
             <?php endif; ?>
           </div>
           <?php if($type && isset($id) && $action !== 'add'): ?>

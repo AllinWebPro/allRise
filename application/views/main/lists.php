@@ -12,7 +12,8 @@
     <?php endif; ?>
   </ul>
 </nav>
-<div id="list" class="pure-u-1 vertical-padding-small">
+<div class="pure-u-1-8"></div>
+<div id="list" class="pure-u-3-4 vertical-padding-small">
   <section id="search-filters" class="small">
     <div class="horizontal-margin-small vertical-margin-small">
       <div class="vertical-padding-xsmall horizontal-padding-small">
@@ -220,6 +221,7 @@
     </section>
   <?php endif; ?>
 </div>
+<div class="pure-u-1-8"></div>
 <script>
 if(window.jQuery) { $("#k").val($("#filter-k").val()); }
 else { document.getElementById('k').value = document.getElementById('filter-k').value; }

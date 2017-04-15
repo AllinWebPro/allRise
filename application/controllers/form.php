@@ -121,6 +121,7 @@ class Form extends CI_Controller
         'createdBy' => $userId,
         'createdOn' => $time,
         'editedBy' => $userId,
+        'active' =>  $post['active'],
         'decay' => (log10($decay + $decay) / 4) / 10
       );
       if($post['placeId']) { $insert['placeId'] = $post['placeId']; }
@@ -131,8 +132,6 @@ class Form extends CI_Controller
       }
       if($this->data['type'] == 'headline') { $insert['notes'] = $this->db->escape_str($post['notes']); }
       if($this->data['type'] == 'article') { $insert['article'] = $this->db->escape_str(str_replace('\r', '', str_replace('\n', '', $post['article']))); }
-      if(isset($_POST['draft'])) { $insert['active'] = 0; }
-      else { $insert['active'] = 1; }
       
       if($this->session->userdata('level') == 'a')
       {
@@ -193,7 +192,10 @@ class Form extends CI_Controller
       $metadata = array($this->data['type'].'Id' => $id, 'quality' => 0, 'importance' => 0);
       $metadata['credibility'] = $this->utility_model->credibility($this->data['type'], $id);
       $this->database_model->add('metadata', $metadata, 'metadataId');
-      $this->stream_model->autocompare($this->data['type'], $id);
+      if($post['active'] == 1)
+      {
+        $this->stream_model->autocompare($this->data['type'], $id);
+      }
       // Load View
       redirect($this->data['type'].'/'.$id."?n=1");
     }
@@ -275,7 +277,8 @@ class Form extends CI_Controller
         $update = array(
           'headline' => $this->db->escape_str(preg_replace('/\s+/', ' ', $post['headline'])),
           'tags' => $this->db->escape_str($this->utility_model->clean_tag_list($post['tags'])),
-          'editedBy' => $userId
+          'editedBy' => $userId,
+          'active' =>  $post['active'],
         );
         $update['decay'] = (log10(($this->data['item']->createdOn - 1385884800) + (time() - 1385884800)) / 4) / 10;
         if($this->data['place'] && $post['placeId'] == $this->data['place']->placeId)
@@ -299,8 +302,6 @@ class Form extends CI_Controller
         // Update Proper Table
         if($this->data['type'] == 'headline') { $update['notes'] = $this->db->escape_str($post['notes']); }
         if($this->data['type'] == 'article') { $update['article'] = $this->db->escape_str(str_replace('\r', '', str_replace('\n', '', $post['article']))); }
-        if(isset($_POST['draft'])) { $update['active'] = 0; }
-        else { $update['active'] = 1; }
 
         $sInsert = array($this->data['type'].'Id' => $this->data['id'], 'userId' => $userId);
         if(!$this->database_model->get_single('subscriptions', $sInsert))
@@ -337,8 +338,11 @@ class Form extends CI_Controller
         }
         //
         $this->utility_model->keywords($this->data['type'], $this->data['id'], $post['headline'], $post['tags']);
-        if($this->data['type'] == 'cluster' && !$this->data['item']->articleId) { $this->stream_model->autocompare($this->data['type'], $id); }
-        elseif($this->data['type'] == 'headline' && !$this->data['item']->clusterId) { $this->stream_model->autocompare($this->data['type'], $id); }
+        if($post['active'] == 1)
+        {
+          if($this->data['type'] == 'cluster' && !$this->data['item']->articleId) { $this->stream_model->autocompare($this->data['type'], $id); }
+          elseif($this->data['type'] == 'headline' && !$this->data['item']->clusterId) { $this->stream_model->autocompare($this->data['type'], $id); }
+        }
         // Edit Categories
         $delete = array('active' => 0, 'deleted' => 1, 'editedBy' => $userId);
         $undelete = array('active' => 1, 'deleted' => 0, 'editedBy' => $userId);
@@ -529,6 +533,7 @@ class Form extends CI_Controller
     $this->form_validation->set_rules('placeId', 'Place ID', 'trim|xss_clean');
     $this->form_validation->set_rules('categoryId[]', 'Category', 'trim|required|xss_clean');
     $this->form_validation->set_rules('tags', 'Tags', 'trim|xss_clean');
+    $this->form_validation->set_rules('active', 'Active', 'trim|integer|xss_clean');
     $this->form_validation->set_rules('image[]', 'Links', 'trim|prep_url|xss_clean');
     $this->form_validation->set_rules('add-image[]', 'Links', 'trim|prep_url|xss_clean');
     $this->form_validation->set_rules('remove-image[]', 'Links', 'trim|prep_url|xss_clean');

@@ -5,7 +5,7 @@ class Sitemap extends CI_Controller
   function __construct()
   {
     parent::__construct();
-    $this->output->set_content_type('text/xml');
+    header('Content-type: text/xml');
   }
 
   function index()
@@ -14,7 +14,7 @@ class Sitemap extends CI_Controller
     echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">';
       echo '<url>';
         echo '<loc>http:'.base_url().'</loc>';
-        echo '<lastmod>20015-02-24</lastmod>';
+        echo '<lastmod>2015-02-24</lastmod>';
         echo '<changefreq>yearly</changefreq>';
         echo '<priority>0.4</priority>';
       echo '</url>';
@@ -46,31 +46,31 @@ class Sitemap extends CI_Controller
       //
       echo '<url>';
         echo '<loc>http:'.base_url().'p/faq</loc>';
-        echo '<lastmod>20015-02-24</lastmod>';
+        echo '<lastmod>2015-02-24</lastmod>';
         echo '<changefreq>monthly</changefreq>';
         echo '<priority>0.2</priority>';
       echo '</url>';
       echo '<url>';
         echo '<loc>http:'.base_url().'p/bugs</loc>';
-        echo '<lastmod>20015-02-24</lastmod>';
+        echo '<lastmod>2015-02-24</lastmod>';
         echo '<changefreq>yearly</changefreq>';
         echo '<priority>0.2</priority>';
       echo '</url>';
       echo '<url>';
         echo '<loc>http:'.base_url().'p/contact</loc>';
-        echo '<lastmod>20015-02-24</lastmod>';
+        echo '<lastmod>2015-02-24</lastmod>';
         echo '<changefreq>yearly</changefreq>';
         echo '<priority>0.2</priority>';
       echo '</url>';
       echo '<url>';
         echo '<loc>http:'.base_url().'p/terms</loc>';
-        echo '<lastmod>20015-02-24</lastmod>';
+        echo '<lastmod>2015-02-24</lastmod>';
         echo '<changefreq>yearly</changefreq>';
         echo '<priority>0.2</priority>';
       echo '</url>';
       echo '<url>';
         echo '<loc>http:'.base_url().'p/policy</loc>';
-        echo '<lastmod>20015-02-24</lastmod>';
+        echo '<lastmod>2015-02-24</lastmod>';
         echo '<changefreq>yearly</changefreq>';
         echo '<priority>0.2</priority>';
       echo '</url>';

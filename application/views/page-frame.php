@@ -8,7 +8,8 @@
   <body>
     <?php $this->load->view('includes/main-header'); ?>
     <div id="content" class="pure-g-r" data-page="<?php echo $page; ?>">
-      <div id="notices" class="pure-u-1 vertical-padding-small">
+      <div class="pure-u-1-8"></div>
+      <div id="notices" class="pure-u-3-4 vertical-padding-small">
         <section class="small">
           <?php if($this->session->userdata('isLoggedIn')): ?>
             <div class="horizontal-margin-small vertical-margin-small bottom-margin-large">
@@ -46,6 +47,7 @@
           </div>
         </section>
       </div>
+      <div class="pure-u-1-8"></div>
     </div>
     <?php $this->load->view('includes/main-footer'); ?>
     <?php $this->load->view('includes/main-scripts'); ?>

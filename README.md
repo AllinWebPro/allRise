@@ -5,7 +5,7 @@
 * MySQL Version: 5.6+
 
 ## Version Information
-* Latest Version: 371
+* Latest Version: 372
 
 ### Citations
 1. New version system as of 361.
